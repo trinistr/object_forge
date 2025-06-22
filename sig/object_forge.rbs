@@ -1,0 +1,3 @@
+module ObjectForge
+  VERSION: String
+end

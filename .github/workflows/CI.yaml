@@ -1,0 +1,14 @@
+name: CI
+permissions:
+  contents: read
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  schedule:
+  - cron: '53 4 * * TUE'
+jobs:
+  CRuby:
+    uses: ./.github/workflows/cruby.yaml
