@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "object_forge/version"
+Dir["#{__dir__}/object_forge/**/*.rb"].each { require _1 }
 
 module ObjectForge
   class Error < StandardError; end
-  # Your code goes here...
 end
