@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "forge_dsl"
+
 module ObjectForge
   class Forge
     def initialize(forged, attributes, sequences, traits)
