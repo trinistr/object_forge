@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     object_forge (0.1.0)
+      concurrent-ruby (~> 1.2)
 
 GEM
   remote: https://rubygems.org/

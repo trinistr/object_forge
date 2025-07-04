@@ -21,8 +21,6 @@ module ObjectForge
     # @param name [Symbol] name to register forge under
     # @param forge [Forge] forge to register
     # @return [Forge] actually registered forge
-    #
-    # @since 0.1.0
     def register(name, forge)
       @forges.put_if_absent(name, forge) || forge
     end
@@ -42,8 +40,6 @@ module ObjectForge
     #   @return [Any] built instance
     #
     # @raise [KeyError] if forge with the specified name is not registered
-    #
-    # @since 0.1.0
     def forge(name, *traits, **overrides)
       forge = @forges.fetch(name)
       if traits.empty? && overrides.empty?
