@@ -45,7 +45,7 @@ end
 
 desc "Generate documentation with YARD"
 task :docs do
-  status = system "yard", "doc", ".", "--main", "README.md", "--files", "CHANGELOG.md"
+  status = system "yard", "doc", ".", "--tag", "thread_safety:Thread safety"
   exit $CHILD_STATUS.exitstatus || 1 unless status
 end
 

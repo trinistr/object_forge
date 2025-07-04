@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+# Require coverage helper first to ensure it's loaded before any other files
 require_relative "support/coverage_helper"
-require_relative "support/negated_matchers"
+
+Dir["#{__dir__}/support/**/*.rb"].each { require _1 }
 
 require "object_forge"
 
