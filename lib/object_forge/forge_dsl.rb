@@ -25,7 +25,8 @@ module ObjectForge
     #
     # @thread_safety DSL is not thread-safe.
     #   Take care not to introduce side effects in the block.
-    #   However, the returned object is frozen, so should be safe to use.
+    #   However, the instance is frozen after initialization,
+    #   so it should be safe to use.
     #
     # @yieldparam f [ForgeDSL] self
     # @yieldreturn [void]
@@ -61,9 +62,9 @@ module ObjectForge
     # @param definition [Proc] value of the attribute
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [ArgumentError] if name is not a symbol
+    # @raise [DSLError] if name is not a Symbol
     def attribute(name, &definition)
-      raise ArgumentError, "attribute name must be a symbol" unless name.is_a?(Symbol)
+      raise DSLError, "attribute name must be a Symbol" unless name.is_a?(Symbol)
 
       if @current_trait
         @traits[@current_trait][name] = definition
@@ -91,14 +92,15 @@ module ObjectForge
     # @yieldparam value [#succ] current value of the sequence to calculate attribute value
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [ArgumentError] if name is not a symbol
-    def sequence(name, initial = 1, **nil)
-      raise ArgumentError, "sequence name must be a symbol" unless name.is_a?(Symbol)
+    # @raise [DSLError] if name is not a Symbol
+    def sequence(name, initial = 1, **nil, &)
+      raise DSLError, "sequence name must be a Symbol" unless name.is_a?(Symbol)
+      raise DSLError, "initial value must respond to #succ" unless initial.respond_to?(:succ)
 
       @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
 
       if block_given?
-        attribute(name) { yield @sequences[name].next }
+        attribute(name) { instance_exec(@sequences[name].next, &) }
       else
         attribute(name) { @sequences[name].next }
       end
@@ -110,8 +112,8 @@ module ObjectForge
     #
     # @example
     #   f.trait :special do
-    #     f.name { "Special Name" }
-    #     f.sequence(:special_id) { "~~~ SpEcIaL #{special_id} ~~~" }
+    #     f.name { "***xXxSPECIALxXx***" }
+    #     f.sequence(:special_id) { "~~~ SpEcIaL #{_1} ~~~" }
     #   end
     #
     # @note Traits can not be defined inside of traits.
@@ -119,11 +121,11 @@ module ObjectForge
     # @param name [Symbol] trait name
     # @yield block for trait definition
     # @return [Symbol] trait name
-    # @raise [ArgumentError] if name is not a symbol
-    # @raise [Error] if called inside of another trait definition
+    # @raise [DSLError] if name is not a Symbol
+    # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
-      raise ArgumentError, "trait name must be a symbol" unless name.is_a?(Symbol)
-      raise Error, "can not define trait inside of another trait" if @current_trait
+      raise DSLError, "trait name must be a Symbol" unless name.is_a?(Symbol)
+      raise DSLError, "can not define trait inside of another trait" if @current_trait
 
       @current_trait = name
       @traits[name] = {}
@@ -144,11 +146,11 @@ module ObjectForge
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [NoMethodError] if a reserved name is used
+    # @raise [DSLError] if a reserved name is used
     def method_missing(name, **nil, &)
       return attribute(name, &) if respond_to_missing?(name, false)
 
-      super
+      raise DSLError, "#{name} is a reserved name"
     end
 
     def respond_to_missing?(name, _include_all)

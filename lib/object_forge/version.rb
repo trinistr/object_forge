@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module ObjectForge
-  VERSION = "0.1.0"
+  # Current version
+  VERSION = "0.0.0"
 end

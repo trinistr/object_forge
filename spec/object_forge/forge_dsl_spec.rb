@@ -37,7 +37,7 @@ module ObjectForge
 
           f.trait :useless do
             f.useless { "Useless" }
-            f.sequence(:useless_id) { "Useless #{useless}" }
+            f.sequence(:useless_id) { "Useless #{id}" }
           end
         end
       end
@@ -78,10 +78,10 @@ module ObjectForge
         expect(forge_dsl.sequences[:useless_id].initial).to eq 1
       end
 
-      specify "sequenced attributes resolve to expected values", pending: "error in a block" do
+      specify "sequenced attributes resolve to expected values" do
         expect(evaluate(forge_dsl.attributes[:id])).to eq 100_000
         expect(evaluate(forge_dsl.attributes[:reused])).to eq 35
-        expect(evaluate(forge_dsl.attributes[:dated])).to eq "#{Date.today}/100000"
+        expect(evaluate(forge_dsl.attributes[:dated])).to eq "#{Date.today}/100001"
       end
 
       it "contains traits with their attributes" do
@@ -94,12 +94,12 @@ module ObjectForge
         expect(forge_dsl.traits[:useless].values).to all be_a Proc
       end
 
-      it "overrides attributes in traits", pending: "error in a block" do
+      it "overrides attributes in traits" do
         expect(evaluate(forge_dsl.traits[:special][:id])).to eq "~~~ SpEcIaL ~~~"
         expect(evaluate(forge_dsl.traits[:special][:name])).to eq "Special Name"
 
         expect(evaluate(forge_dsl.traits[:useless][:useless])).to eq "Useless"
-        expect(evaluate(forge_dsl.traits[:useless][:useless_id])).to eq "Useless 1"
+        expect(evaluate(forge_dsl.traits[:useless][:useless_id])).to eq "Useless 100000"
       end
     end
   end
