@@ -3,16 +3,33 @@
 require_relative "forge_dsl"
 
 module ObjectForge
+  # Object instantitation forge.
+  #
+  # @since 0.1.0
   class Forge
-    def initialize(forged, attributes, sequences, traits)
+    # @return [Symbol] forge name
+    attr_reader :name
+
+    # @return [Class] class to forge
+    attr_reader :forged
+
+    # @param forged [Class] class to forge
+    # @param name [Symbol] forge name
+    # @yieldparam f [ForgeDSL] forge DSL
+    # @yieldreturn [void]
+    def initialize(forged, name: nil, &)
       @forged = forged
-      @attributes = attributes
-      @sequences = sequences
-      @traits = traits
+      @name = name
+      @parameters = ForgeDSL.new(&)
     end
 
+    # Forge a new instance.
+    #
+    # @param traits [Array<Symbol>] traits to apply
+    # @param overrides [Hash{Symbol => Any}] attribute overrides
+    # @return [Any] built instance
     def forge(*traits, **overrides)
-      forged.new(@attributes.merge(*@traits.values_at(*traits), overrides))
+      raise NotImplementedError
     end
 
     alias [] forge
