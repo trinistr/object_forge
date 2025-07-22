@@ -1,22 +1,31 @@
 # frozen_string_literal: true
 
 module ObjectForge
+  # Melting pot for the forged object's attributes.
+  #
+  # @since 0.1.0
   class Crucible
-    def initialize(attributes, sequences)
+    # @param attributes [Hash{Symbol => Proc}]
+    #   initial attributes; will be modified directly
+    def initialize(attributes)
       @attributes = attributes
-      @sequences = sequences
     end
 
+    # Resolve all attributes by calling their procs,
+    # using +self+ as the evaluation context.
+    #
+    # @return [Hash{Symbol => Any}]
     def resolve!
-      @attributes.each do |name, definition|
-        @attributes[name] = instance_eval(&definition) if definition.is_a?(Proc)
-      end
-
+      @attributes.each_key { |name| method_missing(name) }
       @attributes
     end
 
     private
 
+    # Get the value of the attribute +name+.
+    #
+    # @param name [Symbol]
+    # @return [Any]
     def method_missing(name)
       if @attributes.key?(name)
         if @attributes[name].is_a?(Proc)

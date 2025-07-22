@@ -7,7 +7,6 @@ module ObjectForge
     let(:attribute_context) do
       Object.new.tap do |o|
         o.instance_variable_set(:@attributes, forge_dsl.attributes)
-        o.instance_variable_set(:@sequences, forge_dsl.sequences)
         # rubocop:disable RSpec/InstanceVariable, ThreadSafety/ClassInstanceVariable
         def o.method_missing(name) = @attributes[name].call
         def o.respond_to_missing?(_name, _include_private = false) = true

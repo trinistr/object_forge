@@ -11,7 +11,7 @@ module ObjectForge
     # @return [Class] class to forge
     attr_reader :forged
 
-    # @return [Symbol, name] forge name
+    # @return [Symbol, nil] forge name
     attr_reader :name
 
     # @param forged [Class] class to forge
@@ -35,8 +35,8 @@ module ObjectForge
     def forge(*traits, **overrides)
       traits, overrides = check_traits_and_overrides(traits, overrides)
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
-      attributes = Crucible.new(attributes, @parameters.sequences).resolve!
-      
+      attributes = Crucible.new(attributes).resolve!
+
       forged.new(attributes)
     end
 

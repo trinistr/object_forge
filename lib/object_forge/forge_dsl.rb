@@ -38,10 +38,19 @@ module ObjectForge
 
       yield self
 
+      freeze
+    end
+
+    # Freezes the instance, including +attributes+ and +traits+.
+    #
+    # Called automatically in {#initialize}.
+    #
+    # @return [self]
+    def freeze
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
-      freeze
+      super
     end
 
     # Define an attribute, possibly transient.
@@ -56,15 +65,16 @@ module ObjectForge
     #   f.duration { rand(1000) }
     # @example using external sequence
     #   seq = Sequence.new(1)
-    #   f.global_id { seq.succ }
+    #   f.sequence(:global_id, seq)
     #
     # @param name [Symbol] attribute name
-    # @param definition [Proc] value of the attribute
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [DSLError] if name is not a Symbol
+    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [ArgumentError] if no block is given
     def attribute(name, &definition)
-      raise DSLError, "attribute name must be a Symbol" unless name.is_a?(Symbol)
+      raise ArgumentError, "attribute name must be a Symbol" unless name.is_a?(Symbol)
+      raise ArgumentError, "attribute definition requires a block" unless block_given?
 
       if @current_trait
         @traits[@current_trait][name] = definition
@@ -92,17 +102,18 @@ module ObjectForge
     # @yieldparam value [#succ] current value of the sequence to calculate attribute value
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [DSLError] if name is not a Symbol
+    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
-      raise DSLError, "sequence name must be a Symbol" unless name.is_a?(Symbol)
+      raise ArgumentError, "sequence name must be a Symbol" unless name.is_a?(Symbol)
       raise DSLError, "initial value must respond to #succ" unless initial.respond_to?(:succ)
 
-      @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
+      seq = @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
 
       if block_given?
-        attribute(name) { instance_exec(@sequences[name].next, &) }
+        attribute(name) { instance_exec(seq.next, &) }
       else
-        attribute(name) { @sequences[name].next }
+        attribute(name) { seq.next }
       end
 
       name
@@ -121,10 +132,10 @@ module ObjectForge
     # @param name [Symbol] trait name
     # @yield block for trait definition
     # @return [Symbol] trait name
-    # @raise [DSLError] if name is not a Symbol
+    # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
-      raise DSLError, "trait name must be a Symbol" unless name.is_a?(Symbol)
+      raise ArgumentError, "trait name must be a Symbol" unless name.is_a?(Symbol)
       raise DSLError, "can not define trait inside of another trait" if @current_trait
 
       @current_trait = name
@@ -146,7 +157,7 @@ module ObjectForge
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
-    # @raise [DSLError] if a reserved name is used
+    # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, **nil, &)
       return attribute(name, &) if respond_to_missing?(name, false)
 

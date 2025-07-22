@@ -9,14 +9,15 @@ require "ostruct"
 gem_name = File.basename(Dir["*.rb", base: "#{__dir__}/../lib"].first)
 require gem_name
 
-$forge = ObjectForge::Forge.new(OpenStruct) do |f|
-  f.foo { bar + 1 }
-  f.sequence(:bar) { _1}
+FORGE =
+  ObjectForge::Forge.new(OpenStruct) do |f| # rubocop:disable Style/OpenStructUse
+    f.foo { bar - 1 }
+    f.sequence(:bar)
 
-  f.trait :zero do
-    f.foo { 0 }
+    f.trait :zero do
+      f.foo { 0 }
+    end
   end
-end
 
 # Start interactive console
 require "irb"
