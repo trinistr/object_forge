@@ -5,8 +5,7 @@ module ObjectForge
   #
   # @since 0.1.0
   class Crucible
-    # @param attributes [Hash{Symbol => Proc}]
-    #   initial attributes; will be modified directly
+    # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)
       @attributes = attributes
     end
@@ -14,7 +13,12 @@ module ObjectForge
     # Resolve all attributes by calling their procs,
     # using +self+ as the evaluation context.
     #
-    # @return [Hash{Symbol => Any}]
+    # @note This method destructively modifies initial attributes.
+    #
+    # @thread_safety Resolving attributes modifies instance variables,
+    #   therefore making it unsafe to use in a concurrent environment.
+    #
+    # @return [Hash{Symbol => Any}] resolved attributes
     def resolve!
       @attributes.each_key { |name| method_missing(name) }
       @attributes
@@ -29,7 +33,7 @@ module ObjectForge
     def method_missing(name)
       if @attributes.key?(name)
         if @attributes[name].is_a?(Proc)
-          @attributes[name] = instance_eval(&@attributes[name])
+          @attributes[name] = instance_exec(&@attributes[name])
         else
           @attributes[name]
         end
