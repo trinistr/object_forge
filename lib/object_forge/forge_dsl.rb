@@ -13,15 +13,12 @@ module ObjectForge
       define_method(m, ::Object.instance_method(m))
     end
 
-    # @api private
     # @return [Hash{Symbol => Proc}] frozen hash
     attr_reader :attributes
 
-    # @api private
     # @return [Hash{Symbol => Sequence}] frozen hash
     attr_reader :sequences
 
-    # @api private
     # @return [Hash{Symbol => Hash{Symbol => Proc}}] frozen hash of frozen hashes
     attr_reader :traits
 
@@ -38,7 +35,6 @@ module ObjectForge
       @attributes = {}
       @sequences = {}
       @traits = {}
-      @current_trait = nil
 
       yield self
 
@@ -72,11 +68,12 @@ module ObjectForge
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
+    #
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if no block is given
     def attribute(name, &definition)
-      raise ::ArgumentError, "attribute name must be a Symbol" unless name.is_a?(::Symbol)
-      raise DSLError, "attribute definition requires a block" unless block_given?
+      raise ::ArgumentError, "attribute name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
+      raise DSLError, "attribute definition requires a block (in #{name.inspect})" unless block_given?
 
       if @current_trait
         @traits[@current_trait][name] = definition
@@ -92,7 +89,8 @@ module ObjectForge
     # Define an attribute, using a sequence.
     #
     # +name+ is used for both attribute and sequence, for the whole forge.
-    # If the name was used for a sequence previously, it will not be redefined in traits.
+    # If the name was used for a sequence previously,
+    # the sequence will not be redefined on subsequent calls.
     #
     # @example
     #   f.sequence(:date, Date.today)
@@ -101,17 +99,23 @@ module ObjectForge
     # @example using external sequence
     #   seq = Sequence.new(1)
     #   f.sequence(:global_id, seq)
+    # @example sequence reuse
+    #   f.sequence(:id, "a") # => "a", "b", ...
+    #   f.trait :new_id do
+    #     f.sequence(:id) { |n| n * 2 } # => "aa", "bb", ...
+    #   end
     #
     # @param name [Symbol] attribute name
     # @param initial [Sequence, #succ] existing sequence, or initial value for a new sequence
     # @yieldparam value [#succ] current value of the sequence to calculate attribute value
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
+    #
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
-      raise ::ArgumentError, "sequence name must be a Symbol" unless name.is_a?(::Symbol)
-      raise DSLError, "initial value must respond to #succ" unless initial.respond_to?(:succ)
+      raise ::ArgumentError, "sequence name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
+      raise DSLError, "initial value must respond to #succ, #{initial.class} given (in #{name.inspect})" unless initial.respond_to?(:succ)
 
       seq = @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
 
@@ -137,11 +141,14 @@ module ObjectForge
     # @param name [Symbol] trait name
     # @yield block for trait definition
     # @return [Symbol] trait name
+    #
     # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [DSLError] if no block is given
     # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
-      raise ::ArgumentError, "trait name must be a Symbol" unless name.is_a?(::Symbol)
-      raise DSLError, "can not define trait inside of another trait" if @current_trait
+      raise ::ArgumentError, "trait name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
+      raise DSLError, "trait definition requires a block (in #{name.inspect})" unless block_given?
+      raise DSLError, "can not define trait inside of another trait (in #{name.inspect})" if @current_trait
 
       @current_trait = name
       @traits[name] = {}
@@ -157,7 +164,7 @@ module ObjectForge
     # Define an attribute using a shorthand.
     #
     # Can not be used to define attributes with reserved names.
-    # Trying to use a conflicting name will lead to usual errors
+    # Trying to use a conflicting name will lead to usual issues
     # with calling random methods.
     # When in doubt, use {#attribute} or {#[]} instead.
     #
@@ -169,11 +176,12 @@ module ObjectForge
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
+    #
     # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, **nil, &)
       return attribute(name, &) if respond_to_missing?(name, false)
 
-      raise DSLError, "#{name} is a reserved name"
+      raise DSLError, "#{name.inspect} is a reserved name (in #{name.inspect})"
     end
 
     def respond_to_missing?(name, _include_all)

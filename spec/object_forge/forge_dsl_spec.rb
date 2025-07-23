@@ -15,7 +15,7 @@ module ObjectForge
     end
 
     def evaluate(proc)
-      attribute_context.instance_eval(&proc)
+      attribute_context.instance_exec(&proc)
     end
 
     describe "full example" do
@@ -26,7 +26,7 @@ module ObjectForge
           f.duration { rand(1000) }
 
           f.sequence(:id, 100_000)
-          f.sequence(:reused, Sequence.new(35))
+          f.sequence(:external, Sequence.new(35))
           f.sequence(:dated, Date.today) { |d| "#{d}/#{id}" }
 
           f.trait :special do
@@ -54,7 +54,7 @@ module ObjectForge
 
       it "contains root attributes, including sequenced ones" do
         expect(forge_dsl.attributes.keys).to contain_exactly(
-          :name, :description, :duration, :id, :reused, :dated
+          :name, :description, :duration, :id, :external, :dated
         )
         expect(forge_dsl.attributes.values).to all be_a Proc
       end
@@ -66,20 +66,20 @@ module ObjectForge
       end
 
       it "contains all sequences" do
-        expect(forge_dsl.sequences.keys).to contain_exactly(:id, :reused, :dated, :useless_id)
+        expect(forge_dsl.sequences.keys).to contain_exactly(:id, :external, :dated, :useless_id)
         expect(forge_dsl.sequences.values).to all be_a Sequence
       end
 
       specify "all sequences use expected initial values" do
         expect(forge_dsl.sequences[:id].initial).to eq 100_000
-        expect(forge_dsl.sequences[:reused].initial).to eq 35
+        expect(forge_dsl.sequences[:external].initial).to eq 35
         expect(forge_dsl.sequences[:dated].initial).to eq Date.today
         expect(forge_dsl.sequences[:useless_id].initial).to eq 1
       end
 
       specify "sequenced attributes resolve to expected values" do
         expect(evaluate(forge_dsl.attributes[:id])).to eq 100_000
-        expect(evaluate(forge_dsl.attributes[:reused])).to eq 35
+        expect(evaluate(forge_dsl.attributes[:external])).to eq 35
         expect(evaluate(forge_dsl.attributes[:dated])).to eq "#{Date.today}/100001"
       end
 
@@ -99,6 +99,229 @@ module ObjectForge
 
         expect(evaluate(forge_dsl.traits[:useless][:useless])).to eq "Useless"
         expect(evaluate(forge_dsl.traits[:useless][:useless_id])).to eq "Useless 100000"
+      end
+    end
+
+    describe "#attribute" do
+      context "with valid attribute definition" do
+        let(:definition) { proc { |f| f.attribute(:attr_1) { "Name" } } }
+
+        it "defines an attribute Proc" do
+          expect(forge_dsl.attributes[:attr_1]).to be_a Proc
+
+          expect(forge_dsl.attributes[:attr_1].call).to eq "Name"
+          # Does not change between calls
+          expect(forge_dsl.attributes[:attr_1].call).to eq "Name"
+        end
+
+        context "with a reserved name" do
+          let(:definition) do
+            proc do |f|
+              f.attribute(:attr?) { "Name?" }
+              f.attribute(:attr!) { "Name!" }
+              f.attribute(:attr=) { "Name=" }
+              f.attribute(:`) { "`Name`" }
+            end
+          end
+
+          it "defines an attribute successfully" do
+            expect(forge_dsl.attributes[:attr?].call).to eq "Name?"
+            expect(forge_dsl.attributes[:attr!].call).to eq "Name!"
+            expect(forge_dsl.attributes[:attr=].call).to eq "Name="
+            expect(forge_dsl.attributes[:`].call).to eq "`Name`"
+          end
+        end
+      end
+
+      context "when attribute name is not a Symbol" do
+        let(:definition) { proc { |f| f.attribute("attr_string") { "Name" } } }
+
+        it "raises ArgumentError on definition" do
+          expect { forge_dsl }.to raise_error ArgumentError, "attribute name must be a Symbol, String given (in \"attr_string\")"
+        end
+      end
+
+      context "when no block is given" do
+        let(:definition) { proc { |f| f.attribute(:attr_invalid) } }
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error DSLError, "attribute definition requires a block (in :attr_invalid)"
+        end
+      end
+    end
+
+    include_examples "has an alias", :[], :attribute
+
+    describe "#sequence" do
+      context "with valid, plain sequence definition" do
+        let(:definition) { proc { |f| f.sequence(:seq_1) } }
+
+        it "defines a sequence and an attribute" do
+          expect(forge_dsl.sequences[:seq_1]).to be_a Sequence
+          expect(forge_dsl.attributes[:seq_1]).to be_a Proc
+
+          expect(forge_dsl.attributes[:seq_1].call).to eq 1
+          expect(forge_dsl.attributes[:seq_1].call).to eq 2
+        end
+      end
+
+      context "with an initial value" do
+        let(:definition) { proc { |f| f.sequence(:seq_2, "a") } }
+
+        it "defines a sequence and an attribute with a custom value" do
+          expect(forge_dsl.sequences[:seq_2]).to be_a Sequence
+          expect(forge_dsl.attributes[:seq_2]).to be_a Proc
+
+          expect(forge_dsl.attributes[:seq_2].call).to eq "a"
+          expect(forge_dsl.attributes[:seq_2].call).to eq "b"
+        end
+
+        context "with a Sequence as initial value" do
+          let(:definition) { proc { |f| f.sequence(:seq_2a, sequence) } }
+          let(:sequence) { Sequence.new("a") }
+
+          before { sequence.next }
+
+          it "defines a sequence and an attribute with an externally sequenced value" do
+            expect(forge_dsl.sequences[:seq_2a]).to be_a Sequence
+            expect(forge_dsl.attributes[:seq_2a]).to be_a Proc
+
+            expect(forge_dsl.attributes[:seq_2a].call).to eq "b"
+            sequence.next
+            expect(forge_dsl.attributes[:seq_2a].call).to eq "d"
+          end
+        end
+      end
+
+      context "with a block" do
+        let(:definition) { proc { |f| f.sequence(:seq_3) { |n| n.to_s } } }
+
+        it "defines a sequence and an attribute with a transformed value" do
+          expect(forge_dsl.sequences[:seq_3]).to be_a Sequence
+          expect(forge_dsl.attributes[:seq_3]).to be_a Proc
+
+          expect(forge_dsl.attributes[:seq_3].call).to eq "1"
+          expect(forge_dsl.attributes[:seq_3].call).to eq "2"
+        end
+      end
+
+      context "when attribute name is not a Symbol" do
+        let(:definition) { proc { |f| f.sequence(15) } }
+
+        it "raises ArgumentError on definition" do
+          expect { forge_dsl }.to raise_error ArgumentError, "sequence name must be a Symbol, Integer given (in 15)"
+        end
+      end
+
+      context "when initial value is not a Sequence and does not respond to #succ" do
+        let(:definition) { proc { |f| f.sequence(:seq_invalid, -> { "a" }) } }
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error DSLError, "initial value must respond to #succ, Proc given (in :seq_invalid)"
+        end
+      end
+    end
+
+    describe "#trait" do
+      context "with valid trait definition" do
+        let(:definition) do
+          proc do |f|
+            f.attribute(:attr_1) { "Name" }
+            f.trait(:trait_1) do
+              f.attribute(:attr_1) { "Eman" }
+            end
+          end
+        end
+
+        it "defines a trait, overriding attributes" do
+          expect(forge_dsl.attributes[:attr_1].call).to eq "Name"
+          expect(forge_dsl.traits[:trait_1]).to be_a Hash
+          expect(forge_dsl.traits[:trait_1][:attr_1].call).to eq "Eman"
+        end
+      end
+
+      context "when trait name is not a Symbol" do
+        let(:definition) { proc { |f| f.trait("trait_string") } }
+
+        it "raises ArgumentError on definition" do
+          expect { forge_dsl }.to raise_error ArgumentError, "trait name must be a Symbol, String given (in \"trait_string\")"
+        end
+      end
+
+      context "when called inside of another trait" do
+        let(:definition) do
+          proc do |f|
+            f.trait(:trait_1) do
+              f.trait(:trait_2) { f.attribute(:attr_unreachable) { "Name" } }
+            end
+          end
+        end
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error DSLError, "can not define trait inside of another trait (in :trait_2)"
+        end
+      end
+
+      context "when no block is given" do
+        let(:definition) { proc { |f| f.trait(:trait_invalid) } }
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error DSLError, "trait definition requires a block (in :trait_invalid)"
+        end
+      end
+    end
+
+    describe "#method_missing" do
+      context "when called with a non-reserved not-defined name" do
+        let(:definition) { proc { |f| f.non_reserved_name { "nAME" } } }
+
+        it "defines corresponding attribute" do
+          expect(forge_dsl.attributes[:non_reserved_name].call).to eq "nAME"
+        end
+      end
+
+      context "when called with a reserved name" do
+        %i[name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~].each do |reserved_name|
+          context "##{reserved_name}" do
+            let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }
+
+            it "raises DSLError on definition" do
+              expect { forge_dsl }.to raise_error DSLError, "#{reserved_name.inspect} is a reserved name (in #{reserved_name.inspect})"
+            end
+          end
+        end
+      end
+
+      context "when called with a conflicting name" do
+        let(:definition) { proc { |f| f.raise { "Name!!!" } } }
+
+        it "behaves in an undefined manner" do
+          expect { forge_dsl }.to raise_error RuntimeError
+        end
+      end
+    end
+
+    describe "#respond_to?" do
+      let(:definition) { proc { nil } }
+
+      it "returns true if the method is defined" do
+        expect(forge_dsl.respond_to?(:attribute)).to be true
+      end
+
+      it "returns true if the name is not reserved" do
+        expect(forge_dsl.respond_to?(:nnasd_kjbksadk)).to be true
+      end
+
+      context "when called with a reserved name" do
+        %i[name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~].each do |reserved_name|
+          context "##{reserved_name}" do
+            let(:definition) { proc { nil } }
+
+            it "returns false" do
+              expect(forge_dsl.respond_to?(reserved_name)).to be false
+            end
+          end
+        end
       end
     end
   end
