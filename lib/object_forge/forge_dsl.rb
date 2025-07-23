@@ -8,7 +8,11 @@ module ObjectForge
   # @note This class is not intended to be used directly.
   #
   # @since 0.1.0
-  class ForgeDSL
+  class ForgeDSL < ::BasicObject
+    %i[block_given? frozen? respond_to? raise].each do |m|
+      define_method(m, ::Object.instance_method(m))
+    end
+
     # @api private
     # @return [Hash{Symbol => Proc}] frozen hash
     attr_reader :attributes
@@ -41,7 +45,7 @@ module ObjectForge
       freeze
     end
 
-    # Freezes the instance, including +attributes+ and +traits+.
+    # Freezes the instance, including +attributes+, +sequences+ and +traits+.
     #
     # Called automatically in {#initialize}.
     #
@@ -50,31 +54,29 @@ module ObjectForge
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
-      super
+      ::Object.instance_method(:freeze).bind_call(self)
     end
 
     # Define an attribute, possibly transient.
     #
-    # You can refer to any other attribute inside the attribute definition block.
-    # It is also possible to define attributes using {#method_missing} shortcut,
+    # It is also possible to define attributes using +method_missing+ shortcut,
     # except for conflicting or reserved names.
+    #
+    # You can refer to any other attribute inside the attribute definition block.
     #
     # @example
     #   f.attribute(:name) { "Name" }
     #   f[:description] { name.downcase }
     #   f.duration { rand(1000) }
-    # @example using external sequence
-    #   seq = Sequence.new(1)
-    #   f.sequence(:global_id, seq)
     #
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
     # @raise [ArgumentError] if +name+ is not a Symbol
-    # @raise [ArgumentError] if no block is given
+    # @raise [DSLError] if no block is given
     def attribute(name, &definition)
-      raise ArgumentError, "attribute name must be a Symbol" unless name.is_a?(Symbol)
-      raise ArgumentError, "attribute definition requires a block" unless block_given?
+      raise ::ArgumentError, "attribute name must be a Symbol" unless name.is_a?(::Symbol)
+      raise DSLError, "attribute definition requires a block" unless block_given?
 
       if @current_trait
         @traits[@current_trait][name] = definition
@@ -96,6 +98,9 @@ module ObjectForge
     #   f.sequence(:date, Date.today)
     #   f.sequence(:id) { _1.to_s }
     #   f.sequence(:dated_id, 10) { |n| "#{Date.today}/#{n}-#{id}" }
+    # @example using external sequence
+    #   seq = Sequence.new(1)
+    #   f.sequence(:global_id, seq)
     #
     # @param name [Symbol] attribute name
     # @param initial [Sequence, #succ] existing sequence, or initial value for a new sequence
@@ -105,7 +110,7 @@ module ObjectForge
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
-      raise ArgumentError, "sequence name must be a Symbol" unless name.is_a?(Symbol)
+      raise ::ArgumentError, "sequence name must be a Symbol" unless name.is_a?(::Symbol)
       raise DSLError, "initial value must respond to #succ" unless initial.respond_to?(:succ)
 
       seq = @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
@@ -135,7 +140,7 @@ module ObjectForge
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
-      raise ArgumentError, "trait name must be a Symbol" unless name.is_a?(Symbol)
+      raise ::ArgumentError, "trait name must be a Symbol" unless name.is_a?(::Symbol)
       raise DSLError, "can not define trait inside of another trait" if @current_trait
 
       @current_trait = name
@@ -151,8 +156,15 @@ module ObjectForge
 
     # Define an attribute using a shorthand.
     #
-    # Does not allow to define attributes with names ending with +?+, +!+ or +=+,
-    # use {#attribute} or {#[]} instead.
+    # Can not be used to define attributes with reserved names.
+    # Trying to use a conflicting name will lead to usual errors
+    # with calling random methods.
+    # When in doubt, use {#attribute} or {#[]} instead.
+    #
+    # Reserved names are:
+    # - all names ending in +?+, +!+ or +=+
+    # - all names starting with a non-word ASCII character
+    #   (operators, +`+, +[]+, +[]=+)
     #
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
@@ -165,11 +177,7 @@ module ObjectForge
     end
 
     def respond_to_missing?(name, _include_all)
-      if name.end_with?("?", "!", "=")
-        super
-      else
-        true
-      end
+      !name.end_with?("?", "!", "=") && !name.match?(/\A(?=\p{ASCII})\P{Word}/)
     end
   end
 end
