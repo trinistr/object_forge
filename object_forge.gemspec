@@ -6,7 +6,6 @@ Gem::Specification.new do |spec|
   spec.name = "object_forge"
   spec.version = ObjectForge::VERSION
   spec.authors = ["Alexandr Bulancov"]
-  spec.email = ["6594487+trinistr@users.noreply.github.com"]
 
   spec.homepage = "https://github.com/trinistr/#{spec.name}"
   spec.license = "MIT"
