@@ -137,7 +137,10 @@ module ObjectForge
         let(:definition) { proc { |f| f.attribute("attr_string") { "Name" } } }
 
         it "raises ArgumentError on definition" do
-          expect { forge_dsl }.to raise_error ArgumentError, "attribute name must be a Symbol, String given (in \"attr_string\")"
+          expect { forge_dsl }.to raise_error(
+            ArgumentError,
+            "attribute name must be a Symbol, String given (in \"attr_string\")"
+          )
         end
       end
 
@@ -145,7 +148,10 @@ module ObjectForge
         let(:definition) { proc { |f| f.attribute(:attr_invalid) } }
 
         it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error DSLError, "attribute definition requires a block (in :attr_invalid)"
+          expect { forge_dsl }.to raise_error(
+            DSLError,
+            "attribute definition requires a block (in :attr_invalid)"
+          )
         end
       end
     end
@@ -209,15 +215,21 @@ module ObjectForge
         let(:definition) { proc { |f| f.sequence(15) } }
 
         it "raises ArgumentError on definition" do
-          expect { forge_dsl }.to raise_error ArgumentError, "sequence name must be a Symbol, Integer given (in 15)"
+          expect { forge_dsl }.to raise_error(
+            ArgumentError,
+            "sequence name must be a Symbol, Integer given (in 15)"
+          )
         end
       end
 
       context "when initial value is not a Sequence and does not respond to #succ" do
         let(:definition) { proc { |f| f.sequence(:seq_invalid, -> { "a" }) } }
 
-        it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error DSLError, "initial value must respond to #succ, Proc given (in :seq_invalid)"
+        it "raises ArgumentError on definition (proxied from Sequence)" do
+          expect { forge_dsl }.to raise_error(
+            ArgumentError,
+            "initial value must respond to #succ, Proc given"
+          )
         end
       end
     end
@@ -227,9 +239,7 @@ module ObjectForge
         let(:definition) do
           proc do |f|
             f.attribute(:attr_1) { "Name" }
-            f.trait(:trait_1) do
-              f.attribute(:attr_1) { "Eman" }
-            end
+            f.trait(:trait_1) { f.attribute(:attr_1) { "Eman" } }
           end
         end
 
@@ -244,21 +254,25 @@ module ObjectForge
         let(:definition) { proc { |f| f.trait("trait_string") } }
 
         it "raises ArgumentError on definition" do
-          expect { forge_dsl }.to raise_error ArgumentError, "trait name must be a Symbol, String given (in \"trait_string\")"
+          expect { forge_dsl }.to raise_error(
+            ArgumentError,
+            "trait name must be a Symbol, String given (in \"trait_string\")"
+          )
         end
       end
 
       context "when called inside of another trait" do
         let(:definition) do
           proc do |f|
-            f.trait(:trait_1) do
-              f.trait(:trait_2) { f.attribute(:attr_unreachable) { "Name" } }
-            end
+            f.trait(:trait_1) { f.trait(:trait_2) { f.attribute(:attr_unreachable) { "Name" } } }
           end
         end
 
         it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error DSLError, "can not define trait inside of another trait (in :trait_2)"
+          expect { forge_dsl }.to raise_error(
+            DSLError,
+            "can not define trait inside of another trait (in :trait_2)"
+          )
         end
       end
 
@@ -266,7 +280,10 @@ module ObjectForge
         let(:definition) { proc { |f| f.trait(:trait_invalid) } }
 
         it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error DSLError, "trait definition requires a block (in :trait_invalid)"
+          expect { forge_dsl }.to raise_error(
+            DSLError,
+            "trait definition requires a block (in :trait_invalid)"
+          )
         end
       end
     end
@@ -281,12 +298,17 @@ module ObjectForge
       end
 
       context "when called with a reserved name" do
-        %i[name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~].each do |reserved_name|
-          context "##{reserved_name}" do
+        %i[
+          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
+        ].each do |reserved_name|
+          describe "##{reserved_name}" do
             let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }
 
             it "raises DSLError on definition" do
-              expect { forge_dsl }.to raise_error DSLError, "#{reserved_name.inspect} is a reserved name (in #{reserved_name.inspect})"
+              expect { forge_dsl }.to raise_error(
+                DSLError,
+                "#{reserved_name.inspect} is a reserved name (in #{reserved_name.inspect})"
+              )
             end
           end
         end
@@ -302,7 +324,7 @@ module ObjectForge
     end
 
     describe "#respond_to?" do
-      let(:definition) { proc { nil } }
+      let(:definition) { proc {} }
 
       it "returns true if the method is defined" do
         expect(forge_dsl.respond_to?(:attribute)).to be true
@@ -313,9 +335,11 @@ module ObjectForge
       end
 
       context "when called with a reserved name" do
-        %i[name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~].each do |reserved_name|
-          context "##{reserved_name}" do
-            let(:definition) { proc { nil } }
+        %i[
+          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
+        ].each do |reserved_name|
+          describe "##{reserved_name}" do
+            let(:definition) { proc {} }
 
             it "returns false" do
               expect(forge_dsl.respond_to?(reserved_name)).to be false

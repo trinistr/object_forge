@@ -7,6 +7,16 @@ module ObjectForge
   #
   # @since 0.1.0
   class Sequence
+    # Return a new sequence, or +initial+ if it's already a sequence.
+    #
+    # @param initial [#succ, Sequence]
+    # @return [Sequence]
+    def self.new(initial, ...)
+      return initial if initial.is_a?(Sequence)
+
+      super
+    end
+
     # @return [#succ] initial value for the sequence
     attr_reader :initial
 
@@ -14,7 +24,13 @@ module ObjectForge
     #   or the results will be unpredicatable. Consider always passing a frozen value.
     #
     # @param initial [#succ] initial value for the sequence
+    #
+    # @raise [ArgumentError] if +initial+ does not respond to #succ
     def initialize(initial)
+      unless initial.respond_to?(:succ)
+        raise ArgumentError, "initial value must respond to #succ, #{initial.class} given"
+      end
+
       @initial = initial
       @container = Concurrent::MVar.new(initial)
     end
@@ -25,11 +41,9 @@ module ObjectForge
     #   so no duplicate values will be returned.
     #
     # @return [#succ] next value
-    def succ
+    def next
       @container.modify(&:succ)
     end
-
-    alias next succ
 
     # Reset the sequence to its {#initial} value.
     #

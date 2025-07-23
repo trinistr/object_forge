@@ -72,8 +72,13 @@ module ObjectForge
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if no block is given
     def attribute(name, &definition)
-      raise ::ArgumentError, "attribute name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
-      raise DSLError, "attribute definition requires a block (in #{name.inspect})" unless block_given?
+      unless ::Symbol === name
+        raise ::ArgumentError,
+              "attribute name must be a Symbol, #{name.class} given (in #{name.inspect})"
+      end
+      unless block_given?
+        raise DSLError, "attribute definition requires a block (in #{name.inspect})"
+      end
 
       if @current_trait
         @traits[@current_trait][name] = definition
@@ -114,10 +119,12 @@ module ObjectForge
     # @raise [ArgumentError] if +name+ is not a Symbol
     # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
-      raise ::ArgumentError, "sequence name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
-      raise DSLError, "initial value must respond to #succ, #{initial.class} given (in #{name.inspect})" unless initial.respond_to?(:succ)
+      unless ::Symbol === name
+        raise ::ArgumentError,
+              "sequence name must be a Symbol, #{name.class} given (in #{name.inspect})"
+      end
 
-      seq = @sequences[name] ||= initial.is_a?(Sequence) ? initial : Sequence.new(initial)
+      seq = @sequences[name] ||= Sequence.new(initial)
 
       if block_given?
         attribute(name) { instance_exec(seq.next, &) }
@@ -146,9 +153,14 @@ module ObjectForge
     # @raise [DSLError] if no block is given
     # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
-      raise ::ArgumentError, "trait name must be a Symbol, #{name.class} given (in #{name.inspect})" unless name.is_a?(::Symbol)
+      unless ::Symbol === name
+        raise ::ArgumentError,
+              "trait name must be a Symbol, #{name.class} given (in #{name.inspect})"
+      end
+      if @current_trait
+        raise DSLError, "can not define trait inside of another trait (in #{name.inspect})"
+      end
       raise DSLError, "trait definition requires a block (in #{name.inspect})" unless block_given?
-      raise DSLError, "can not define trait inside of another trait (in #{name.inspect})" if @current_trait
 
       @current_trait = name
       @traits[name] = {}

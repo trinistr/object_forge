@@ -24,7 +24,10 @@ module ObjectForge
         let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bard } } }
 
         it "raises NameError" do
-          expect { crucible.resolve! }.to raise_error NameError, "undefined local variable or method 'bard' for an instance of ObjectForge::Crucible"
+          expect { crucible.resolve! }.to raise_error(
+            NameError,
+            /\Aundefined local variable or method ['`]bard'/
+          )
         end
       end
     end
