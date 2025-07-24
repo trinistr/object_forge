@@ -9,8 +9,11 @@ require "ostruct"
 gem_name = File.basename(Dir["*.rb", base: "#{__dir__}/../lib"].first)
 require gem_name
 
+FoobarStruct = Struct.new(:foo, :bar, keyword_init: true)
+
+FORGEYARD = ObjectForge::Forgeyard.new
 FORGE =
-  ObjectForge::Forge.define(OpenStruct) do |f| # rubocop:disable Style/OpenStructUse
+  FORGEYARD.define(:foobar, FoobarStruct) do |f|
     f.foo { bar - 1 }
     f.sequence(:bar)
 

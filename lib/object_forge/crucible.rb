@@ -10,7 +10,7 @@ module ObjectForge
       @attributes = attributes
     end
 
-    # Resolve all attributes by calling their procs,
+    # Resolve all attributes by calling their +Proc+s,
     # using +self+ as the evaluation context.
     #
     # @note This method destructively modifies initial attributes.

@@ -47,9 +47,9 @@ module ObjectForge
 
     # Reset the sequence to its {#initial} value.
     #
-    # @thread_safety Reset is synchronized with {#succ}.
+    # @thread_safety Reset is synchronized with {#next}.
     #
-    # @return [#succ] whatever value would be returned by {#succ} before reset
+    # @return [#succ] whatever value would be returned by {#next} before reset
     def reset
       @container.modify { @initial }
     end

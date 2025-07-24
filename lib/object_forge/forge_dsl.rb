@@ -5,7 +5,8 @@ require_relative "sequence"
 module ObjectForge
   # DSL for defining a forge.
   #
-  # @note This class is not intended to be used directly.
+  # @note This class is not intended to be used directly,
+  #   but it's not a private API.
   #
   # @since 0.1.0
   class ForgeDSL < ::BasicObject
