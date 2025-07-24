@@ -9,6 +9,9 @@ module ObjectForge
   #
   # @since 0.1.0
   class Forgeyard
+    # @return [Concurrent::Map{Symbol => Forge}] registered forges
+    attr_reader :forges
+
     def initialize
       @forges = Concurrent::Map.new
     end
@@ -41,13 +44,7 @@ module ObjectForge
     #
     # @raise [KeyError] if forge with the specified name is not registered
     def forge(name, *traits, **overrides)
-      forge = @forges.fetch(name)
-      # TODO: Get rid of this currying? It's currently impossible to forge without arguments.
-      if traits.empty? && overrides.empty?
-        forge
-      else
-        forge[traits, overrides]
-      end
+      @forges.fetch(name)[traits, overrides]
     end
 
     alias [] forge

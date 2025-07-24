@@ -7,6 +7,21 @@ module ObjectForge
     let(:forge) { instance_double(Forge, "Forge", "[]": instance) }
     let(:instance) { Object.new }
 
+    describe "#forges" do
+      before { forgeyard.register(:forage, forge) }
+
+      it "returns a map of registered forges" do
+        expect(forgeyard.forges).to respond_to :[]
+        expect(forgeyard.forges).to respond_to :fetch
+        expect(forgeyard.forges).to respond_to :key?
+      end
+
+      it "can be used to get forges directly" do
+        expect(forgeyard.forges[:forage]).to be forge
+        expect(forgeyard.forges[:hunt]).to be nil
+      end
+    end
+
     describe "#register" do
       let(:another_forge) { instance_double(Forge, "Another forge") }
 
@@ -42,27 +57,22 @@ module ObjectForge
       before { forgeyard.register(:test, forge) }
 
       context "with a single argument" do
-        it "returns a forge by name" do
-          expect(forgeyard.forge(:test)).to be forge
-        end
-
-        context "when name is not registered" do
-          it "raises KeyError" do
-            expect { forgeyard.forge(:nonexistent) }.to raise_error KeyError
-          end
+        it "builds an instance through named forge with default parameters" do
+          expect(forgeyard.forge(:test)).to be instance
+          expect(forge).to have_received(:[]).with([], {})
         end
       end
 
       context "with multiple arguments" do
-        it "builds an instance using the forge" do
+        it "builds an instance through named forge with specified parameters" do
           expect(forgeyard.forge(:test, :trait, attribute: 2)).to be instance
           expect(forge).to have_received(:[]).with([:trait], { attribute: 2 })
         end
+      end
 
-        context "when name is not registered" do
-          it "raises KeyError" do
-            expect { forgeyard.forge(:nonexistent, :trait, attribute: 2) }.to raise_error KeyError
-          end
+      context "when name is not registered" do
+        it "raises KeyError" do
+          expect { forgeyard.forge(:nonexistent) }.to raise_error KeyError
         end
       end
     end
