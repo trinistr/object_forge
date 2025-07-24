@@ -31,6 +31,9 @@ module ObjectForge
     # @return [Class] class to forge
     attr_reader :forged
 
+    # @return [Parameters, ForgeDSL] forge parameters
+    attr_reader :parameters
+
     # @return [Symbol, nil] forge name
     attr_reader :name
 

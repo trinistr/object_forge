@@ -321,30 +321,47 @@ module ObjectForge
           expect { forge_dsl }.to raise_error RuntimeError
         end
       end
+
+      context "if called after DSL definition" do
+        let(:definition) { proc { |f| f.non_reserved_name { "nAME" } } }
+
+        it "raises NoMethodError" do
+          expect { forge_dsl.non_reserved_name }.to raise_error NoMethodError
+        end
+      end
     end
 
     describe "#respond_to?" do
-      let(:definition) { proc {} }
+      let(:definition) { proc { |f| f.__send__(name) { "Name" } if f.respond_to?(name) } }
+      let(:name) { :nnasd_kjbksadk }
 
       it "returns true if the method is defined" do
         expect(forge_dsl.respond_to?(:attribute)).to be true
       end
 
-      it "returns true if the name is not reserved" do
-        expect(forge_dsl.respond_to?(:nnasd_kjbksadk)).to be true
-      end
+      context "if called during DSL definition" do
+        it "returns true for non-reserved names" do
+          expect(forge_dsl.attributes[name]).to be_a Proc
+        end
 
-      context "when called with a reserved name" do
-        %i[
-          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
-        ].each do |reserved_name|
-          describe "##{reserved_name}" do
-            let(:definition) { proc {} }
+        context "when called with a reserved name" do
+          %i[
+            name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
+          ].each do |reserved_name|
+            describe "##{reserved_name}" do
+              let(:name) { reserved_name }
 
-            it "returns false" do
-              expect(forge_dsl.respond_to?(reserved_name)).to be false
+              it "returns false" do
+                expect(forge_dsl.attributes[reserved_name]).to be nil
+              end
             end
           end
+        end
+      end
+
+      context "if called after DSL definition" do
+        it "returns false for non-defined names" do
+          expect(forge_dsl.respond_to?(name)).to be false
         end
       end
     end

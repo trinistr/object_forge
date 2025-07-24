@@ -9,7 +9,7 @@ module ObjectForge
   #
   # @since 0.1.0
   class ForgeDSL < ::BasicObject
-    %i[block_given? frozen? is_a? respond_to? raise].each do |m|
+    %i[raise block_given? eql? frozen? is_a? respond_to? class hash inspect to_s].each do |m|
       define_method(m, ::Object.instance_method(m))
     end
 
@@ -32,9 +32,9 @@ module ObjectForge
     # @yieldparam f [ForgeDSL] self
     # @yieldreturn [void]
     def initialize
-      @attributes = {}
-      @sequences = {}
-      @traits = {}
+      @attributes = {}.compare_by_identity
+      @sequences = {}.compare_by_identity
+      @traits = {}.compare_by_identity
 
       yield self
 
@@ -42,15 +42,17 @@ module ObjectForge
     end
 
     # Freezes the instance, including +attributes+, +sequences+ and +traits+.
+    # Prevents further responses through +#method_missing+.
     #
-    # Called automatically in {#initialize}.
+    # @note Called automatically in {#initialize}.
     #
     # @return [self]
     def freeze
+      ::Object.instance_method(:freeze).bind_call(self)
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
-      ::Object.instance_method(:freeze).bind_call(self)
+      self
     end
 
     # Define an attribute, possibly transient.
@@ -163,12 +165,22 @@ module ObjectForge
       raise DSLError, "trait definition requires a block (in #{name.inspect})" unless block_given?
 
       @current_trait = name
-      @traits[name] = {}
+      @traits[name] = {}.compare_by_identity
       yield self
       @traits[name].freeze
       @current_trait = nil
 
       name
+    end
+
+    # Return a string containing a human-readable representation of the definition.
+    #
+    # @return [String]
+    def inspect
+      "#<#{self.class.name}:#{__id__} " \
+        "attributes=#{@attributes.keys.inspect} " \
+        "sequences=#{@sequences.keys.inspect} " \
+        "traits=#{@traits.transform_values(&:keys).inspect}>"
     end
 
     private
@@ -191,12 +203,15 @@ module ObjectForge
     #
     # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, **nil, &)
+      return super if frozen?
       return attribute(name, &) if respond_to_missing?(name, false)
 
       raise DSLError, "#{name.inspect} is a reserved name (in #{name.inspect})"
     end
 
     def respond_to_missing?(name, _include_all)
+      return false if frozen?
+
       !name.end_with?("?", "!", "=") && !name.match?(/\A(?=\p{ASCII})\P{Word}/)
     end
   end
