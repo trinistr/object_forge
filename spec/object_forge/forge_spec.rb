@@ -2,10 +2,11 @@
 
 module ObjectForge
   RSpec.describe Forge do
-    subject(:forge) { described_class.new(forged_class, name: name) { nil } }
+    subject(:forge) { described_class.new(forged_class, parameters, name: name) }
 
     let(:forged_class) { Struct.new(:foo, :bar) }
     let(:name) { "ASDFg" }
+    let(:parameters) { described_class::Parameters.new }
 
     describe "#forged" do
       it "returns the class to forge" do

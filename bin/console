@@ -10,7 +10,7 @@ gem_name = File.basename(Dir["*.rb", base: "#{__dir__}/../lib"].first)
 require gem_name
 
 FORGE =
-  ObjectForge::Forge.new(OpenStruct) do |f| # rubocop:disable Style/OpenStructUse
+  ObjectForge::Forge.define(OpenStruct) do |f| # rubocop:disable Style/OpenStructUse
     f.foo { bar - 1 }
     f.sequence(:bar)
 

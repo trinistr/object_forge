@@ -8,6 +8,26 @@ module ObjectForge
   #
   # @since 0.1.0
   class Forge
+    # @!attribute [r] attributes
+    #   @return [Hash{Symbol => Any}] non-trait values of the attributes
+    #
+    # @!attribute [r] traits
+    #   @return [Hash{Symbol => Hash{Symbol => Any}}] attributes belonging to traits
+    Parameters = Struct.new(:attributes, :traits)
+
+    # Define (and create) a forge using DSL.
+    #
+    # @see ForgeDSL
+    #
+    # @param forged [Class] class to forge
+    # @param name [Symbol, nil] forge name
+    # @yieldparam f [ForgeDSL]
+    # @yieldreturn [void]
+    # @return [Forge] forge
+    def self.define(forged, name: nil, &)
+      new(forged, ForgeDSL.new(&), name: name)
+    end
+
     # @return [Class] class to forge
     attr_reader :forged
 
@@ -15,13 +35,12 @@ module ObjectForge
     attr_reader :name
 
     # @param forged [Class] class to forge
+    # @param parameters [Parameters, ForgeDSL] forge parameters
     # @param name [Symbol, nil] forge name
-    # @yieldparam f [ForgeDSL] forge DSL
-    # @yieldreturn [void]
-    def initialize(forged, name: nil, &)
+    def initialize(forged, parameters, name: nil)
       @forged = forged
+      @parameters = parameters
       @name = name
-      @parameters = ForgeDSL.new(&)
     end
 
     # Forge a new instance.
@@ -45,15 +64,14 @@ module ObjectForge
     private
 
     def check_traits_and_overrides(traits, overrides)
-      case [traits, overrides]
-      in [[Array => real_traits, Hash => real_overrides], {}]
-        traits = real_traits
-        overrides = real_overrides
-      else
-        # already good
-      end
+      return [traits, overrides] unless overrides.empty?
 
-      [traits, overrides]
+      case traits
+      in [Array => real_traits, Hash => real_overrides]
+        [real_traits, real_overrides]
+      else
+        [traits, overrides]
+      end
     end
   end
 end

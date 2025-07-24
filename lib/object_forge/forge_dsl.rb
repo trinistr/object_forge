@@ -9,7 +9,7 @@ module ObjectForge
   #
   # @since 0.1.0
   class ForgeDSL < ::BasicObject
-    %i[block_given? frozen? respond_to? raise].each do |m|
+    %i[block_given? frozen? is_a? respond_to? raise].each do |m|
       define_method(m, ::Object.instance_method(m))
     end
 
