@@ -184,6 +184,16 @@ module ObjectForge
         "traits=#{@traits.transform_values(&:keys).inspect}>"
     end
 
+    # Support for +pp+.
+    def pretty_print(...)
+      ::Object.instance_method(:pretty_print).bind_call(self, ...)
+    end
+
+    # Support for +pp+.
+    def pretty_print_cycle(...)
+      ::Object.instance_method(:pretty_print_cycle).bind_call(self, ...)
+    end
+
     private
 
     # Define an attribute using a shorthand.
