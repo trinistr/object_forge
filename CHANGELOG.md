@@ -9,5 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initital implementation.
 
+**Added**
+- `Forge`, a factory for objects, utilising FactoryBot-like DSL.
+- `Forgeyard`, a container for named forges.
+- `Sequence`, a thread-safe sequence generator.
+
 [Next]: https://github.com/trinistr/object_forge/tree/main
 [🚀 CI]: https://github.com/trinistr/object_forge/actions/workflows/CI.yaml
