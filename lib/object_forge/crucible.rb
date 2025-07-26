@@ -18,6 +18,7 @@ module ObjectForge
     def initialize(attributes)
       super()
       @attributes = attributes
+      @resolved_attributes = ::Set.new
     end
 
     # Resolve all attributes by calling their +Proc+s,
@@ -42,10 +43,11 @@ module ObjectForge
     # @return [Any]
     def method_missing(name)
       if @attributes.key?(name)
-        if @attributes[name].is_a?(::Proc)
-          @attributes[name] = instance_exec(&@attributes[name])
-        else
+        if @resolved_attributes.include?(name) || !(::Proc === @attributes[name])
           @attributes[name]
+        else
+          @resolved_attributes << name
+          @attributes[name] = instance_exec(&@attributes[name])
         end
       else
         super

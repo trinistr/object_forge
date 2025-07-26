@@ -20,7 +20,24 @@ module ObjectForge
         expect { crucible.resolve! }.not_to change(attributes, :itself)
       end
 
-      context "if an attribute can not be resolved" do
+      context "if an attribute contains a Proc" do
+        foo_proc = ->(v) { v + 1 }
+        let(:attributes) do
+          {
+            foo: -> { foo_proc },
+            bar: -> { foo.call(1) },
+            baz: -> { foo.call(2) },
+          }
+        end
+
+        it "resolves attributes once without breaking specified Proc" do
+          expect(crucible.resolve!).to eq({ foo: foo_proc, bar: 2, baz: 3 })
+          # :foo should not change on second invocation either
+          expect(crucible.resolve!).to eq({ foo: foo_proc, bar: 2, baz: 3 })
+        end
+      end
+
+      context "if an attribute is not found" do
         let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bard } } }
 
         it "raises NameError" do
