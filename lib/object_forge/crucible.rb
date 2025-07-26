@@ -7,6 +7,13 @@ module ObjectForge
   #
   # @since 0.1.0
   class Crucible < UnBasicObject
+    # @!group Instance methods copied from Object
+    # @!method rand(max = 0)
+    #   @see Kernel#rand
+    #   @return [Float, Integer]
+    %i[rand].each { |m| private define_method(m, ::Object.instance_method(m)) }
+    # @!endgroup
+
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)
       super()
@@ -44,6 +51,8 @@ module ObjectForge
         super
       end
     end
+
+    alias [] method_missing
 
     def respond_to_missing?(name, _include_all)
       @attributes.key?(name)

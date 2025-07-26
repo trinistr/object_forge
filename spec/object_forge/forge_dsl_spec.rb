@@ -361,10 +361,10 @@ module ObjectForge
       end
 
       context "when called with a conflicting name" do
-        let(:definition) { proc { |f| f.raise { "Name!!!" } } }
+        let(:definition) { proc { |f| f.eql? { "Name!!!" } } }
 
         it "behaves in an undefined manner" do
-          expect { forge_dsl }.to raise_error RuntimeError
+          expect { forge_dsl }.to raise_error ArgumentError
         end
       end
 

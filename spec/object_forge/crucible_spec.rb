@@ -26,6 +26,7 @@ module ObjectForge
         it "raises NameError" do
           expect { crucible.resolve! }.to raise_error(
             NameError,
+            # Ruby 3.4 changed initial quote from "`" to "'" in error messages.
             /\Aundefined local variable or method ['`]bard'/
           )
         end
@@ -46,6 +47,36 @@ module ObjectForge
             display: "My String",
             long_display: "My String +L +fell off"
           )
+        end
+      end
+
+      context "if attributes conflict with existing methods" do
+        let(:attributes) { dsl.attributes.dup }
+        let(:dsl) do
+          ForgeDSL.new do |f|
+            f.attribute(:resolve!) { "My Resolve!" }
+            f.attribute(:[]) { "#{self[:resolve!]} It's Strong!" }
+          end
+        end
+
+        it "resolves attributes correctly when accessed through #[]" do
+          expect(dsl.attributes).to match({ resolve!: Proc, "[]": Proc })
+          expect(crucible.resolve!).to eq(resolve!: "My Resolve!", "[]": "My Resolve! It's Strong!")
+        end
+      end
+
+      context "when `rand` is used in attribute definitions" do
+        let(:attributes) { dsl.attributes.dup }
+        let(:dsl) do
+          ForgeDSL.new do |f|
+            f.attribute(:foo) { rand(100) }
+            f.attribute(:bar) { rand(100) }
+            f.attribute(:baz) { foo + bar }
+          end
+        end
+
+        it "resolves attributes correctly" do
+          expect(crucible.resolve!).to match({ foo: Integer, bar: Integer, baz: Integer })
         end
       end
     end

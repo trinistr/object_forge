@@ -8,33 +8,32 @@ module ObjectForge
   # @since 0.1.0
   class UnBasicObject < ::BasicObject
     # @!group Instance methods copied from Object
-    # @!method raise(exception [, string [, array]], cause: $!)
-    #   @return [void]
-    # @!method block_given?
-    #   @return [Boolean]
     # @!method eql?(other)
+    #   @see Object#eql?
     #   @return [Boolean]
     # @!method frozen?
+    #   @see Kernel#frozen?
     #   @return [Boolean]
     # @!method respond_to?(symbol [, include_private])
+    #   @see Object#respond_to?
     #   @return [Boolean]
     # @!method class
+    #   @see Kernel#class
     #   @return [Class]
     # @!method hash
+    #   @see Object#hash
     #   @return [Integer]
     # @!method inspect
+    #   @see Object#inspect
     #   @return [String]
     # @!method to_s
+    #   @see Object#to_s
     #   @return [String]
-    %i[
-      class raise
-      block_given? frozen? respond_to?
-      eql? hash
-      inspect to_s
-    ].each do |m|
+    %i[class frozen? respond_to? eql? hash inspect to_s].each do |m|
       define_method(m, ::Object.instance_method(m))
     end
     # @!endgroup
+    %i[raise block_given?].each { |m| private define_method(m, ::Object.instance_method(m)) }
 
     # @!macro pp_support
     #   Support for +pp+ (and IRB).
