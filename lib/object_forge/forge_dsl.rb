@@ -9,6 +9,12 @@ module ObjectForge
   # @note This class is not intended to be used directly,
   #   but it's not a private API.
   #
+  # @thread_safety DSL is not thread-safe.
+  #   Take care not to introduce side effects,
+  #   especially in attribute definitions.
+  #   The instance itself is frozen after initialization,
+  #   so it should be safe to share.
+  #
   # @since 0.1.0
   class ForgeDSL < UnBasicObject
     # @return [Hash{Symbol => Proc}] frozen hash
@@ -22,20 +28,34 @@ module ObjectForge
 
     # Define forge's parameters through DSL.
     #
-    # @thread_safety DSL is not thread-safe.
-    #   Take care not to introduce side effects in the block.
-    #   However, the instance is frozen after initialization,
-    #   so it should be safe to use.
+    # If the block has a parameter, an object will be yielded,
+    # and +self+ context will be preserved.
+    # Otherwise, DSL will change +self+ context inside the block,
+    # without ability to call methods available outside.
+    #
+    # @example with block parameter
+    #   ForgeDSL.new do |f|
+    #     f.attribute(:name) { "Name" }
+    #     f[:description] { name.upcase }
+    #     f.duration { rand(1000) }
+    #   end
+    #
+    # @example without block parameter
+    #   ForgeDSL.new do
+    #     attribute(:name) { "Name" }
+    #     self[:description] { name.upcase }
+    #     duration { rand(1000) }
+    #   end
     #
     # @yieldparam f [ForgeDSL] self
     # @yieldreturn [void]
-    def initialize
+    def initialize(&dsl)
       super
       @attributes = {}
       @sequences = {}
       @traits = {}
 
-      yield self
+      dsl.arity.zero? ? instance_exec(&dsl) : yield(self)
 
       freeze
     end
@@ -60,11 +80,16 @@ module ObjectForge
     # except for conflicting or reserved names.
     #
     # You can refer to any other attribute inside the attribute definition block.
+    # +self[:name]+ can be used to refer to an attribute with a conflicting or reserved name.
     #
     # @example
     #   f.attribute(:name) { "Name" }
     #   f[:description] { name.downcase }
     #   f.duration { rand(1000) }
+    # @example using conflicting and reserved names
+    #   f.attribute(:[]) { "Brackets" }
+    #   f.attribute(:[]=) { "#{self[:[]]} are brackets" }
+    #   f.attribute(:!) { "#{self[:[]=]}!" }
     #
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value

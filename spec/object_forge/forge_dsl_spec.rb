@@ -100,6 +100,52 @@ module ObjectForge
         expect(evaluate(forge_dsl.traits[:useless][:useless])).to eq "Useless"
         expect(evaluate(forge_dsl.traits[:useless][:useless_id])).to eq "Useless 100000"
       end
+
+      context "if an outside method is called in definition" do
+        let(:definition) do
+          proc do |f|
+            f.attr { "Name" }
+            puts f.attributes[:attr].call
+          end
+        end
+
+        it "calls the method successfully" do
+          expect { forge_dsl }.to output("Name\n").to_stdout
+        end
+      end
+    end
+
+    describe "definition without block parameter" do
+      let(:definition) do
+        proc do
+          attr_1 { "Name" }
+          sequence(:attr_2) { "#{attr_1} #{_1}" }
+          trait :unnamed do
+            attr_1 { nil }
+            sequence(:attr_2) { "<unnamed> #{_1}" }
+          end
+        end
+      end
+
+      it "defines forge attributes, sequences and traits, changing `self` for the block" do
+        expect(forge_dsl.attributes[:attr_1]).to be_a Proc
+        expect(forge_dsl.attributes[:attr_2]).to be_a Proc
+        expect(forge_dsl.sequences[:attr_2]).to be_a Sequence
+        expect(forge_dsl.traits[:unnamed]).to be_a Hash
+      end
+
+      context "if an outside method is called in definition" do
+        let(:definition) do
+          proc do
+            attr { "Name" }
+            puts attributes[:attr].call
+          end
+        end
+
+        it "fails, probably with ArgumentError" do
+          expect { forge_dsl }.to raise_error(ArgumentError, /wrong number of arguments/)
+        end
+      end
     end
 
     describe "#attribute" do
