@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+require_relative "un_basic_object"
+
 module ObjectForge
   # Melting pot for the forged object's attributes.
   #
   # @since 0.1.0
-  class Crucible
+  class Crucible < UnBasicObject
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)
+      super()
       @attributes = attributes
     end
 
@@ -32,7 +35,7 @@ module ObjectForge
     # @return [Any]
     def method_missing(name)
       if @attributes.key?(name)
-        if @attributes[name].is_a?(Proc)
+        if @attributes[name].is_a?(::Proc)
           @attributes[name] = instance_exec(&@attributes[name])
         else
           @attributes[name]
@@ -43,7 +46,7 @@ module ObjectForge
     end
 
     def respond_to_missing?(name, _include_all)
-      @attributes.key?(name) || super
+      @attributes.key?(name)
     end
   end
 end

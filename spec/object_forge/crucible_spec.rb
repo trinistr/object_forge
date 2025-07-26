@@ -30,13 +30,31 @@ module ObjectForge
           )
         end
       end
+
+      context "if attributes conflict with Object (but not BasicObject) methods" do
+        let(:attributes) { dsl.attributes.dup }
+        let(:dsl) do
+          ForgeDSL.new do |f|
+            f.display { "My String" }
+            f.long_display { "#{display} +L +fell off" }
+          end
+        end
+
+        it "resolves attributes correctly" do
+          expect(dsl.attributes).to match({ display: Proc, long_display: Proc })
+          expect(crucible.resolve!).to eq(
+            display: "My String",
+            long_display: "My String +L +fell off"
+          )
+        end
+      end
     end
 
     describe "#respond_to?" do
       it "returns true if a corresponding key exists" do
         key = attributes.keys.sample
         expect(crucible).to respond_to key
-        expect(crucible.public_send(key)).to be attributes[key]
+        expect(crucible.__send__(key)).to be attributes[key]
       end
 
       it "returns false if a corresponding key does not exist" do

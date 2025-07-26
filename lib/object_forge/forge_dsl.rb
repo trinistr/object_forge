@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "sequence"
+require_relative "un_basic_object"
 
 module ObjectForge
   # DSL for defining a forge.
@@ -9,11 +10,7 @@ module ObjectForge
   #   but it's not a private API.
   #
   # @since 0.1.0
-  class ForgeDSL < ::BasicObject
-    %i[raise block_given? eql? frozen? is_a? respond_to? class hash inspect to_s].each do |m|
-      define_method(m, ::Object.instance_method(m))
-    end
-
+  class ForgeDSL < UnBasicObject
     # @return [Hash{Symbol => Proc}] frozen hash
     attr_reader :attributes
 
@@ -33,9 +30,10 @@ module ObjectForge
     # @yieldparam f [ForgeDSL] self
     # @yieldreturn [void]
     def initialize
-      @attributes = {}.compare_by_identity
-      @sequences = {}.compare_by_identity
-      @traits = {}.compare_by_identity
+      super
+      @attributes = {}
+      @sequences = {}
+      @traits = {}
 
       yield self
 
@@ -166,7 +164,7 @@ module ObjectForge
       raise DSLError, "trait definition requires a block (in #{name.inspect})" unless block_given?
 
       @current_trait = name
-      @traits[name] = {}.compare_by_identity
+      @traits[name] = {}
       yield self
       @traits[name].freeze
       @current_trait = nil
@@ -182,16 +180,6 @@ module ObjectForge
         "attributes=#{@attributes.keys.inspect} " \
         "sequences=#{@sequences.keys.inspect} " \
         "traits=#{@traits.transform_values(&:keys).inspect}>"
-    end
-
-    # Support for +pp+.
-    def pretty_print(...)
-      ::Object.instance_method(:pretty_print).bind_call(self, ...)
-    end
-
-    # Support for +pp+.
-    def pretty_print_cycle(...)
-      ::Object.instance_method(:pretty_print_cycle).bind_call(self, ...)
     end
 
     private
