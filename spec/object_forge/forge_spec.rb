@@ -19,5 +19,8 @@ module ObjectForge
         expect(forge.name).to eq name
       end
     end
+
+    include_examples "has an alias", :build, :forge
+    include_examples "has an alias", :[], :forge
   end
 end

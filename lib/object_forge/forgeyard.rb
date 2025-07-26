@@ -5,8 +5,6 @@ require "concurrent/map"
 module ObjectForge
   # A registry for forges, making them accessible by name.
   #
-  # Forgeyard provides a thread-safe interface for adding and retrieving forges.
-  #
   # @since 0.1.0
   class Forgeyard
     # @return [Concurrent::Map{Symbol => Forge}] registered forges
@@ -19,6 +17,7 @@ module ObjectForge
     # Define and register a forge in one go.
     #
     # @see Forge.define
+    # @see #register
     #
     # @param name [Symbol] name to register forge under
     # @param forged [Class] class to forge
@@ -31,8 +30,10 @@ module ObjectForge
 
     # Add a forge under a specified name.
     #
-    # @thread_safety If +name+ was already taken, new +forge+ will be ignored
-    #   and existing forge will be returned.
+    # If +name+ was already taken, new +forge+ will be ignored
+    # and existing forge will be returned.
+    #
+    # @thread_safety Registration is thread-safe, i.e. first one always wins.
     #
     # @param name [Symbol] name to register forge under
     # @param forge [Forge] forge to register
@@ -42,9 +43,9 @@ module ObjectForge
       @forges.put_if_absent(name, forge) || forge
     end
 
-    alias []= register
-
     # Build an instance using a forge.
+    #
+    # @see Forge#forge
     #
     # @param name [Symbol] name of the forge
     # @param traits [Array<Symbol>] traits to apply
@@ -56,6 +57,7 @@ module ObjectForge
       @forges.fetch(name)[traits, overrides]
     end
 
+    alias build forge
     alias [] forge
   end
 end

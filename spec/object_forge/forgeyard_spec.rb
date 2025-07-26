@@ -51,8 +51,6 @@ module ObjectForge
       end
     end
 
-    include_examples "has an alias", :[]=, :register
-
     describe "#forge" do
       before { forgeyard.register(:test, forge) }
 
@@ -77,6 +75,7 @@ module ObjectForge
       end
     end
 
+    include_examples "has an alias", :build, :forge
     include_examples "has an alias", :[], :forge
   end
 end

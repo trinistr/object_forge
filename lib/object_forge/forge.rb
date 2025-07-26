@@ -51,6 +51,9 @@ module ObjectForge
     # @overload forge(*traits, **overrides)
     # @overload forge(traits, overrides)
     #
+    # @thread_safety Forging is thread-safe if {#parameters},
+    #    +traits+ and +overrides+ are thread-safe.
+    #
     # @param traits [Array<Symbol>] traits to apply
     # @param overrides [Hash{Symbol => Any}] attribute overrides
     # @return [Any] built instance
@@ -62,6 +65,7 @@ module ObjectForge
       forged.new(attributes)
     end
 
+    alias build forge
     alias [] forge
 
     private
