@@ -8,32 +8,40 @@ module ObjectForge
   # @since 0.1.0
   class UnBasicObject < ::BasicObject
     # @!group Instance methods copied from Object
-    # @!method eql?(other)
-    #   @see Object#eql?
-    #   @return [Boolean]
-    # @!method frozen?
-    #   @see Kernel#frozen?
-    #   @return [Boolean]
-    # @!method respond_to?(symbol [, include_private])
-    #   @see Object#respond_to?
-    #   @return [Boolean]
     # @!method class
     #   @see Kernel#class
     #   @return [Class]
+    # @!method eql?(other)
+    #   @see Object#eql?
+    #   @return [Boolean]
+    # @!method freeze
+    #   @see Kernel#freeze
+    #   @return [self]
+    # @!method frozen?
+    #   @see Kernel#frozen?
+    #   @return [Boolean]
     # @!method hash
     #   @see Object#hash
     #   @return [Integer]
     # @!method inspect
     #   @see Object#inspect
     #   @return [String]
+    # @!method is_a?(class)
+    #   @see Kernel#is_a?
+    #   @return [Boolean]
+    # @!method respond_to?(symbol [, include_private])
+    #   @see Object#respond_to?
+    #   @return [Boolean]
     # @!method to_s
     #   @see Object#to_s
     #   @return [String]
-    %i[class frozen? respond_to? eql? hash inspect to_s].each do |m|
+    %i[class eql? freeze frozen? hash inspect is_a? respond_to? to_s].each do |m|
       define_method(m, ::Object.instance_method(m))
     end
+    alias kind_of? is_a?
     # @!endgroup
-    %i[raise block_given?].each { |m| private define_method(m, ::Object.instance_method(m)) }
+
+    %i[block_given? raise].each { |m| private define_method(m, ::Object.instance_method(m)) }
 
     # @!macro pp_support
     #   Support for +pp+ (and IRB).
@@ -50,7 +58,9 @@ module ObjectForge
     # @!macro pp_support
     def pretty_print_cycle(...)
       # See comment for #pretty_print.
+      # :nocov:
       ::Object.instance_method(:pretty_print_cycle).bind_call(self, ...)
+      # :nocov:
     end
   end
 end
