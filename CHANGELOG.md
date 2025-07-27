@@ -14,5 +14,9 @@ Initital implementation.
 - `Forgeyard`, a container for named forges.
 - `Sequence`, a thread-safe sequence generator.
 
+[Compare v0.0.0...main](https://github.com/trinistr/object_forge/compare/v0.0.0...main)
+
+## [v0.0.0]
+
 [Next]: https://github.com/trinistr/object_forge/tree/main
 [🚀 CI]: https://github.com/trinistr/object_forge/actions/workflows/CI.yaml
