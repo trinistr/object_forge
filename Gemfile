@@ -40,4 +40,5 @@ group :test do
 
   # Code coverage report
   gem "simplecov"
+  gem "simplecov_lcov_formatter"
 end

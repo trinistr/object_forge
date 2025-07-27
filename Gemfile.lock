@@ -122,6 +122,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
+    simplecov_lcov_formatter (0.9.0)
+      simplecov (>= 0.18)
     solargraph (0.55.2)
       backport (~> 1.2)
       benchmark (~> 0.4)
@@ -189,6 +191,7 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-thread_safety
   simplecov
+  simplecov_lcov_formatter
   solargraph
   steep
   yard
