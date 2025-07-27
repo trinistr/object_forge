@@ -12,3 +12,22 @@ on:
 jobs:
   CRuby:
     uses: ./.github/workflows/cruby.yaml
+  coverage:
+    if: ${{ github.GITHUB_EVENT_NAME == 'pull_request' }}
+    needs: CRuby
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+    - name: Run RSpec
+      run: bundle exec rake spec
+    - name: Add code coverage comment
+      uses: romeovs/lcov-reporter-action@v0.3.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./coverage/lcov/object_forge.lcov
+        delete-old-comments: true
