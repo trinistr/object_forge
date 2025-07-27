@@ -204,7 +204,7 @@ module ObjectForge
       "#<#{self.class.name}:#{__id__} " \
         "attributes=#{@attributes.keys.inspect} " \
         "sequences=#{@sequences.keys.inspect} " \
-        "traits=#{@traits.transform_values(&:keys).inspect}>"
+        "traits={#{@traits.map { |k, v| "#{k.inspect}=#{v.keys.inspect}" }.join(", ")}}>"
     end
 
     private

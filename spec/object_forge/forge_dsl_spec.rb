@@ -436,7 +436,7 @@ module ObjectForge
           "#<#{described_class.name}:#{forge_dsl.__id__} " \
           "attributes=[:name, :id] " \
           "sequences=[:id] " \
-          "traits={:special=>[:name, :id], :useless=>[:useless]}>"
+          "traits={:special=[:name, :id], :useless=[:useless]}>"
         )
       end
     end
