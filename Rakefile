@@ -27,7 +27,7 @@ end
 desc "Validate signatures with RBS"
 task :rbs do
   puts "Checking signatures with RBS..."
-  if system "rbs", "-rbigdecimal", "-Isig", "validate"
+  if system "rbs", "-Isig", "validate"
     puts "Signatures are good!"
     puts
   else

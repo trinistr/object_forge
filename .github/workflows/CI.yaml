@@ -25,7 +25,7 @@ jobs:
         ruby-version: '3.1'
         bundler-cache: true
     - name: Run Rubocop
-      run: bundle exec rake rubocop
+      run: bundle exec rubocop -f github
   signatures:
     name: RBS
     runs-on: ubuntu-latest

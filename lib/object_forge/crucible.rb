@@ -19,7 +19,6 @@ module ObjectForge
 
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)
-      super()
       @attributes = attributes
       @resolved_attributes = ::Set.new
     end
