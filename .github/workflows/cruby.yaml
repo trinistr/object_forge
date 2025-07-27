@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         ruby:
+        # Versions below 3.1.3 have a bug with anonymous block parameters (see #1).
         - '3.1.3'
         - '3.1'
         - '3.2'
