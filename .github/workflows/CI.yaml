@@ -13,7 +13,7 @@ jobs:
   CRuby:
     uses: ./.github/workflows/cruby.yaml
   coverage:
-    if: ${{ github.GITHUB_EVENT_NAME == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' }}
     needs: CRuby
     runs-on: ubuntu-latest
     steps:
