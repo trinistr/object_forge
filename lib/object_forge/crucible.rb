@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
+require "set"
+
 require_relative "un_basic_object"
 
 module ObjectForge
   # Melting pot for the forged object's attributes.
   #
+  # @note This class is not intended to be used directly,
+  #   but it's not a private API.
+  #
+  # @thread_safety Attribute resolution is idempotent,
+  #   but modifies instance variables, making it unsafe to share the Crucible
+  #
   # @since 0.1.0
   class Crucible < UnBasicObject
-    # @!group Instance methods copied from Object
-    # @!method rand(max = 0)
-    #   @see Kernel#rand
-    #   @return [Float, Integer]
     %i[rand].each { |m| private define_method(m, ::Object.instance_method(m)) }
-    # @!endgroup
 
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)
@@ -24,10 +27,12 @@ module ObjectForge
     # Resolve all attributes by calling their +Proc+s,
     # using +self+ as the evaluation context.
     #
-    # @note This method destructively modifies initial attributes.
+    # Attributes can freely refer to each other inside +Proc+s
+    # through bareword names or +#[]+.
+    # However, make sure to avoid cyclic dependencies:
+    # they aren't specially detected or handled, and will cause +SystemStackError+.
     #
-    # @thread_safety Resolving attributes modifies instance variables,
-    #   therefore making it unsafe to use in a concurrent environment.
+    # @note This method destructively modifies initial attributes.
     #
     # @return [Hash{Symbol => Any}] resolved attributes
     def resolve!
@@ -38,6 +43,26 @@ module ObjectForge
     private
 
     # Get the value of the attribute +name+.
+    #
+    # To prevent problems with calling methods which may be defined,
+    # +#[]+ can be used instead.
+    #
+    # @example
+    #   attrs = {
+    #     name: -> { "Name" },
+    #     description: -> { name.downcase },
+    #     duration: -> { rand(1000) }
+    #   }
+    #   Crucible.new(attrs).resolve!
+    #   # => { name: "Name", description: "name", duration: 123 }
+    # @example using conflicting and reserved names
+    #   attrs = {
+    #     "[]": -> { "Brackets" },
+    #     "[]=": -> { "#{self[:[]]} are brackets" },
+    #     "!": -> { "#{self[:[]=]}!" }
+    #   }
+    #   Crucible.new(attrs).resolve!
+    #   # => { "[]": "Brackets", "[]=": "Brackets are brackets", "!": "Brackets are brackets!" }
     #
     # @param name [Symbol]
     # @return [Any]

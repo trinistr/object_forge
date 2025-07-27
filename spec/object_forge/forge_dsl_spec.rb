@@ -411,5 +411,34 @@ module ObjectForge
         end
       end
     end
+
+    describe "#inspect" do
+      subject(:inspect) { forge_dsl.inspect }
+
+      let(:definition) do
+        proc do |f|
+          f.attribute(:name) { "Name" }
+          f.sequence(:id, 100_000)
+
+          f.trait :special do
+            f.name { "Special Name" }
+            f[:id] { "~~~ SpEcIaL ~~~" }
+          end
+
+          f.trait :useless do
+            f.useless { "Useless" }
+          end
+        end
+      end
+
+      it "returns a string containing a human-readable representation of the definition" do
+        expect(inspect).to eq(
+          "#<#{described_class.name}:#{forge_dsl.__id__} " \
+          "attributes=[:name, :id] " \
+          "sequences=[:id] " \
+          "traits={:special=>[:name, :id], :useless=>[:useless]}>"
+        )
+      end
+    end
   end
 end

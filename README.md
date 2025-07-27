@@ -1,6 +1,10 @@
 # ObjectForge
 
-A simple factory for Structs and other classes without assumptions.
+[![CI](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml/badge.svg)](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml)
+
+***
+
+ObjectForge provides a familiar way to build objects in any context with minimal assumptions about usage environment. It has no connection to any framework and, indeed, has nothing to do with a database. To use, just define some factories and call them wherever you need, be it in tests, console, or application code.
 
 ## Installation
 

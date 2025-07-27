@@ -10,8 +10,14 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/trinistr/#{spec.name}"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
-  spec.summary = "A simple factory for Structs and other classes without assumptions."
-  # spec.description = "TODO: Write a longer description or delete this line."
+  spec.summary = "A simple factory for objects with minimal assumptions."
+  spec.description = <<~TEXT
+    ObjectForge provides a familiar way to build objects in any context
+    with minimal assumptions about usage environment.
+    It has no connection to any framework and, indeed, has nothing to do with a database.
+    To use, just define some factories and call them wherever you need,
+    be it in tests, console, or application code.
+  TEXT
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
@@ -24,6 +30,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{lib,sig,exe}/**/*"].select { File.file?(_1) }
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { File.basename(_1) }
+
+  spec.rdoc_options = ["--tag", "thread_safety:Thread safety"]
 
   spec.add_dependency "concurrent-ruby", "~> 1.2"
 end

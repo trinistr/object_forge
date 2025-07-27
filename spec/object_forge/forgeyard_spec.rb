@@ -7,6 +7,18 @@ module ObjectForge
     let(:forge) { instance_double(Forge, "Forge", "[]": instance) }
     let(:instance) { Object.new }
 
+    describe "#define" do
+      let(:definition) { forgeyard.define(:foo, Object) { |f| f.attribute(:[]) { nil } } }
+
+      before { allow(Forge).to receive(:define).and_return(forge) }
+
+      it "defines and registers a forge" do
+        expect { definition }.to change(forgeyard.forges, :size).by(1)
+        expect(Forge).to have_received(:define).with(Object, name: :foo)
+        expect(forgeyard.forges[:foo]).to be forge
+      end
+    end
+
     describe "#forges" do
       before { forgeyard.register(:forage, forge) }
 
