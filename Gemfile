@@ -32,6 +32,11 @@ group :development do
 
   # Version changes
   gem "bump"
+
+  # Benchmarking and profiling
+  gem "benchmark"
+  gem "benchmark-ips"
+  gem "stackprof"
 end
 
 group :test do

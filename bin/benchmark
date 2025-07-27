@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Set up LOAD_PATH with Bundler
+require "bundler/setup"
+
+# Load supporting libraries
+require "fileutils"
+
+require "benchmark"
+require "benchmark/ips"
+require "stackprof"
+
+# Load this gem
+gem_name = File.basename(Dir["*.rb", base: "#{__dir__}/../lib"].first)
+require gem_name
+
+# Setup test data
+FoobarStruct = Struct.new(:foo, :bar, keyword_init: true)
+
+FORGEYARD = ObjectForge::Forgeyard.new
+FORGE =
+  FORGEYARD.define(:foobar, FoobarStruct) do |f|
+    f.foo { bar - 1 }
+    f.sequence(:bar)
+
+    f.trait :zero do
+      f.foo { 0 }
+    end
+  end
+
+# Run benchmark
+FileUtils.mkdir_p("tmp")
+StackProf.run(mode: :cpu, raw: true, out: "tmp/stackprof.dump") do
+  Benchmark.ips do |ips|
+    ips.report("yard.forge()") { FORGEYARD.forge(:foobar) }
+    ips.report("forge.forge()") { FORGE.forge }
+
+    ips.report("yard.forge(:zero)") { FORGEYARD.forge(:foobar, :zero) }
+    ips.report("forge.forge(:zero)") { FORGE.forge(:zero) }
+
+    ips.report("yard.forge(foo: 15)") { FORGEYARD.forge(:foobar, foo: 15) }
+    ips.report("forge.forge(foo: 15)") { FORGE.forge(foo: 15) }
+
+    ips.report("yard.forge(foo: 1, bar: 2)") { FORGEYARD.forge(:foobar, foo: 1, bar: 2) }
+    ips.report("forge.forge(foo: 1, bar: 2)") { FORGE.forge(foo: 1, bar: 2) }
+  end
+end
+
+# Generate flamegraph to actually understand StackProf's report
+`stackprof tmp/stackprof.dump --d3-flamegraph > tmp/flamegraph.html`
+puts "Flamegraph generated at tmp/flamegraph.html"
