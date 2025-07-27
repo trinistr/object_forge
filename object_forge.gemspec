@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
 
   spec.homepage = "https://github.com/trinistr/#{spec.name}"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.1.0"
+  spec.required_ruby_version = ">= 3.1.3"
   spec.summary = "A simple factory for objects with minimal assumptions."
   spec.description = <<~TEXT
     ObjectForge provides a familiar way to build objects in any context
