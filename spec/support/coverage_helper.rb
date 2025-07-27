@@ -2,7 +2,7 @@
 
 begin
   require "simplecov"
-  require "simplecov-lcov"
+  require "simplecov_lcov_formatter"
 rescue LoadError
   warn "simplecov is not available, coverage report will not be generated!"
   return

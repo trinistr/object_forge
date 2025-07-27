@@ -14,7 +14,6 @@ jobs:
     uses: ./.github/workflows/cruby.yaml
   lint:
     name: Rubocop
-    needs: CRuby
     runs-on: ubuntu-latest
     env:
       BUNDLE_WITHOUT: 'development'
@@ -29,7 +28,6 @@ jobs:
       run: bundle exec rake rubocop
   signatures:
     name: RBS
-    needs: CRuby
     runs-on: ubuntu-latest
     env:
       BUNDLE_WITHOUT: 'development'
@@ -61,6 +59,5 @@ jobs:
     - name: Add code coverage comment
       uses: romeovs/lcov-reporter-action@v0.3.1
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         lcov-file: ./coverage/lcov/object_forge.lcov
         delete-old-comments: true
