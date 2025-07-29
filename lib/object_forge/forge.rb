@@ -84,7 +84,7 @@ module ObjectForge
     private
 
     def check_traits_and_overrides(traits, overrides)
-      return [traits, overrides] unless overrides.empty?
+      return [traits, overrides] unless overrides.empty? && traits.size == 2
 
       case traits
       in [Array => real_traits, Hash => real_overrides]

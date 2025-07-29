@@ -8,7 +8,7 @@
 
 ***
 
-ObjectForge provides a familiar way to build objects in any context with minimal assumptions about usage environment. It has no connection to any framework and, indeed, has nothing to do with a database. To use, just define some factories and call them wherever you need, be it in tests, console, or application code.
+ObjectForge provides a familiar way to build objects in any context with minimal assumptions about usage environment. It has no connection to any framework and, indeed, has nothing to do with a database. To use, just define some factories and call them wherever you need, be it in tests, console, or application code. And, if you need, almost any part of the process can be easily replaced with a custom solution.
 
 ## Installation
 
@@ -24,7 +24,7 @@ TODO: Write usage instructions here
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
+After checking out the repo, run `bundle` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
 
 You can also run `bin/console` for an interactive prompt that will allow you to experiment, or `bin/benchmark` to run a benchmark script and generate a StackProf flamegraph.
 

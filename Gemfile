@@ -17,21 +17,21 @@ group :linting do
   gem "rubocop-thread_safety"
 
   # Checking type signatures
-  gem "rbs"
+  gem "rbs", require: false
 end
 
 group :development do
   # Type checking
-  gem "steep"
+  gem "steep", require: false
 
   # Documentation
-  gem "yard"
+  gem "yard", require: false
 
   # Language server for development
-  gem "solargraph"
+  gem "solargraph", require: false
 
   # Version changes
-  gem "bump"
+  gem "bump", require: false
 
   # Benchmarking and profiling
   gem "benchmark"
