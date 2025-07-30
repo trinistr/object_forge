@@ -55,7 +55,6 @@ module ObjectForge
       @sequences = {}
       @traits = {}
 
-      # @type var dsl: ^() -> void
       dsl.arity.zero? ? instance_exec(&dsl) : yield(self)
 
       freeze

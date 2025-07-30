@@ -91,10 +91,8 @@ module ObjectForge
         return [traits, overrides]
       end
 
-      # @type var overrides: {}
       case traits
       in [Array => real_traits, Hash => real_overrides]
-        # @type var traits: [Array[Symbol], Hash[Symbol, untyped]]
         [real_traits, real_overrides]
       else
         [traits, overrides]
