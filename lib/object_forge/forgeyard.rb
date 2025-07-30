@@ -50,11 +50,13 @@ module ObjectForge
     # @param name [Symbol] name of the forge
     # @param traits [Array<Symbol>] traits to apply
     # @param overrides [Hash{Symbol => Any}] attribute overrides
+    # @yieldparam object [Any] forged instance
+    # @yieldreturn [void]
     # @return [Any] built instance
     #
     # @raise [KeyError] if forge with the specified name is not registered
-    def forge(name, *traits, **overrides)
-      @forges.fetch(name)[traits, overrides]
+    def forge(name, *traits, **overrides, &)
+      @forges.fetch(name)[traits, overrides, &]
     end
 
     alias build forge

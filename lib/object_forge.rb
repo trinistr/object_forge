@@ -84,7 +84,7 @@ module ObjectForge
     DEFAULT_YARD.define(...)
   end
 
-  # @overload forge(name, *traits, **overrides)
+  # @overload forge(name, *traits, **overrides, &)
   # Build an instance using a forge from {DEFAULT_YARD}.
   #
   # @!macro default_forgeyard
@@ -94,6 +94,8 @@ module ObjectForge
   # @param name [Symbol] name of the forge
   # @param traits [Array<Symbol>] traits to apply
   # @param overrides [Hash{Symbol => Any}] attribute overrides
+  # @yieldparam object [Any] forged instance
+  # @yieldreturn [void]
   # @return [Any] built instance
   def self.forge(...)
     DEFAULT_YARD.forge(...)

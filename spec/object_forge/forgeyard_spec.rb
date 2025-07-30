@@ -80,6 +80,24 @@ module ObjectForge
         end
       end
 
+      context "with a block" do
+        let(:forge) { Forge.new(forged_class, Forge::Parameters.new(attributes: { foo: 1, bar: 2 }, traits: {})) }
+        let(:forged_class) { Struct.new(:foo, :bar, keyword_init: true) }
+
+        before { allow(forge).to receive(:[]).and_call_original }
+
+        it "allows tapping into the object" do
+          expect(forgeyard[:test] { _1.foo = 33 }).to eq forged_class.new(foo: 33, bar: 2)
+          expect(forge).to have_received(:[]).with([], {})
+        end
+
+        it "runs the block after forging the object with resolved attributes" do
+          expect(forgeyard[:test, foo: :foo, bar: -> { foo }] { _1.foo = 33 })
+            .to eq forged_class.new(foo: 33, bar: :foo)
+          expect(forge).to have_received(:[]).with([], { foo: :foo, bar: Proc })
+        end
+      end
+
       context "when name is not registered" do
         it "raises KeyError" do
           expect { forgeyard.forge(:nonexistent) }.to raise_error KeyError
