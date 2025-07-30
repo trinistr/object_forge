@@ -50,6 +50,18 @@ module ObjectForge
         it "builds an instance of the forged class, applying traits and overrides in order" do
           expect(forge.forge(:barfoo, :bazoo, foo: 3)).to eq forged_class.new(foo: 3, bar: 3)
         end
+
+        context "if traits and overrides are passed as two positional parameters" do
+          it "works the same" do
+            expect(forge.forge(%i[barfoo bazoo], { foo: 3 })).to eq forged_class.new(foo: 3, bar: 3)
+          end
+        end
+
+        context "if only two traits are passed" do
+          it "does not try to parse them as traits and overrides" do
+            expect(forge.forge(:barfoo, :bazoo)).to eq forged_class.new(foo: :baz, bar: :baz)
+          end
+        end
       end
     end
 
