@@ -13,6 +13,7 @@ Initital implementation.
 - `Forge`, a factory for objects, utilising FactoryBot-like DSL.
 - `Forgeyard`, a container for named forges.
 - `Sequence`, a thread-safe sequence generator.
+- `ForgeDSL` and `Crucible` — implementation of DSL.
 
 [Compare v0.0.0...main](https://github.com/trinistr/object_forge/compare/v0.0.0...main)
 
