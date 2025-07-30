@@ -16,8 +16,8 @@ module ObjectForge
 
     # Define and register a forge in one go.
     #
-    # @see Forge.define
     # @see #register
+    # @see Forge.define
     #
     # @param name [Symbol] name to register forge under
     # @param forged [Class] class to forge

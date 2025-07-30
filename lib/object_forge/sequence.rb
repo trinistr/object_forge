@@ -3,7 +3,7 @@
 require "concurrent/mvar"
 
 module ObjectForge
-  # A thread-safe container for sequences.
+  # A thread-safe representation of a sequence of values.
   #
   # @since 0.1.0
   class Sequence

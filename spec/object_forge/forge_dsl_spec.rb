@@ -285,14 +285,30 @@ module ObjectForge
         let(:definition) do
           proc do |f|
             f.attribute(:attr_1) { "Name" }
-            f.trait(:trait_1) { f.attribute(:attr_1) { "Eman" } }
+            f.trait(:trait_1) { |ft| ft.attribute(:attr_1) { f.equal?(ft) } }
           end
         end
 
-        it "defines a trait, overriding attributes" do
+        it "yields self to the block, with block defining overridden attributes" do
           expect(forge_dsl.attributes[:attr_1].call).to eq "Name"
           expect(forge_dsl.traits[:trait_1]).to be_a Hash
-          expect(forge_dsl.traits[:trait_1][:attr_1].call).to eq "Eman"
+          expect(forge_dsl.traits[:trait_1][:attr_1].call).to be true
+        end
+
+        context "when trait is defined outside of DSL" do
+          let(:definition) do
+            trait = ->(ft) { ft.attr_1 { "Enam" } }
+            proc do |f|
+              f.attribute(:attr_1) { "Name" }
+              f.trait(:trait_1, &trait)
+            end
+          end
+
+          it "accepts such a block" do
+            expect(forge_dsl.attributes[:attr_1].call).to eq "Name"
+            expect(forge_dsl.traits[:trait_1]).to be_a Hash
+            expect(forge_dsl.traits[:trait_1][:attr_1].call).to eq "Enam"
+          end
         end
       end
 
@@ -345,7 +361,7 @@ module ObjectForge
 
       context "when called with a reserved name" do
         %i[
-          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
+          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
         ].each do |reserved_name|
           describe "##{reserved_name}" do
             let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }
@@ -392,7 +408,7 @@ module ObjectForge
 
         context "when called with a reserved name" do
           %i[
-            name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~
+            name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
           ].each do |reserved_name|
             describe "##{reserved_name}" do
               let(:name) { reserved_name }

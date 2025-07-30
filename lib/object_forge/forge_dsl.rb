@@ -17,13 +17,13 @@ module ObjectForge
   #
   # @since 0.1.0
   class ForgeDSL < UnBasicObject
-    # @return [Hash{Symbol => Proc}] frozen hash
+    # @return [Hash{Symbol => Proc}] attribute definitions
     attr_reader :attributes
 
-    # @return [Hash{Symbol => Sequence}] frozen hash
+    # @return [Hash{Symbol => Sequence}] used sequences
     attr_reader :sequences
 
-    # @return [Hash{Symbol => Hash{Symbol => Proc}}] frozen hash of frozen hashes
+    # @return [Hash{Symbol => Hash{Symbol => Proc}}] trait definitions
     attr_reader :traits
 
     # Define forge's parameters through DSL.
@@ -75,6 +75,10 @@ module ObjectForge
     end
 
     # Define an attribute, possibly transient.
+    #
+    # DSL does not know or care what attributes the forged class has,
+    # so the only difference between "real" and "transient" attributes
+    # is how the class itself treats them.
     #
     # It is also possible to define attributes using +method_missing+ shortcut,
     # except for conflicting or reserved names.
@@ -163,16 +167,29 @@ module ObjectForge
 
     # Define a trait — a group of attributes with non-default values.
     #
+    # DSL yields itself to the block, in case you need to refer to it.
+    # This can be used to define traits using a block coming from outside of DSL.
+    #
     # @example
     #   f.trait :special do
     #     f.name { "***xXxSPECIALxXx***" }
     #     f.sequence(:special_id) { "~~~ SpEcIaL #{_1} ~~~" }
     #   end
+    # @example externally defined trait
+    #   # Variable defined outside of DSL:
+    #   success_trait = ->(ft) do
+    #     ft.status { :success }
+    #     ft.error_code { 0 }
+    #   end
+    #   # Inside the DSL:
+    #   f.trait(:success, &success_trait)
     #
     # @note Traits can not be defined inside of traits.
     #
     # @param name [Symbol] trait name
     # @yield block for trait definition
+    # @yieldparam f [ForgeDSL] self
+    # @yieldreturn [void]
     # @return [Symbol] trait name
     #
     # @raise [ArgumentError] if +name+ is not a Symbol
@@ -220,6 +237,7 @@ module ObjectForge
     # - all names ending in +?+, +!+ or +=+
     # - all names starting with a non-word ASCII character
     #   (operators, +`+, +[]+, +[]=+)
+    # - +rand+
     #
     # @param name [Symbol] attribute name
     # @yieldreturn [Any] attribute value
@@ -236,7 +254,7 @@ module ObjectForge
     def respond_to_missing?(name, _include_all)
       return false if frozen?
 
-      !name.end_with?("?", "!", "=") && !name.match?(/\A(?=\p{ASCII})\P{Word}/)
+      !name.end_with?("?", "!", "=") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
     end
   end
 end

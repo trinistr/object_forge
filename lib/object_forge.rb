@@ -20,6 +20,24 @@ Dir["#{__dir__}/object_forge/**/*.rb"].each { require _1 }
 #   It allows defining arbitrary attributes (possibly using sequences),
 #   with support for traits (collections of attributes with non-default values).
 # - {Crucible} is used to resolve attributes.
+#
+# @example Quick example
+#   Frobinator = Struct.new(:frob, :inator, keyword_init: true)
+#   # Forge's name and forged class are completely independent.
+#   ObjectForge.define(:frobber, Frobinator) do |f|
+#     f.frob { "Frob" + inator.call }
+#     f.inator { -> { "inator" } }
+#     f.trait :static do |tf|
+#       tf.frob { "Static" }
+#     end
+#   end
+#   # These methods are aliases:
+#   ObjectForge.forge(:frobber)
+#   # => #<struct Frobinator frob="Frobinator", inator=#<Proc:...>>
+#   ObjectForge.build(:frobber, frob: -> { "Frob" + inator }, inator: "orn")
+#   # => #<struct Frobinator frob="Froborn", inator="orn">
+#   ObjectForge[:frobber, :static, inator: "Value"]
+#   # => #<struct Frobinator frob="Static", inator="Value">
 module ObjectForge
   # Base error class for ObjectForge.
   # @since 0.1.0
@@ -70,7 +88,7 @@ module ObjectForge
   # Build an instance using a forge from {DEFAULT_YARD}.
   #
   # @!macro default_forgeyard
-  # @see Forgeyard#define
+  # @see Forgeyard#forge
   # @since 0.1.0
   #
   # @param name [Symbol] name of the forge
