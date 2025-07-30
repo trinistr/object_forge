@@ -5,16 +5,16 @@ source "https://rubygems.org"
 gemspec
 
 # For running checks
-gem "rake"
+gem "rake", require: false
 
 group :linting do
   # Linting
-  gem "rubocop", "~> 1.72"
-  gem "rubocop-packaging"
-  gem "rubocop-performance"
-  gem "rubocop-rake"
-  gem "rubocop-rspec"
-  gem "rubocop-thread_safety"
+  gem "rubocop", "~> 1.72", require: false
+  gem "rubocop-packaging", require: false
+  gem "rubocop-performance", require: false
+  gem "rubocop-rake", require: false
+  gem "rubocop-rspec", require: false
+  gem "rubocop-thread_safety", require: false
 
   # Checking type signatures
   gem "rbs", require: false
@@ -34,16 +34,16 @@ group :development do
   gem "bump", require: false
 
   # Benchmarking and profiling
-  gem "benchmark"
-  gem "benchmark-ips"
-  gem "stackprof"
+  gem "benchmark", require: false
+  gem "benchmark-ips", require: false
+  gem "stackprof", require: false
 end
 
 group :test do
   # Testing framework
-  gem "rspec"
+  gem "rspec", require: false
 
   # Code coverage report
-  gem "simplecov"
-  gem "simplecov_lcov_formatter"
+  gem "simplecov", require: false
+  gem "simplecov_lcov_formatter", require: false
 end

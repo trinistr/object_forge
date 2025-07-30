@@ -4,36 +4,44 @@ module ObjectForge
   class DSLError < Error
   end
 
-  interface _Sequencable
+  interface _Sequenceable
     def succ: -> self
+    def respond_to?: (Symbol name, ?bool include_private) -> bool
+    def class: -> Class
   end
   interface _Forgable
     def new: (Hash[Symbol, untyped]) -> self
   end
+  interface _ForgeParameters
+    def attributes: () -> Hash[Symbol, untyped]
+    def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
+  end
 
   VERSION: String
-  DEFAULT_YARD: Forgeyard
+  DEFAULT_YARD: ObjectForge::Forgeyard
 
   def self.sequence
-    : (?(_Sequencable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
+    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
 
   def self.define
-    : (ObjectForge::_Forgable forged, Symbol name) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
-    | (ObjectForge::_Forgable forged, Symbol name) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
+    : (Symbol name, ObjectForge::_Forgable forged) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
+    | (Symbol name, ObjectForge::_Forgable forged) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
 
   def self.forge
-    : (Symbol name, *Array[Symbol] traits, **Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
+    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
 end
 
 class ObjectForge::Sequence
   def self.new
-    : (?(ObjectForge::_Sequencable | instance) initial) -> instance
+    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
   
-  def initialize: (ObjectForge::_Sequencable initial) -> void
+  attr_reader initial: ObjectForge::_Sequenceable
+  
+  def initialize: (ObjectForge::_Sequenceable initial) -> void
 
-  def next: -> ObjectForge::_Sequencable
+  def next: -> ObjectForge::_Sequenceable
 
-  def reset: -> ObjectForge::_Sequencable
+  def reset: -> ObjectForge::_Sequenceable
   alias rewind reset
 end
   
@@ -51,19 +59,14 @@ class ObjectForge::Forgeyard
     : (Symbol name, ObjectForge::Forge forge) -> ObjectForge::Forge
 
   def forge
-    : (Symbol name, *Array[Symbol] traits, **Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
+    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
   alias build forge
   alias [] forge
 end
 
 class ObjectForge::Forge
-  interface _Parameters
-    def attributes: () -> Hash[Symbol, untyped]
-    def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
-  end
-
   class Parameters
-    include _Parameters
+    include ObjectForge::_ForgeParameters
 
     def intitialize
       : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
@@ -77,10 +80,10 @@ class ObjectForge::Forge
     | (ObjectForge::_Forgable forged, ?name: Symbol?) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
   
   def initialize
-    : (ObjectForge::_Forgable forged, _Parameters parameters, ?name: Symbol?) -> void
+    : (ObjectForge::_Forgable forged, ObjectForge::_ForgeParameters parameters, ?name: Symbol?) -> void
   
   def forge
-    : (*Array[Symbol] traits, **Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
+    : (*Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
     | (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
   alias build forge
   alias [] forge
@@ -89,30 +92,30 @@ class ObjectForge::Forge
 
   def check_traits_and_overrides
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> [Array[Symbol], Hash[Symbol, untyped]]
-    | ([Array[Symbol], Hash[Symbol, untyped]]) -> [Array[Symbol], Hash[Symbol, untyped]]
+   | (Array[(Array[Symbol] | Hash[Symbol, untyped])], Hash[Symbol, untyped]) -> [Array[Symbol], Hash[Symbol, untyped]]
 end
 
 class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
-  include ObjectForge::Forge::_Parameters
+  include ObjectForge::_ForgeParameters
   attr_reader sequences: Hash[Symbol, ObjectForge::Sequence]
 
   @attributes: Hash[Symbol, Proc]
   @sequences: Hash[Symbol, ObjectForge::Sequence]
   @traits: Hash[Symbol, Hash[Symbol, Proc]]
 
-  def intialize
-    : () { (self) -> void } -> void
-    | () { [self: self] -> void } -> void
+  def initialize
+    : () { (ObjectForge::ForgeDSL) -> void } -> void
+    | () { [self: ObjectForge::ForgeDSL] -> void } -> void
 
   def freeze: -> self
 
   def attribute
     : (Symbol name) { -> untyped } -> Symbol
-    | (Symbol name) { (ObjectForge::_Sequencable) -> untyped } -> Symbol
+    | (Symbol name) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
   alias [] attribute
 
   def sequence
-    : (Symbol name, ?(ObjectForge::_Sequencable | ObjectForge::Sequence) initial) { (ObjectForge::_Sequencable) -> untyped } -> Symbol
+    : (Symbol name, ?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
 
   def trait
     : (Symbol name) { (self) -> void } -> Symbol
@@ -123,11 +126,13 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 
   def method_missing
     : (Symbol name) { -> untyped } -> Symbol
+    # After freezing:
+    | (Symbol name) { -> untyped } -> void
 
   def respond_to_missing?
     : (Symbol name, bool include_all) -> bool
 
-  def rand: -> (Float | Integer)
+  def rand: [T] (?(Float | Integer | Range[T])) -> (Float | Integer | T)
 end
 
 class ObjectForge::Crucible < ObjectForge::UnBasicObject
@@ -138,7 +143,7 @@ class ObjectForge::Crucible < ObjectForge::UnBasicObject
     : (Hash[Symbol, untyped] attributes) -> void
 
   def resolve!
-    : () -> Hash[Symbol, untyped]
+    : -> Hash[Symbol, untyped]
 
   private
 
@@ -165,7 +170,7 @@ class ObjectForge::UnBasicObject < BasicObject
 
   def is_a?: (Module klass) -> bool
 
-  def respond_to?: (Symbol name, bool include_private) -> bool
+  def respond_to?: (Symbol name, ?bool include_private) -> bool
 
   def to_s: -> String
 
