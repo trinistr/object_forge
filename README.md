@@ -3,7 +3,7 @@
 > [!TIP]
 > You may be viewing documentation for an older (or newer) version of the gem than intended. Look at [Changelog](https://github.com/trinistr/object_forge/blob/main/CHANGELOG.md) to see all versions, including unreleased changes.
 
-<!-- Latest: [![Gem Version](https://badge.fury.io/rb/object_forge.svg?icon=si%3Arubygems)](https://rubygems.org/gems/object_forge) -->
+Latest: [![Gem Version](https://badge.fury.io/rb/object_forge.svg?icon=si%3Arubygems)](https://rubygems.org/gems/object_forge)
 [![CI](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml/badge.svg)](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml)
 
 ***
@@ -33,10 +33,14 @@ Most factory projects are also quite dead, having not been updated in *many* yea
 
 ## Installation
 
-Add to your application's Gemfile:
+Install with `gem`:
+```sh
+gem install object_forge
+```
 
+Or, if using Bundler, add to your Gemfile:
 ```ruby
-gem "object_forge", github: "trinistr/object_forge"
+gem "object_forge"
 ```
 
 ## Usage
