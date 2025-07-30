@@ -168,14 +168,18 @@ Forge definition:
 - Class specification for a forge is non-optional, there is no assumption about the class name.
 - If DSL block declares a block argument, `self` context is not changed, so DSL methods can't be called with an implicit receiver.
 
+Attributes:
+- For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
+- *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
+
 Traits:
 - Traits can't be defined inside of other traits. (I feel that nesting is needlessly confusing.)
 - Traits can't be called from other traits. This may change in the future.
 - There are no default traits.
 
-Attributes:
-- For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
-- *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
+Sequences:
+- There is no way to define shared sequences, unless you pass the same object yourself to multiple `sequence` calls.
+- Sequences work with values implementing `#succ`, not `#next`, expressly prohibiting `Enumerator`. This may be relaxed in the future.
 
 ## Current and planned features (roadmap)
 
@@ -186,6 +190,7 @@ kanban
     [Independent forges]
     [Independent forgeyards]
     [Default global forgeyard]
+    [Thread-safe behavior]
     [Tapping into built objects for post-processing]
   [⚗️ To do]
     [Ability to replace resolver]
@@ -199,6 +204,7 @@ kanban
     [Default traits]
     [Forge inheritance]
     [Premade performance forge: static DSL, epsilon resolver]
+    [Enumerator compatibility in sequences]
 ```
 
 ## Development
