@@ -71,6 +71,7 @@ module ObjectForge
     # @param overrides [Hash{Symbol => Any}] attribute overrides
     # @return [Any] built instance
     def forge(*traits, **overrides)
+      # @type var traits: Array[(Array[Symbol] | Hash[Symbol, untyped])]
       traits, overrides = check_traits_and_overrides(traits, overrides)
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       attributes = Crucible.new(attributes).resolve!
@@ -84,7 +85,11 @@ module ObjectForge
     private
 
     def check_traits_and_overrides(traits, overrides)
-      return [traits, overrides] unless overrides.empty?
+      unless traits.size == 2 && overrides.empty?
+        # @type var traits: Array[Symbol]
+        # @type var overrides: Hash[Symbol, untyped]
+        return [traits, overrides]
+      end
 
       case traits
       in [Array => real_traits, Hash => real_overrides]

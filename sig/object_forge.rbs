@@ -1,3 +1,186 @@
 module ObjectForge
+  class Error < StandardError
+  end
+  class DSLError < Error
+  end
+
+  interface _Sequenceable
+    def succ: -> self
+    def respond_to?: (Symbol name, ?bool include_private) -> bool
+    def class: -> Class
+  end
+  interface _Forgable
+    def new: (Hash[Symbol, untyped]) -> self
+  end
+  interface _ForgeParameters
+    def attributes: () -> Hash[Symbol, untyped]
+    def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
+  end
+
   VERSION: String
+  DEFAULT_YARD: ObjectForge::Forgeyard
+
+  def self.sequence
+    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
+
+  def self.define
+    : (Symbol name, ObjectForge::_Forgable forged) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
+    | (Symbol name, ObjectForge::_Forgable forged) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
+
+  def self.forge
+    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
+end
+
+class ObjectForge::Sequence
+  def self.new
+    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
+  
+  attr_reader initial: ObjectForge::_Sequenceable
+  
+  def initialize: (ObjectForge::_Sequenceable initial) -> void
+
+  def next: -> ObjectForge::_Sequenceable
+
+  def reset: -> ObjectForge::_Sequenceable
+  alias rewind reset
+end
+  
+class ObjectForge::Forgeyard
+  attr_reader forges: Concurrent::Map[Symbol, ObjectForge::Forge]
+
+  def initialize
+    : () -> void
+
+  def define
+    : (Symbol name, ObjectForge::_Forgable forged) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
+    | (Symbol name, ObjectForge::_Forgable forged) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
+
+  def register
+    : (Symbol name, ObjectForge::Forge forge) -> ObjectForge::Forge
+
+  def forge
+    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
+  alias build forge
+  alias [] forge
+end
+
+class ObjectForge::Forge
+  class Parameters
+    include ObjectForge::_ForgeParameters
+
+    def intitialize
+      : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
+  end
+
+  attr_reader forged: ObjectForge::_Forgable
+  attr_reader name: Symbol
+
+  def self.define
+    : (ObjectForge::_Forgable forged, ?name: Symbol?) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
+    | (ObjectForge::_Forgable forged, ?name: Symbol?) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
+  
+  def initialize
+    : (ObjectForge::_Forgable forged, ObjectForge::_ForgeParameters parameters, ?name: Symbol?) -> void
+  
+  def forge
+    : (*Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
+    | (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
+  alias build forge
+  alias [] forge
+
+  private
+
+  def check_traits_and_overrides
+    : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> [Array[Symbol], Hash[Symbol, untyped]]
+   | (Array[(Array[Symbol] | Hash[Symbol, untyped])], Hash[Symbol, untyped]) -> [Array[Symbol], Hash[Symbol, untyped]]
+end
+
+class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
+  include ObjectForge::_ForgeParameters
+  attr_reader sequences: Hash[Symbol, ObjectForge::Sequence]
+
+  @attributes: Hash[Symbol, Proc]
+  @sequences: Hash[Symbol, ObjectForge::Sequence]
+  @traits: Hash[Symbol, Hash[Symbol, Proc]]
+
+  def initialize
+    : () { (ObjectForge::ForgeDSL) -> void } -> void
+    | () { [self: ObjectForge::ForgeDSL] -> void } -> void
+
+  def freeze: -> self
+
+  def attribute
+    : (Symbol name) { -> untyped } -> Symbol
+    | (Symbol name) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
+  alias [] attribute
+
+  def sequence
+    : (Symbol name, ?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
+
+  def trait
+    : (Symbol name) { (self) -> void } -> Symbol
+
+  def inspect: -> String
+  
+  private
+
+  def method_missing
+    : (Symbol name) { -> untyped } -> Symbol
+    # After freezing:
+    | (Symbol name) { -> untyped } -> void
+
+  def respond_to_missing?
+    : (Symbol name, bool include_all) -> bool
+
+  def rand: [T] (?(Float | Integer | Range[T])) -> (Float | Integer | T)
+end
+
+class ObjectForge::Crucible < ObjectForge::UnBasicObject
+  @attributes: Hash[Symbol, untyped]
+  @resolved_attributes: Set[Symbol]
+
+  def initialize
+    : (Hash[Symbol, untyped] attributes) -> void
+
+  def resolve!
+    : -> Hash[Symbol, untyped]
+
+  private
+
+  def method_missing
+    : (Symbol name) -> untyped
+  alias [] method_missing
+
+  def respond_to_missing?
+    : (Symbol name, bool include_all) -> bool
+end
+
+class ObjectForge::UnBasicObject < BasicObject
+  def class: -> Class
+  
+  def eql?: (untyped other) -> bool
+
+  def freeze: -> self
+
+  def frozen?: -> bool
+
+  def hash: -> Integer
+
+  def inspect: -> String
+
+  def is_a?: (Module klass) -> bool
+
+  def respond_to?: (Symbol name, ?bool include_private) -> bool
+
+  def to_s: -> String
+
+  def pretty_print: (untyped) -> void
+
+  def pretty_print_cycle: (untyped) -> void
+  
+  private
+
+  def block_given?: -> bool
+
+  def raise: (_Exception exception, ?String message) -> void
 end

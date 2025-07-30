@@ -38,6 +38,8 @@ jobs:
       with:
         ruby-version: '3.1'
         bundler-cache: true
+    - name: Install RBS collection
+      run: bundle exec rbs collection install
     - name: Run RBS
       run: bundle exec rake rbs
   coverage:

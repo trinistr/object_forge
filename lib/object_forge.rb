@@ -57,8 +57,8 @@ module ObjectForge
   # @see Forgeyard#define
   # @since 0.1.0
   #
+  # @param name [Symbol] forge name
   # @param forged [Class] class to forge
-  # @param name [Symbol, nil] forge name
   # @yieldparam f [ForgeDSL]
   # @yieldreturn [void]
   # @return [Forge] forge
