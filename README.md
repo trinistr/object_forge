@@ -177,6 +177,30 @@ Attributes:
 - For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
 - *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
 
+## Current and planned features (roadmap)
+
+```mermaid
+kanban
+  [✅ Done]
+    [FactoryBot-like DSL: attributes, traits, sequences]
+    [Independent forges]
+    [Independent forgeyards]
+    [Default global forgeyard]
+  [⚗️ To do]
+    [Ability to replace resolver]
+    [Custom builders]
+    [Struct builder]
+    [Data builder]
+    [Hash builder]
+    [After-build hook]
+    [Auto-tapping built objects]
+  [❔Under consideration]
+    [Calling traits from traits]
+    [Default traits]
+    [Forge inheritance]
+    [Premade performance forge: static DSL, epsilon resolver]
+```
+
 ## Development
 
 After checking out the repo, run `bundle` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
