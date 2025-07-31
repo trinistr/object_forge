@@ -92,19 +92,22 @@ end
 A forge builds objects using class's `.new`, passing all attributes as a single hash. Forge can be called through any of `#[]`, `#forge`, or `#build` methods (they are aliases):
 ```ruby
 ObjectForge[:point]
-# => #<Point:0x00007f6109dcad40 @id="a", @x=0.17176955469852973, @y=0.3423901951181103>
+  # => #<Point:0x00007f6109dcad40 @id="a", @x=0.17176955469852973, @y=0.3423901951181103>
 # Positional arguments define used traits:
 ObjectForge.build(:point, :z)
-# => #<Point:0x00007f61099e7980 @id="Z_d", @x=0.0, @y=0.0>
+  # => #<Point:0x00007f61099e7980 @id="Z_b", @x=0.0, @y=0.0>
 # Attributes can be overridden with keyword arguments:
 ObjectForge.forge(:point, x: 10)
-# => #<Point:0x00007f6109aabf88 @id="c", @x=10, @y=-0.3458802496120402>
+  # => #<Point:0x00007f6109aabf88 @id="c", @x=10, @y=-0.3458802496120402>
 # Traits and overrides are combined in the given order:
 ObjectForge[:point, :z, :invalid, id: "NaN"]
-# => #<Point:0x00007f6109b82e48 @id="NaN", @x=0.0, @y=NaN>
+  # => #<Point:0x00007f6109b82e48 @id="NaN", @x=0.0, @y=NaN>
 # A Proc override behaves the same as an attribute definition:
 ObjectForge[:point, :z, x: -> { rand(100..200) + delta }]
-# => #<Point:0x00007f6109932418 @id="ez", @x=135.0, @y=0.0>
+  # => #<Point:0x00007f6109932418 @id="Z_d", @x=135.0, @y=0.0>
+# A block can be passed to do something with the created object:
+ObjectForge[:point, :z] { puts "#{_1.id}: #{_1.x},#{_1.y}" }
+  # outputs "Z_e: 0.0,0.0"
 ```
 
 ### Separate forgeyards and forges
@@ -124,12 +127,13 @@ end
 Now, this forgeyard can be used just like the default one:
 ```ruby
 forgeyard[:point, :z, id: "0"]
-# => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
+  # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
 ```
 
 Note how the forge isn't registered in the default forgeyard:
 ```ruby
-ObjectForge[:point] # => ArgumentError: unknown forge: point
+ObjectForge[:point]
+  # ArgumentError: unknown forge: point
 ```
 
 If you find it more convenient not to use a forgeyard (for example, if you only need a single forge for your service), you can create individual forges:
@@ -142,17 +146,17 @@ forge = ObjectForge::Forge.define(Point) do |f|
   f.trait :z do f.radius { 0 } end
 end
 forge[:z, id: "0"]
-# => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
+  # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
 ```
 
 `Forge` has the same building interface as a `Forgeyard`, but it doesn't have the name argument:
 ```ruby
 forge[]
-# => #<Point:0x00007f610deae578 @id="a", @x=0.3317733939650964, @y=-0.1363936629550252>
+  # => #<Point:0x00007f610deae578 @id="a", @x=0.3317733939650964, @y=-0.1363936629550252>
 forge[:z]
-# => #<Point:0x00007f61099f6520 @id="b", @x=0, @y=0>
+  # => #<Point:0x00007f61099f6520 @id="b", @x=0, @y=0>
 forge[radius: 500]
-# => #<Point:0x00007f6109960048 @id="c", @x=-141, @y=109>
+  # => #<Point:0x00007f6109960048 @id="c", @x=-141, @y=109>
 ```
 
 ### Differences and limitations (compared to FactoryBot)
