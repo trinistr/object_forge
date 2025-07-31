@@ -215,6 +215,15 @@ You can also run `bin/console` for an interactive prompt that will allow you to 
 
 To install this gem onto your local machine, run `rake install`. To release a new version, run `rake version:{major|minor|patch}`, and then run `rake release`, which will push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+Checklist for a new or updated feature:
+- Tests cover the behavior and its interactions.
+- Running `rspec` reports 100% coverage (unless it's impossible to achieve in one run).
+- Running `rubocop` reports no offenses.
+- Running `rake steep` reports no new warnings or errors.
+- Documentation is up-to-date: generate it with `rake docs` and read it.
+- `CHANGELOG.md` lists the change if it has impact on users.
+- `README.md` is updated if the feature should be visible there (especially the Kanban board).
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/trinistr/object_forge.
