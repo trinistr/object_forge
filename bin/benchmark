@@ -6,6 +6,7 @@ require "bundler/setup"
 
 # Load supporting libraries
 require "fileutils"
+require "time"
 
 require "benchmark"
 require "benchmark/ips"
@@ -31,6 +32,9 @@ FORGE =
 
 # Run benchmark
 FileUtils.mkdir_p("tmp")
+report_path = "tmp/benchmark #{Time.now.iso8601} " \
+              "(#{`ruby -v`.chomp}) " \
+              "(commit #{`git rev-parse HEAD`.chomp[0..7]}).json"
 StackProf.run(mode: :cpu, raw: true, out: "tmp/stackprof.dump") do
   Benchmark.ips do |ips|
     ips.report("yard.forge()") { FORGEYARD.forge(:foobar) }
@@ -44,9 +48,12 @@ StackProf.run(mode: :cpu, raw: true, out: "tmp/stackprof.dump") do
 
     ips.report("yard.forge(foo: 1, bar: 2)") { FORGEYARD.forge(:foobar, foo: 1, bar: 2) }
     ips.report("forge.forge(foo: 1, bar: 2)") { FORGE.forge(foo: 1, bar: 2) }
+
+    ips.json!(report_path)
   end
 end
+puts "Report saved to #{report_path}"
 
 # Generate flamegraph to actually understand StackProf's report
 `stackprof tmp/stackprof.dump --d3-flamegraph > tmp/flamegraph.html`
-puts "Flamegraph generated at tmp/flamegraph.html"
+puts "Flamegraph saved to tmp/flamegraph.html"
