@@ -55,8 +55,8 @@ module ObjectForge
 
     # Forge a new instance.
     #
-    # @overload forge(*traits, **overrides) { |object| ... }
-    # @overload forge(traits, overrides) { |object| ... }
+    # @overload forge(*traits, **overrides, &)
+    # @overload forge(traits, overrides, &)
     #
     # Positional arguments are taken as trait names, keyword arguments as attribute overrides,
     # unless there are exactly two positional arguments: an array and a hash.
@@ -74,7 +74,7 @@ module ObjectForge
     # @yieldparam object [Any] forged instance
     # @yieldreturn [void]
     # @return [Any] built instance
-    def forge(*traits, **overrides, &)
+    def forge(*traits, **overrides)
       # @type var traits: Array[(Array[Symbol] | Hash[Symbol, untyped])]
       traits, overrides = check_traits_and_overrides(traits, overrides)
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
