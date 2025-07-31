@@ -168,14 +168,18 @@ Forge definition:
 - Class specification for a forge is non-optional, there is no assumption about the class name.
 - If DSL block declares a block argument, `self` context is not changed, so DSL methods can't be called with an implicit receiver.
 
+Attributes:
+- For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
+- *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
+
 Traits:
 - Traits can't be defined inside of other traits. (I feel that nesting is needlessly confusing.)
 - Traits can't be called from other traits. This may change in the future.
 - There are no default traits.
 
-Attributes:
-- For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
-- *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
+Sequences:
+- There is no way to define shared sequences, unless you pass the same object yourself to multiple `sequence` calls.
+- Sequences work with values implementing `#succ`, not `#next`, expressly prohibiting `Enumerator`. This may be relaxed in the future.
 
 ## Current and planned features (roadmap)
 
@@ -186,6 +190,8 @@ kanban
     [Independent forges]
     [Independent forgeyards]
     [Default global forgeyard]
+    [Thread-safe behavior]
+    [Tapping into built objects for post-processing]
   [⚗️ To do]
     [Ability to replace resolver]
     [Custom builders]
@@ -193,12 +199,12 @@ kanban
     [Data builder]
     [Hash builder]
     [After-build hook]
-    [Auto-tapping built objects]
   [❔Under consideration]
     [Calling traits from traits]
     [Default traits]
     [Forge inheritance]
     [Premade performance forge: static DSL, epsilon resolver]
+    [Enumerator compatibility in sequences]
 ```
 
 ## Development
@@ -208,6 +214,15 @@ After checking out the repo, run `bundle` to install dependencies. Then, run `ra
 You can also run `bin/console` for an interactive prompt that will allow you to experiment, or `bin/benchmark` to run a benchmark script and generate a StackProf flamegraph.
 
 To install this gem onto your local machine, run `rake install`. To release a new version, run `rake version:{major|minor|patch}`, and then run `rake release`, which will push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+Checklist for a new or updated feature:
+- Tests cover the behavior and its interactions.
+- Running `rspec` reports 100% coverage (unless it's impossible to achieve in one run).
+- Running `rubocop` reports no offenses.
+- Running `rake steep` reports no new warnings or errors.
+- Documentation is up-to-date: generate it with `rake docs` and read it.
+- `CHANGELOG.md` lists the change if it has impact on users.
+- `README.md` is updated if the feature should be visible there (especially the Kanban board).
 
 ## Contributing
 

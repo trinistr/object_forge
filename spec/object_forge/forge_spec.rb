@@ -63,6 +63,37 @@ module ObjectForge
           end
         end
       end
+
+      context "with a block" do
+        it "allows tapping into the object" do
+          expect(forge.forge { _1.foo = 33 }).to eq forged_class.new(foo: 33, bar: 2)
+        end
+
+        it "runs the block after forging the object with resolved attributes" do
+          expect(forge.forge(:barfoo, :foofoo) { _1.foo = 33 })
+            .to eq forged_class.new(foo: 33, bar: :foo)
+        end
+
+        context "if the forged class does not implement #tap" do
+          let(:forged_class) do
+            Class.new(BasicObject) do
+              attr_accessor :foo, :bar
+
+              def initialize(attributes)
+                @foo = attributes[:foo]
+                @bar = attributes[:bar]
+              end
+            end
+          end
+
+          it "works correctly" do
+            instance = forge.forge { _1.foo = 33 }
+            expect(forged_class === instance).to be true
+            expect(instance.foo).to eq 33
+            expect(instance.bar).to eq 2
+          end
+        end
+      end
     end
 
     include_examples "has an alias", :build, :forge

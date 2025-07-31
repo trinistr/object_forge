@@ -28,7 +28,7 @@ module ObjectForge
     | (Symbol name, ObjectForge::_Forgable forged) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
 
   def self.forge
-    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
+    : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
 end
 
 class ObjectForge::Sequence
@@ -59,7 +59,7 @@ class ObjectForge::Forgeyard
     : (Symbol name, ObjectForge::Forge forge) -> ObjectForge::Forge
 
   def forge
-    : (Symbol name, *Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
+    : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
   alias build forge
   alias [] forge
 end
@@ -83,8 +83,8 @@ class ObjectForge::Forge
     : (ObjectForge::_Forgable forged, ObjectForge::_ForgeParameters parameters, ?name: Symbol?) -> void
   
   def forge
-    : (*Symbol traits, **untyped overrides) -> ObjectForge::_Forgable
-    | (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> ObjectForge::_Forgable
+    : (*Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
+    | (Array[Symbol] traits, Hash[Symbol, untyped] overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
   alias build forge
   alias [] forge
 

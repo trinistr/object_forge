@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
     It has no connection to any framework and, indeed, has nothing to do with a database.
     To use, just define some factories and call them wherever you need,
     be it in tests, console, or application code.
+    If needed, almost any part of the process can be easily replaced with a custom solution.
   TEXT
 
   spec.metadata["homepage_uri"] = spec.homepage

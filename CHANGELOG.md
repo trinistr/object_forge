@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+**Changed**
+- `Forge#forge` (and all proxy methods) now accept an optional block, yielding the forged object to do user-defined post-processing.
+
 [Compare v0.1.0...main](https://github.com/trinistr/object_forge/compare/v0.1.0...main)
 
 ## [v0.1.0]

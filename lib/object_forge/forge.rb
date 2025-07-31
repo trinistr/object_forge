@@ -55,8 +55,8 @@ module ObjectForge
 
     # Forge a new instance.
     #
-    # @overload forge(*traits, **overrides)
-    # @overload forge(traits, overrides)
+    # @overload forge(*traits, **overrides, &)
+    # @overload forge(traits, overrides, &)
     #
     # Positional arguments are taken as trait names, keyword arguments as attribute overrides,
     # unless there are exactly two positional arguments: an array and a hash.
@@ -64,11 +64,15 @@ module ObjectForge
     # All traits and overrides are applied in argument order,
     # with overrides always applied after traits.
     #
+    # If a block is given, forged instance is yielded to it after being built.
+    #
     # @thread_safety Forging is thread-safe if {#parameters},
     #    +traits+ and +overrides+ are thread-safe.
     #
     # @param traits [Array<Symbol>] traits to apply
     # @param overrides [Hash{Symbol => Any}] attribute overrides
+    # @yieldparam object [Any] forged instance
+    # @yieldreturn [void]
     # @return [Any] built instance
     def forge(*traits, **overrides)
       # @type var traits: Array[(Array[Symbol] | Hash[Symbol, untyped])]
@@ -76,7 +80,9 @@ module ObjectForge
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       attributes = Crucible.new(attributes).resolve!
 
-      forged.new(attributes)
+      instance = forged.new(attributes)
+      yield instance if block_given?
+      instance
     end
 
     alias build forge
