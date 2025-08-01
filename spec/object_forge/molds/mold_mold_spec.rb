@@ -47,7 +47,8 @@ RSpec.describe ObjectForge::Molds::MoldMold do
     end
 
     it "can be called with arbitrary extra arguments" do
-      expect(mold.call(forged: 1, attributes: 2, extra: 3)).to eq(forged: 1, attributes: 2, extra: 3)
+      expect(mold.call(forged: 1, attributes: 2, extra: 3))
+        .to eq(forged: 1, attributes: 2, extra: 3)
     end
   end
 end

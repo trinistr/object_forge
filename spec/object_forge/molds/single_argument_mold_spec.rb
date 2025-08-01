@@ -6,13 +6,7 @@ RSpec.describe ObjectForge::Molds::SingleArgumentMold do
   subject(:mold) { described_class.new }
 
   let(:forged_object) do
-    klass = Class.new do
-      def new(attributes)
-        attributes.slice(:a, :c)
-      end
-    end
-
-    klass.new
+    Class.new { def new(attributes) = attributes.slice(:a, :c) }.new
   end
 
   describe "#call" do
