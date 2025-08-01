@@ -69,14 +69,14 @@ module ObjectForge
       context "with a single argument" do
         it "builds an instance through named forge with default parameters" do
           expect(forgeyard.forge(:test)).to be instance
-          expect(forge).to have_received(:[]).with([], {})
+          expect(forge).to have_received(:[]).with(no_args)
         end
       end
 
       context "with multiple arguments" do
         it "builds an instance through named forge with specified parameters" do
           expect(forgeyard.forge(:test, :trait, attribute: 2)).to be instance
-          expect(forge).to have_received(:[]).with([:trait], { attribute: 2 })
+          expect(forge).to have_received(:[]).with(:trait, attribute: 2)
         end
       end
 
@@ -88,13 +88,13 @@ module ObjectForge
 
         it "allows tapping into the object" do
           expect(forgeyard[:test] { _1.foo = 33 }).to eq forged_class.new(foo: 33, bar: 2)
-          expect(forge).to have_received(:[]).with([], {})
+          expect(forge).to have_received(:[]).with(no_args)
         end
 
         it "runs the block after forging the object with resolved attributes" do
           expect(forgeyard[:test, foo: :foo, bar: -> { foo }] { _1.foo = 33 })
             .to eq forged_class.new(foo: 33, bar: :foo)
-          expect(forge).to have_received(:[]).with([], { foo: :foo, bar: Proc })
+          expect(forge).to have_received(:[]).with(foo: :foo, bar: Proc)
         end
       end
 
