@@ -1,0 +1,19 @@
+module ObjectForge
+  module Molds
+    class SingleArgumentMold
+      include ObjectForge::_Mold
+    end
+
+    class MoldMold
+      interface _MoldClass[T]
+        def new: () -> T
+      end
+
+      include ObjectForge::_Mold
+
+      attr_reader wrapped_mold: _MoldClass[ObjectForge::mold]
+
+      def initialize: (_MoldClass[ObjectForge::mold] wrapped_mold) -> void
+    end
+  end
+end
