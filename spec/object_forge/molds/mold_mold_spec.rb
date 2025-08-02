@@ -19,17 +19,15 @@ RSpec.describe ObjectForge::Molds::MoldMold do
     end
   end
 
-  if defined?(Data)
-    context "when called with a Data subclass" do
-      let(:klass) { Data.define(:a, :b) }
+  context "when called with a Data subclass", skip: !defined?(Data) && "Data is not available" do
+    let(:klass) { Data.define(:a, :b) }
 
-      it "returns KeywordsMold" do
-        expect(mold).to be_a ObjectForge::Molds::KeywordsMold
-      end
+    it "returns KeywordsMold" do
+      expect(mold).to be_a ObjectForge::Molds::KeywordsMold
+    end
 
-      specify "returned mold is appropriate" do
-        expect(built_object).to eq klass.new(a: 1, b: 2)
-      end
+    specify "returned mold is appropriate" do
+      expect(built_object).to eq klass.new(a: 1, b: 2)
     end
   end
 

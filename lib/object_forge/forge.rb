@@ -85,7 +85,7 @@ module ObjectForge
     # @return [Any] built instance
     def forge(*traits, **overrides)
       resolved_attributes = resolve_attributes(traits, overrides)
-      instance = build_instance(resolved_attributes)
+      instance = @mold.call(forged: @forged, attributes: resolved_attributes)
       yield instance if block_given?
       instance
     end
@@ -98,10 +98,6 @@ module ObjectForge
     def resolve_attributes(traits, overrides)
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       Crucible.new(attributes).resolve!
-    end
-
-    def build_instance(attributes)
-      @mold.call(forged: @forged, attributes:)
     end
   end
 end

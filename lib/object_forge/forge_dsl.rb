@@ -75,6 +75,7 @@ module ObjectForge
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
+      @mold.freeze
       self
     end
 
@@ -89,11 +90,11 @@ module ObjectForge
     # @param mold [Class, #call, nil]
     # @return [Class, #call, nil]
     #
-    # @raise [DSLError] if +mold+ does not respond to +call+
+    # @raise [DSLError] if +mold+ does not respond to or implement +#call+
     def mold=(mold)
       if nil == mold || mold.respond_to?(:call) # rubocop:disable Style/YodaCondition
         @mold = mold
-      elsif Class === mold && mold.public_method_defined?(:call)
+      elsif ::Class === mold && mold.public_method_defined?(:call)
         @mold = Molds::WrappedMold.new(mold)
       else
         raise DSLError, "mold must respond to or implement #call"

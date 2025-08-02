@@ -21,6 +21,8 @@ module ObjectForge
     describe "full example" do
       let(:definition) do
         proc do |f|
+          f.mold = Molds::KeywordsMold.new
+
           f.attribute(:name) { "Name" }
           f[:description] { name.upcase }
           f.duration { rand(1000) }
@@ -50,6 +52,11 @@ module ObjectForge
         expect(forge_dsl.sequences).to be_frozen
         expect(forge_dsl.traits).to be_frozen
         expect(forge_dsl.traits.values).to all be_frozen
+      end
+
+      it "contains mold" do
+        expect(forge_dsl.mold).to be_a Molds::KeywordsMold
+        expect(forge_dsl.mold).to be_frozen
       end
 
       it "contains root attributes, including sequenced ones" do
@@ -144,6 +151,64 @@ module ObjectForge
 
         it "fails, probably with ArgumentError" do
           expect { forge_dsl }.to raise_error(ArgumentError, /wrong number of arguments/)
+        end
+      end
+    end
+
+    describe "#mold=" do
+      context "when assigned nil" do
+        let(:definition) do
+          proc { |f|
+            f.mold = ->(**) { [] }
+            f.mold = nil
+          }
+        end
+
+        it "clears the mold" do
+          expect(forge_dsl.mold).to be nil
+        end
+      end
+
+      context "when assigned a proc" do
+        let(:definition) { proc { |f| f.mold = mold } }
+        let(:mold) { ->(attributes:, **) { attributes } }
+
+        it "sets it as the mold" do
+          expect(forge_dsl.mold).to be mold
+        end
+      end
+
+      context "when assigned a callable object" do
+        let(:definition) { proc { |f| f.mold = mold } }
+        let(:mold) { Molds::HashMold.new }
+
+        it "sets it as the mold" do
+          expect(forge_dsl.mold).to be mold
+        end
+      end
+
+      context "when assigned a class with #call" do
+        let(:definition) { proc { |f| f.mold = Proc } }
+
+        it "wraps the class" do
+          expect(forge_dsl.mold).to be_a Molds::WrappedMold
+          expect(forge_dsl.mold.wrapped_mold).to be Proc
+        end
+      end
+
+      context "when assigned a class without #call" do
+        let(:definition) { proc { |f| f.mold = Object } }
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error(DSLError, "mold must respond to or implement #call")
+        end
+      end
+
+      context "when assigned an object without #call" do
+        let(:definition) { proc { |f| f.mold = Object.new } }
+
+        it "raises DSLError on definition" do
+          expect { forge_dsl }.to raise_error(DSLError, "mold must respond to or implement #call")
         end
       end
     end

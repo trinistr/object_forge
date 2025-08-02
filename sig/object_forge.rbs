@@ -99,9 +99,6 @@ class ObjectForge::Forge
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
-
-  def build_instance
-    : (Hash[Symbol, untyped] attributes) -> ObjectForge::_Forgable
 end
 
 class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
