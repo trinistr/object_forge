@@ -78,7 +78,7 @@ class ObjectForge::Forge
       : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
   end
 
-  DEFAULT_MOLD: ObjectForge::mold
+  MOLD_MOLD: ObjectForge::Molds::MoldMold
 
   attr_reader forged: ObjectForge::_Forgable
   attr_reader name: Symbol

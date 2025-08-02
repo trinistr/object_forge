@@ -28,7 +28,7 @@ module ObjectForge
     #   @return [#call, nil]
     Parameters = Struct.new(:attributes, :traits, :mold, keyword_init: true)
 
-    DEFAULT_MOLD = Molds::SingleArgumentMold.new
+    MOLD_MOLD = Molds::MoldMold.new.freeze
 
     # Define (and create) a forge using DSL.
     #
@@ -60,7 +60,7 @@ module ObjectForge
       @name = name
       @forged = forged
       @parameters = parameters
-      @mold = parameters.mold || DEFAULT_MOLD
+      @mold = parameters.mold || MOLD_MOLD.call(forged: forged)
     end
 
     # Forge a new instance.

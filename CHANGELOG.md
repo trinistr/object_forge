@@ -19,6 +19,7 @@ making it possible to consume attributes in any way you want.
 
 **Changed**
 - [Breaking] `Forge::Parameters` interface now includes `#mold`.
+- `Forge` will automatically use `Molds::MoldMold` to determine the mold if none is provided.
 
 [Compare v0.1.1...main](https://github.com/trinistr/object_forge/compare/v0.1.1...main)
 
