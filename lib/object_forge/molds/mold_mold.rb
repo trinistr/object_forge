@@ -7,8 +7,7 @@ module ObjectForge
     # Wrapping a mold class is useful when its +#call+ is stateful,
     # making it unsafe to use multiple times or in shared environments.
     #
-    # @thread_safety Thread-safe if +mold+ does not use global state.
-    #
+    # @thread_safety Thread-safe if {wrapped_mold} does not use global state.
     # @since 0.1.1
     class MoldMold
       # @return [Class] wrapped mold class
@@ -19,9 +18,10 @@ module ObjectForge
         @wrapped_mold = wrapped_mold
       end
 
-      # Instantiate +wrapped_mold+ and call it.
+      # @overload call(...)
+      # Instantiate {wrapped_mold} and call it.
       #
-      # @return [Any] result of +wrapped_mold.new.call+ with the same arguments
+      # @return [Any] result of +wrapped_mold.new.call(...)+
       def call(...)
         wrapped_mold.new.call(...)
       end

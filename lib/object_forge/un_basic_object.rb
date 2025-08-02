@@ -4,7 +4,6 @@ module ObjectForge
   # BasicObject with a few common methods copied from Object.
   #
   # @api private
-  #
   # @since 0.1.0
   class UnBasicObject < ::BasicObject
     # @!group Instance methods copied from Object

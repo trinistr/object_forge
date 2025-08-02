@@ -16,7 +16,6 @@ module ObjectForge
   #   especially in attribute definitions.
   #   The instance itself is frozen after initialization,
   #   so it should be safe to share.
-  #
   # @since 0.1.0
   class ForgeDSL < UnBasicObject
     # @return [Hash{Symbol => Proc}] attribute definitions
