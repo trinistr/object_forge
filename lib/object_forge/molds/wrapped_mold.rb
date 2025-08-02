@@ -9,7 +9,7 @@ module ObjectForge
     #
     # @thread_safety Thread-safe if {wrapped_mold} does not use global state.
     # @since 0.1.1
-    class MoldMold
+    class WrappedMold
       # @return [Class] wrapped mold class
       attr_reader :wrapped_mold
 

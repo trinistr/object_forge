@@ -4,7 +4,7 @@ module ObjectForge
       include ObjectForge::_Mold
     end
 
-    class MoldMold
+    class WrappedMold
       interface _MoldClass[T]
         def new: () -> T
       end

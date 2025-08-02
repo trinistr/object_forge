@@ -3,7 +3,7 @@
 require_relative "sequence"
 require_relative "un_basic_object"
 
-require_relative "molds/mold_mold"
+require_relative "molds/wrapped_mold"
 
 module ObjectForge
   # DSL for defining a forge.
@@ -94,7 +94,7 @@ module ObjectForge
       if nil == mold || mold.respond_to?(:call) # rubocop:disable Style/YodaCondition
         @mold = mold
       elsif Class === mold && mold.public_method_defined?(:call)
-        @mold = Molds::MoldMold.new(mold)
+        @mold = Molds::WrappedMold.new(mold)
       else
         raise DSLError, "mold must respond to or implement #call"
       end

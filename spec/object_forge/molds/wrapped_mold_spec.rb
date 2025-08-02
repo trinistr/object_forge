@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "object_forge/molds/mold_mold"
+require "object_forge/molds/wrapped_mold"
 
-RSpec.describe ObjectForge::Molds::MoldMold do
+RSpec.describe ObjectForge::Molds::WrappedMold do
   subject(:mold) { described_class.new(mold_class) }
 
   let(:mold_class) do
