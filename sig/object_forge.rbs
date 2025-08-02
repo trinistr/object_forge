@@ -17,10 +17,6 @@ module ObjectForge
     def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
     def mold: () -> ObjectForge::mold?
   end
-  interface _Mold
-    def call
-      : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
-  end
 
   class Error < StandardError
   end

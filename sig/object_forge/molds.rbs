@@ -1,6 +1,15 @@
 module ObjectForge
+  interface _Mold
+    def call
+      : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
+  end
+
   module Molds
     class SingleArgumentMold
+      include ObjectForge::_Mold
+    end
+
+    class KeywordsMold
       include ObjectForge::_Mold
     end
 
