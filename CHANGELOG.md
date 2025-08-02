@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+[Compare v0.1.1...main](https://github.com/trinistr/object_forge/compare/v0.1.1...main)
+
+## [v0.1.1]
+
 **Added**
 - `Forge#forge` (and all proxy methods) now accept an optional block, yielding the forged object to do user-defined post-processing.
 
 **Changed**
 - [Breaking] `Forge#forge` no longer accepts array of traits and hash of overrides as positional arguments.
 
-[Compare v0.1.0...main](https://github.com/trinistr/object_forge/compare/v0.1.0...main)
+[Compare v0.1.0...v0.1.1](https://github.com/trinistr/object_forge/compare/v0.1.0...v0.1.1)
 
 ## [v0.1.0]
 
@@ -28,5 +32,6 @@ Initital implementation.
 [Compare v0.0.0...v0.1.0](https://github.com/trinistr/object_forge/compare/v0.0.0...v0.1.0)
 
 [Next]: https://github.com/trinistr/object_forge/tree/main
+[v0.1.1]: https://github.com/trinistr/object_forge/tree/v0.1.1
 [v0.1.0]: https://github.com/trinistr/object_forge/tree/v0.1.0
 [🚀 CI]: https://github.com/trinistr/object_forge/actions/workflows/CI.yaml
