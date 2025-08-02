@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
-**Changed**
+**Added**
 - `Forge#forge` (and all proxy methods) now accept an optional block, yielding the forged object to do user-defined post-processing.
+
+**Changed**
+- [Breaking] `Forge#forge` no longer accepts array of traits and hash of overrides as positional arguments.
 
 [Compare v0.1.0...main](https://github.com/trinistr/object_forge/compare/v0.1.0...main)
 
