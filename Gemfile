@@ -18,12 +18,11 @@ group :linting do
 
   # Checking type signatures
   gem "rbs", require: false
+  # Checking types in code
+  gem "steep", require: false
 end
 
 group :development do
-  # Type checking
-  gem "steep", require: false
-
   # Documentation
   gem "yard", require: false
 
