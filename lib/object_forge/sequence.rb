@@ -32,7 +32,7 @@ module ObjectForge
       end
 
       @initial = initial
-      @container = Concurrent::MVar.new(initial)
+      @container = Concurrent::MVar.new(initial) # steep:ignore UnknownConstant
     end
 
     # Get the next value in the sequence, starting with the initial value.

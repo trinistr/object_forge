@@ -1,13 +1,12 @@
 module ObjectForge
-  class Error < StandardError
-  end
-  class DSLError < Error
-  end
+  type sequenceable = ObjectForge::_RespondTo & ObjectForge::_Sequenceable
 
-  interface _Sequenceable
-    def succ: -> self
+  interface _RespondTo
     def respond_to?: (Symbol name, ?bool include_private) -> bool
     def class: -> Class
+  end
+interface _Sequenceable
+    def succ: -> self
   end
   interface _Forgable
     def new: (Hash[Symbol, untyped]) -> self
@@ -17,11 +16,16 @@ module ObjectForge
     def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
   end
 
+  class Error < StandardError
+  end
+  class DSLError < Error
+  end
+
   VERSION: String
   DEFAULT_YARD: ObjectForge::Forgeyard
 
   def self.sequence
-    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
+    : (?(ObjectForge::sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
 
   def self.define
     : (Symbol name, ObjectForge::_Forgable forged) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
@@ -33,15 +37,15 @@ end
 
 class ObjectForge::Sequence
   def self.new
-    : (?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
+    : (?(ObjectForge::sequenceable | ObjectForge::Sequence) initial) -> ObjectForge::Sequence
   
-  attr_reader initial: ObjectForge::_Sequenceable
+  attr_reader initial: ObjectForge::sequenceable
   
-  def initialize: (ObjectForge::_Sequenceable initial) -> void
+  def initialize: (ObjectForge::sequenceable initial) -> void
 
-  def next: -> ObjectForge::_Sequenceable
+  def next: -> ObjectForge::sequenceable
 
-  def reset: -> ObjectForge::_Sequenceable
+  def reset: -> ObjectForge::sequenceable
   alias rewind reset
 end
   
@@ -68,7 +72,7 @@ class ObjectForge::Forge
   class Parameters
     include ObjectForge::_ForgeParameters
 
-    def intitialize
+    def initialize
       : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
   end
 
@@ -84,19 +88,21 @@ class ObjectForge::Forge
   
   def forge
     : (*Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
-    | (Array[Symbol] traits, Hash[Symbol, untyped] overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
   alias build forge
   alias [] forge
 
   private
 
-  def check_traits_and_overrides
-    : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> [Array[Symbol], Hash[Symbol, untyped]]
-   | (Array[(Array[Symbol] | Hash[Symbol, untyped])], Hash[Symbol, untyped]) -> [Array[Symbol], Hash[Symbol, untyped]]
+  def resolve_attributes
+    : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
+
+  def build_instance
+    : (Hash[Symbol, untyped] attributes) -> ObjectForge::_Forgable
 end
 
 class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   include ObjectForge::_ForgeParameters
+
   attr_reader sequences: Hash[Symbol, ObjectForge::Sequence]
 
   @attributes: Hash[Symbol, Proc]
@@ -110,12 +116,11 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   def freeze: -> self
 
   def attribute
-    : (Symbol name) { -> untyped } -> Symbol
-    | (Symbol name) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
+    : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
   alias [] attribute
 
   def sequence
-    : (Symbol name, ?(ObjectForge::_Sequenceable | ObjectForge::Sequence) initial) { (ObjectForge::_Sequenceable) -> untyped } -> Symbol
+    : (Symbol name, ?(ObjectForge::sequenceable | ObjectForge::Sequence) initial) { (ObjectForge::sequenceable) [self: ObjectForge::Crucible] -> untyped } -> Symbol
 
   def trait
     : (Symbol name) { (self) -> void } -> Symbol
@@ -125,7 +130,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   private
 
   def method_missing
-    : (Symbol name) { -> untyped } -> Symbol
+    : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
     # After freezing:
     | (Symbol name) { -> untyped } -> void
 
@@ -182,5 +187,5 @@ class ObjectForge::UnBasicObject < BasicObject
 
   def block_given?: -> bool
 
-  def raise: (_Exception exception, ?String message) -> void
+  def raise: (_Exception exception, ?String message, ?Array[String] backtrace, ?cause: _Exception) -> void
 end

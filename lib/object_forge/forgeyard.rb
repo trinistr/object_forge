@@ -56,7 +56,7 @@ module ObjectForge
     #
     # @raise [KeyError] if forge with the specified name is not registered
     def forge(name, *traits, **overrides, &)
-      @forges.fetch(name)[traits, overrides, &]
+      @forges.fetch(name)[*traits, **overrides, &]
     end
 
     alias build forge

@@ -75,12 +75,8 @@ module ObjectForge
     # @yieldreturn [void]
     # @return [Any] built instance
     def forge(*traits, **overrides)
-      # @type var traits: Array[(Array[Symbol] | Hash[Symbol, untyped])]
-      traits, overrides = check_traits_and_overrides(traits, overrides)
-      attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
-      attributes = Crucible.new(attributes).resolve!
-
-      instance = forged.new(attributes)
+      resolved_attributes = resolve_attributes(traits, overrides)
+      instance = build_instance(resolved_attributes)
       yield instance if block_given?
       instance
     end
@@ -90,19 +86,13 @@ module ObjectForge
 
     private
 
-    def check_traits_and_overrides(traits, overrides)
-      unless traits.size == 2 && overrides.empty?
-        # @type var traits: Array[Symbol]
-        # @type var overrides: Hash[Symbol, untyped]
-        return [traits, overrides]
-      end
+    def resolve_attributes(traits, overrides)
+      attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
+      Crucible.new(attributes).resolve!
+    end
 
-      case traits
-      in [Array => real_traits, Hash => real_overrides]
-        [real_traits, real_overrides]
-      else
-        [traits, overrides]
-      end
+    def build_instance(attributes)
+      forged.new(attributes)
     end
   end
 end
