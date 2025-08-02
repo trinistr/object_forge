@@ -24,6 +24,7 @@ module ObjectForge
     # @!attribute [r] mold
     #   An object that knows how to build the instance.
     #   Must have a +call+ method that takes a class and a hash of attributes.
+    #   @since 0.2.0
     #   @return [#call, nil]
     Parameters = Struct.new(:attributes, :traits, :mold, keyword_init: true)
 

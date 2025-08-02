@@ -7,7 +7,7 @@ module ObjectForge
     # @thread_safety Thread-safe on its own,
     #   but using unshareable default value or block is not thread-safe.
     #
-    # @since 0.1.1
+    # @since 0.2.0
     class HashMold
       # Default value to be assigned to each produced hash.
       # @return [Any, nil]

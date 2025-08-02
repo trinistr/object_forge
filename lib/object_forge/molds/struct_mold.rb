@@ -7,7 +7,7 @@ module ObjectForge
     # Supports all variations of +keyword_init+.
     #
     # @thread_safety Thread-safe.
-    # @since 0.1.1
+    # @since 0.2.0
     class StructMold
       # Does Struct automatically use keyword initialization
       # when +keyword_init+ is not specified / +nil+?

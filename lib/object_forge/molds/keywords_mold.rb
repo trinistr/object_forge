@@ -8,7 +8,7 @@ module ObjectForge
     # but performance is about 1.5 times worse.
     #
     # @thread_safety Thread-safe.
-    # @since 0.1.1
+    # @since 0.2.0
     class KeywordsMold
       # Instantiate +forged+ with a hash of attributes.
       #

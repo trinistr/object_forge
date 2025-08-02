@@ -5,7 +5,7 @@ module ObjectForge
     # Basic mold which calls +forged.new(attributes)+.
     #
     # @thread_safety Thread-safe.
-    # @since 0.1.1
+    # @since 0.2.0
     class SingleArgumentMold
       # Instantiate +forged+ with a hash of attributes.
       #

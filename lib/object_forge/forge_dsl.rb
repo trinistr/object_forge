@@ -87,6 +87,8 @@ module ObjectForge
     # automatically for each build. If a single instance is enough,
     # please call +.new+ yourself once.
     #
+    # @since 0.2.0
+    #
     # @param mold [Class, #call, nil]
     # @return [Class, #call, nil]
     #

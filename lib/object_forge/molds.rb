@@ -56,7 +56,7 @@ module ObjectForge
   #   printer.call(forged: $stderr, attributes: {a:1, b:2})
   #     # outputs "{:a=>1, :b=>2}" to $stderr
   #
-  # @since 0.1.1
+  # @since 0.2.0
   module Molds
     Dir["#{__dir__}/molds/*.rb"].each { require_relative _1 }
   end
