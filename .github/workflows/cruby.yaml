@@ -20,7 +20,7 @@ jobs:
         experimental: [false]
     continue-on-error: ${{ matrix.experimental }}
     env:
-      BUNDLE_WITHOUT: 'development'
+      BUNDLE_ONLY: 'default test'
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby

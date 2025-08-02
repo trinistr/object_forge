@@ -18,25 +18,8 @@ group :linting do
 
   # Checking type signatures
   gem "rbs", require: false
-end
-
-group :development do
-  # Type checking
+  # Checking types in code
   gem "steep", require: false
-
-  # Documentation
-  gem "yard", require: false
-
-  # Language server for development
-  gem "solargraph", require: false
-
-  # Version changes
-  gem "bump", require: false
-
-  # Benchmarking and profiling
-  gem "benchmark", require: false
-  gem "benchmark-ips", require: false
-  gem "stackprof", require: false
 end
 
 group :test do
@@ -46,4 +29,17 @@ group :test do
   # Code coverage report
   gem "simplecov", require: false
   gem "simplecov_lcov_formatter", require: false
+end
+
+group :development do
+  # Documentation
+  gem "yard", require: false
+
+  # Version changes
+  gem "bump", require: false
+
+  # Benchmarking and profiling
+  gem "benchmark", require: false
+  gem "benchmark-ips", require: false
+  gem "stackprof", require: false
 end

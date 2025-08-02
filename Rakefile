@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-task default: %i[spec rubocop rbs]
+task default: %i[spec rubocop steep]
 
 require "English"
 require "bundler/gem_tasks"
@@ -22,7 +22,7 @@ desc "Validate signatures with RBS"
 task :rbs do
   puts "Checking signatures with RBS..."
   if system "rbs", "-Isig", "validate"
-    puts "Signatures are good!"
+    puts "Signatures are valid!"
     puts
   else
     puts "Signatures validation was not successful!"
