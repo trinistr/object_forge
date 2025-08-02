@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    env:
+      BUNDLE_WITHOUT: 'development'
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby

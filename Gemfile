@@ -22,12 +22,18 @@ group :linting do
   gem "steep", require: false
 end
 
+group :test do
+  # Testing framework
+  gem "rspec", require: false
+
+  # Code coverage report
+  gem "simplecov", require: false
+  gem "simplecov_lcov_formatter", require: false
+end
+
 group :development do
   # Documentation
   gem "yard", require: false
-
-  # Language server for development
-  gem "solargraph", require: false
 
   # Version changes
   gem "bump", require: false
@@ -36,13 +42,4 @@ group :development do
   gem "benchmark", require: false
   gem "benchmark-ips", require: false
   gem "stackprof", require: false
-end
-
-group :test do
-  # Testing framework
-  gem "rspec", require: false
-
-  # Code coverage report
-  gem "simplecov", require: false
-  gem "simplecov_lcov_formatter", require: false
 end
