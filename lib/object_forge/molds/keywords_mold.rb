@@ -4,6 +4,9 @@ module ObjectForge
   module Molds
     # Basic mold which calls +forged.new(**attributes)+.
     #
+    # Can be used instead of {SingleArgumentMold},
+    # but performance is about 1.5 times worse.
+    #
     # @thread_safety Thread-safe.
     # @since 0.1.1
     class KeywordsMold

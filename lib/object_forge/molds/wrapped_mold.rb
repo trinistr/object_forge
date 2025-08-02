@@ -13,7 +13,7 @@ module ObjectForge
       # @return [Class] wrapped mold class
       attr_reader :wrapped_mold
 
-      # @param mold [Class] class with +#call+ method
+      # @param wrapped_mold [Class] class with +#call+ method
       def initialize(wrapped_mold)
         @wrapped_mold = wrapped_mold
       end

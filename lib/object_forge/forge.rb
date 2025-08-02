@@ -2,7 +2,7 @@
 
 require_relative "crucible"
 require_relative "forge_dsl"
-require_relative "molds/single_argument_mold"
+require_relative "molds"
 
 module ObjectForge
   # Object instantitation forge.

@@ -5,6 +5,11 @@ module ObjectForge
   end
 
   module Molds
+    class MoldMold
+      def call
+        : (forged: untyped, **untyped) -> ObjectForge::_Mold
+    end
+
     class SingleArgumentMold
       include ObjectForge::_Mold
     end
