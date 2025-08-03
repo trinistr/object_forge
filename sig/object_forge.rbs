@@ -1,11 +1,12 @@
 module ObjectForge
+  type mold = ObjectForge::_RespondTo & ObjectForge::_Mold
   type sequenceable = ObjectForge::_RespondTo & ObjectForge::_Sequenceable
 
   interface _RespondTo
     def respond_to?: (Symbol name, ?bool include_private) -> bool
     def class: -> Class
   end
-interface _Sequenceable
+  interface _Sequenceable
     def succ: -> self
   end
   interface _Forgable
@@ -14,6 +15,7 @@ interface _Sequenceable
   interface _ForgeParameters
     def attributes: () -> Hash[Symbol, untyped]
     def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
+    def mold: () -> ObjectForge::mold?
   end
 
   class Error < StandardError
@@ -76,6 +78,8 @@ class ObjectForge::Forge
       : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
   end
 
+  MOLD_MOLD: ObjectForge::Molds::MoldMold
+
   attr_reader forged: ObjectForge::_Forgable
   attr_reader name: Symbol
 
@@ -95,9 +99,6 @@ class ObjectForge::Forge
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
-
-  def build_instance
-    : (Hash[Symbol, untyped] attributes) -> ObjectForge::_Forgable
 end
 
 class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
@@ -114,6 +115,9 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
     | () { [self: ObjectForge::ForgeDSL] -> void } -> void
 
   def freeze: -> self
+
+  def mold=
+    : (ObjectForge::mold) -> void
 
   def attribute
     : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol

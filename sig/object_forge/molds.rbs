@@ -1,0 +1,72 @@
+module ObjectForge
+  interface _Mold
+    def call
+      : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
+  end
+
+  module Molds
+    class MoldMold
+      def call
+        : (forged: untyped, **untyped) -> ObjectForge::_Mold
+    end
+
+    class SingleArgumentMold
+      include ObjectForge::_Mold
+    end
+
+    class KeywordsMold
+      include ObjectForge::_Mold
+    end
+
+    class WrappedMold
+      interface _MoldClass[T]
+        def new: () -> T
+      end
+
+      include ObjectForge::_Mold
+
+      attr_reader wrapped_mold: _MoldClass[ObjectForge::mold]
+
+      def initialize: (_MoldClass[ObjectForge::mold] wrapped_mold) -> void
+    end
+
+    class StructMold
+      interface _StructSubclass[T]
+        def new
+          : (*untyped) -> T
+          | (**untyped) -> T
+          | (Hash[Symbol, untyped]) -> T
+        def members: -> Array[Symbol]
+        def keyword_init?: -> bool?
+      end
+
+      RUBY_FEATURE_AUTO_KEYWORDS: bool
+      attr_reader lax: bool
+
+      def initialize: (?lax: bool) -> void
+
+      def call
+        : [T < Struct] (forged: _StructSubclass[T], attributes: Hash[Symbol, untyped], **untyped) -> T
+      
+      private
+      
+      def build_struct_with_unspecified_keyword_init
+        : [T < Struct] (_StructSubclass[T] forged, Hash[Symbol, untyped] attributes) -> T
+    end
+
+    class HashMold
+      interface _HashSubclass[T]
+        def []: (Hash[untyped, untyped]) -> T
+      end
+
+      attr_reader default: untyped?
+      attr_reader default_proc: Proc?
+
+      def initialize
+        : (?untyped? default_value) ?{ (Hash[untyped, untyped] hash, untyped key) -> untyped} -> void
+      
+      def call
+        : [T < Hash] (forged: _HashSubclass[T], attributes: Hash[Symbol, untyped], **untyped) -> T
+    end
+  end
+end

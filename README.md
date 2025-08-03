@@ -23,8 +23,8 @@ However, such gems make a lot of assumptions about why, how and what for they wi
 - assuming that streamlined object generation is only useful for testing;
 - (related to the previous point) assuming that there will never be a need to
   have more than one configuration of a library in the same project
-  (I believe, this anti-pattern was popularised by Rails);
-- (and related again) assuming that adding global methods or objects is a good idea.
+  (I believe this anti-pattern was popularised by Rails);
+- assuming that adding global methods or objects is a good idea.
 
 I notice that there is also a problem of thinking that Rails's "convention-over-configuration" approach is always appropriate, but then making configuration convoluted, instead of making it easy for the user to do the things they want in the way they want in the first place.
 
@@ -196,12 +196,10 @@ kanban
     [Default global forgeyard]
     [Thread-safe behavior]
     [Tapping into built objects for post-processing]
+    [Custom builders (molds)]
+    [Built-in Hash, Struct, Data builders (molds)]
   [⚗️ To do]
     [Ability to replace resolver]
-    [Custom builders]
-    [Struct builder]
-    [Data builder]
-    [Hash builder]
     [After-build hook]
   [❔Under consideration]
     [Calling traits from traits]

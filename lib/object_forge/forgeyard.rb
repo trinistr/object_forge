@@ -2,6 +2,8 @@
 
 require "concurrent/map"
 
+require_relative "forge"
+
 module ObjectForge
   # A registry for forges, making them accessible by name.
   #
@@ -20,7 +22,7 @@ module ObjectForge
     # @see Forge.define
     #
     # @param name [Symbol] name to register forge under
-    # @param forged [Class] class to forge
+    # @param forged [Class, Any] class or object to forge
     # @yieldparam f [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge

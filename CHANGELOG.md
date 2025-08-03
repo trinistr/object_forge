@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+This update brings a huge and necessary enhancement: ability to change how objects are built.
+This is achieved with the *mold* (builder) system. You can now precisely control (or abuse) the process,
+making it possible to consume attributes in any way you want.
+
+**Added**
+- Add setting the mold for a Forge through the `ForgeDSL#mold=` method, using any object (or class) with a `#call` method.
+- Add `Molds::SingleArgumentMold` as a default mold, mimicing previous behavior, and `Molds::KeywordsMold` as an alternative.
+- Add `Molds::HashMold` and `Molds::StructMold` to support Hashes and Structs out-of-the-box.
+- Add `Molds::WrappedMold` to support complex user-provided molds.
+
+**Changed**
+- [Breaking] `Forge::Parameters` interface now includes `#mold`.
+- `Forge` will automatically use `Molds::MoldMold` to determine the mold if none is provided.
+
 [Compare v0.1.1...main](https://github.com/trinistr/object_forge/compare/v0.1.1...main)
 
 ## [v0.1.1]

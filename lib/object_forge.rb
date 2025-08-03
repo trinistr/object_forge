@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-Dir["#{__dir__}/object_forge/**/*.rb"].each { require _1 }
+require_relative "object_forge/forgeyard"
+require_relative "object_forge/sequence"
+require_relative "object_forge/version"
 
 # A simple all-purpose factory library with minimal assumptions.
 #
@@ -76,7 +78,7 @@ module ObjectForge
   # @since 0.1.0
   #
   # @param name [Symbol] forge name
-  # @param forged [Class] class to forge
+  # @param forged [Class, Any] class or object to forge
   # @yieldparam f [ForgeDSL]
   # @yieldreturn [void]
   # @return [Forge] forge

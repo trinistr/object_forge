@@ -3,6 +3,8 @@
 require_relative "sequence"
 require_relative "un_basic_object"
 
+require_relative "molds/wrapped_mold"
+
 module ObjectForge
   # DSL for defining a forge.
   #
@@ -14,7 +16,6 @@ module ObjectForge
   #   especially in attribute definitions.
   #   The instance itself is frozen after initialization,
   #   so it should be safe to share.
-  #
   # @since 0.1.0
   class ForgeDSL < UnBasicObject
     # @return [Hash{Symbol => Proc}] attribute definitions
@@ -25,6 +26,9 @@ module ObjectForge
 
     # @return [Hash{Symbol => Hash{Symbol => Proc}}] trait definitions
     attr_reader :traits
+
+    # @return [#call, nil] forge mold
+    attr_reader :mold
 
     # Define forge's parameters through DSL.
     #
@@ -71,7 +75,32 @@ module ObjectForge
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
+      @mold.freeze
       self
+    end
+
+    # Set the forge mold.
+    #
+    # Mold is an object that knows how to take a hash of attributes
+    # and create an object from them.
+    # It can also be a class with +#call+, in which case a new mold will be instantiated
+    # automatically for each build. If a single instance is enough,
+    # please call +.new+ yourself once.
+    #
+    # @since 0.2.0
+    #
+    # @param mold [Class, #call, nil]
+    # @return [Class, #call, nil]
+    #
+    # @raise [DSLError] if +mold+ does not respond to or implement +#call+
+    def mold=(mold)
+      if nil == mold || mold.respond_to?(:call) # rubocop:disable Style/YodaCondition
+        @mold = mold
+      elsif ::Class === mold && mold.public_method_defined?(:call)
+        @mold = Molds::WrappedMold.new(mold)
+      else
+        raise DSLError, "mold must respond to or implement #call"
+      end
     end
 
     # Define an attribute, possibly transient.
