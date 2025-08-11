@@ -18,8 +18,8 @@ RSpec.describe ObjectForge::Molds::StructMold do
   end
 
   describe "#lax" do
-    it "is false by default" do
-      expect(described_class.new.lax).to be false
+    it "is true by default" do
+      expect(described_class.new.lax).to be true
     end
 
     it "is set on initialization" do

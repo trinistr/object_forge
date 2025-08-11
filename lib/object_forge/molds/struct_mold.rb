@@ -26,7 +26,7 @@ module ObjectForge
       #   (when keyword_init is false, workaround always happens for technical reasons)
       #   - if +true+, arguments can contain extra keys, but building is slower;
       #   - if +false+, building may raise an error if extra keys are present;
-      def initialize(lax: false)
+      def initialize(lax: true)
         @lax = lax
       end
 
