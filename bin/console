@@ -10,6 +10,7 @@ gem_name = File.basename(Dir["*.rb", base: "#{__dir__}/../lib"].first)
 require gem_name
 
 FoobarStruct = Struct.new(:foo, :bar, keyword_init: true)
+Point = Struct.new(:id, :x, :y)
 
 FORGEYARD = ObjectForge::Forgeyard.new
 FORGE =
