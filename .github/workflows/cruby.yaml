@@ -23,6 +23,8 @@ jobs:
       BUNDLE_ONLY: 'default test'
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
