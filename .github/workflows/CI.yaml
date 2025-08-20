@@ -15,14 +15,14 @@ jobs:
   lint:
     name: Code quality
     runs-on: ubuntu-latest
-    env:
-      BUNDLE_ONLY: 'default linting'
     steps:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
+      env:
+        BUNDLE_ONLY: 'default linting'
       with:
         bundler-cache: true
     - name: Run RuboCop
@@ -30,14 +30,14 @@ jobs:
   typing:
     name: Type checking
     runs-on: ubuntu-latest
-    env:
-      BUNDLE_ONLY: 'default linting'
     steps:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
+      env:
+        BUNDLE_ONLY: 'default linting'
       with:
         bundler-cache: true
     - name: Install RBS collection
@@ -51,14 +51,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-    env:
-      BUNDLE_ONLY: 'default test'
     steps:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
+      env:
+        BUNDLE_ONLY: 'default test'
       with:
         bundler-cache: true
     - name: Run RSpec
