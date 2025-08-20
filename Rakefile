@@ -47,7 +47,8 @@ end
 desc "Generate documentation with YARD"
 task :docs, [:output_dir] do |_task, args|
   output_dir = args[:output_dir] || "doc"
-  status = system "yard", "doc", ".", "--output-dir", output_dir
+  # The default is to generate documentation for `lib/**/*.rb`.
+  status = system "yard", "doc", "--output-dir", output_dir
   exit $CHILD_STATUS.exitstatus || 1 unless status
 end
 
