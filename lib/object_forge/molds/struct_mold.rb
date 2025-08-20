@@ -12,6 +12,8 @@ module ObjectForge
       # Does Struct automatically use keyword initialization
       # when +keyword_init+ is not specified / +nil+?
       #
+      # This should be true on Ruby 3.2.0 and later.
+      #
       # @return [Boolean]
       RUBY_FEATURE_AUTO_KEYWORDS = (::Struct.new(:a, :b).new(a: 1, b: 2).a == 1)
 
