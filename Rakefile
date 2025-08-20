@@ -5,14 +5,21 @@ task default: %i[spec rubocop steep]
 require "English"
 require "bundler/gem_tasks"
 
-require "rspec/core/rake_task"
-RSpec::Core::RakeTask.new(:spec)
+begin
+  require "rspec/core/rake_task"
+  RSpec::Core::RakeTask.new(:spec)
+rescue LoadError
+  # Probably running in CI.
+  task :spec do
+    puts "RSpec is not available, tests will not be run!"
+  end
+end
 
 begin
   require "rubocop/rake_task"
   RuboCop::RakeTask.new
 rescue LoadError
-  # Well, this is bad, but we can live without it.
+  # Probably running in CI.
   task :rubocop do
     puts "RuboCop is not available, linting will not be done!"
   end
@@ -38,8 +45,9 @@ task steep: :rbs do
 end
 
 desc "Generate documentation with YARD"
-task :docs do
-  status = system "yard", "doc", ".", "--tag", "thread_safety:Thread safety"
+task :docs, [:output_dir] do |_task, args|
+  output_dir = args[:output_dir] || "doc"
+  status = system "yard", "doc", ".", "--output-dir", output_dir
   exit $CHILD_STATUS.exitstatus || 1 unless status
 end
 

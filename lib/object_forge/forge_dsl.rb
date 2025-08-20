@@ -27,9 +27,6 @@ module ObjectForge
     # @return [Hash{Symbol => Hash{Symbol => Proc}}] trait definitions
     attr_reader :traits
 
-    # @return [#call, nil] forge mold
-    attr_reader :mold
-
     # Define forge's parameters through DSL.
     #
     # If the block has a parameter, an object will be yielded,
@@ -79,18 +76,25 @@ module ObjectForge
       self
     end
 
+    # @return [#call, nil] forge mold
+    # @since 0.2.0
+    def mold # rubocop:disable Style/TrivialAccessors
+      # Not using attr_reader because YARD eats `#mold=` then.
+      @mold
+    end
+
     # Set the forge mold.
     #
     # Mold is an object that knows how to take a hash of attributes
     # and create an object from them.
     # It can also be a class with +#call+, in which case a new mold will be instantiated
-    # automatically for each build. If a single instance is enough,
-    # please call +.new+ yourself once.
+    # automatically for each build through {Molds::WrappedMold}.
+    # If a single instance is enough, please call +.new+ yourself once.
     #
     # @since 0.2.0
     #
     # @param mold [Class, #call, nil]
-    # @return [Class, #call, nil]
+    # @return [#call, nil] the set mold
     #
     # @raise [DSLError] if +mold+ does not respond to or implement +#call+
     def mold=(mold)
