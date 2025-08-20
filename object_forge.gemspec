@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
     If needed, almost any part of the process can be easily replaced with a custom solution.
   TEXT
 
+  spec.add_dependency "concurrent-ruby", "~> 1.2"
+
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
   spec.metadata["documentation_uri"] = "https://rubydoc.info/gems/#{spec.name}/#{spec.version}"
@@ -33,6 +35,5 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { File.basename(_1) }
 
   spec.rdoc_options = ["--tag", "thread_safety:Thread safety", "--main", "README.md"]
-
-  spec.add_dependency "concurrent-ruby", "~> 1.2"
+  spec.extra_rdoc_files = ["README.md"]
 end
