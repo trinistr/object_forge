@@ -19,6 +19,8 @@ jobs:
       BUNDLE_WITHOUT: 'development'
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -32,6 +34,8 @@ jobs:
       BUNDLE_WITHOUT: 'development'
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -51,6 +55,8 @@ jobs:
       BUNDLE_WITHOUT: 'development'
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -58,7 +64,7 @@ jobs:
     - name: Run RSpec
       run: bundle exec rake spec
     - name: Add code coverage comment
-      uses: romeovs/lcov-reporter-action@v0.3.1
+      uses: romeovs/lcov-reporter-action@87a815f34ec27a5826abba44ce09bbc688da58fd
       with:
         lcov-file: ./coverage/lcov/object_forge.lcov
         delete-old-comments: true
