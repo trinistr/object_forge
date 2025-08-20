@@ -4,8 +4,17 @@ source "https://rubygems.org"
 
 gemspec
 
-# For running checks
+# For running tasks
 gem "rake", require: false
+
+group :test do
+  # Testing framework
+  gem "rspec", require: false
+
+  # Code coverage report
+  gem "simplecov", require: false
+  gem "simplecov_lcov_formatter", require: false
+end
 
 group :linting do
   # Linting
@@ -22,19 +31,13 @@ group :linting do
   gem "steep", require: false
 end
 
-group :test do
-  # Testing framework
-  gem "rspec", require: false
-
-  # Code coverage report
-  gem "simplecov", require: false
-  gem "simplecov_lcov_formatter", require: false
+group :documentation do
+  # Documentation
+  gem "redcarpet", require: false
+  gem "yard", require: false
 end
 
 group :development do
-  # Documentation
-  gem "yard", require: false
-
   # Version changes
   gem "bump", require: false
 

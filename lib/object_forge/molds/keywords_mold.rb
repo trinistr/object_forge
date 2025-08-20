@@ -4,7 +4,8 @@ module ObjectForge
   module Molds
     # Basic mold which calls +forged.new(**attributes)+.
     #
-    # Can be used instead of {SingleArgumentMold},
+    # Can be used instead of {SingleArgumentMold}
+    # due to how keyword arguments are treated in Ruby,
     # but performance is about 1.5 times worse.
     #
     # @thread_safety Thread-safe.

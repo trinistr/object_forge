@@ -10,7 +10,7 @@ module ObjectForge
   #
   # A simple mold can easily be just a +Proc+.
   # All molds must have the following +#call+ signature: +call(forged:, attributes:, **)+.
-  # The extra keywords are for future extensions.
+  # The extra keywords are ignored for possibility of future extensions.
   #
   # @example A very basic FactoryBot replacement
   #   creator = ->(forged:, attributes:, **) do

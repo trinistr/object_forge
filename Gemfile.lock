@@ -87,6 +87,7 @@ GEM
       ffi (~> 1.0)
     rbs (3.9.4)
       logger
+    redcarpet (3.6.1)
     regexp_parser (2.10.0)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
@@ -192,6 +193,7 @@ DEPENDENCIES
   object_forge!
   rake
   rbs
+  redcarpet
   rspec
   rubocop (~> 1.72)
   rubocop-packaging

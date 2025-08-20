@@ -16,7 +16,7 @@ jobs:
     name: Code quality
     runs-on: ubuntu-latest
     env:
-      BUNDLE_WITHOUT: 'development'
+      BUNDLE_ONLY: 'default linting'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -31,7 +31,7 @@ jobs:
     name: Type checking
     runs-on: ubuntu-latest
     env:
-      BUNDLE_WITHOUT: 'development'
+      BUNDLE_ONLY: 'default linting'
     steps:
     - uses: actions/checkout@v4
       with:
@@ -52,7 +52,7 @@ jobs:
     permissions:
       pull-requests: write
     env:
-      BUNDLE_WITHOUT: 'development'
+      BUNDLE_ONLY: 'default test'
     steps:
     - uses: actions/checkout@v4
       with:

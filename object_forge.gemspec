@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { File.basename(_1) }
 
-  spec.rdoc_options = ["--tag", "thread_safety:Thread safety"]
+  spec.rdoc_options = ["--tag", "thread_safety:Thread safety", "--main", "README.md"]
 
   spec.add_dependency "concurrent-ruby", "~> 1.2"
 end

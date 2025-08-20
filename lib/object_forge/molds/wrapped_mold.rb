@@ -7,6 +7,8 @@ module ObjectForge
     # Wrapping a mold class is useful when its +#call+ is stateful,
     # making it unsafe to use multiple times or in shared environments.
     #
+    # This mold is usually automatically used through {ForgeDSL#mold=}.
+    #
     # @thread_safety Thread-safe if {wrapped_mold} does not use global state.
     # @since 0.2.0
     class WrappedMold
