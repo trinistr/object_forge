@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
     If needed, almost any part of the process can be easily replaced with a custom solution.
   TEXT
 
+  # Dependencies:
   spec.add_dependency "concurrent-ruby", "~> 1.2"
 
   spec.metadata["homepage_uri"] = spec.homepage

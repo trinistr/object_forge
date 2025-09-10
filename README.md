@@ -13,6 +13,21 @@
 - To use, just define some factories and call them wherever you need, be it in tests, console, or application code.
 - If you need, almost any part of the process can be easily replaced with a custom solution.
 
+## Table of contents
+
+- [Motivation (why *another* another factory gem?)](#motivation-why-another-another-factory-gem)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Basics](#basics)
+  - [Separate forgeyards and forges](#separate-forgeyards-and-forges)
+  - [Molds: customized forging](#molds-customized-forging)
+  - [Performance tips](#performance-tips)
+- [Differences and limitations (compared to FactoryBot)](#differences-and-limitations-compared-to-factorybot)
+- [Current and planned features (roadmap)](#current-and-planned-features-roadmap)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Motivation (why *another* another factory gem?)
 
 There are a bunch of gems that provide object generation functionality, chief among them [FactoryBot](https://github.com/thoughtbot/factory_bot) and [Fabrication](https://fabricationgem.org/).
@@ -106,7 +121,8 @@ ObjectForge[:point, :z, x: -> { rand(100..200) + delta }]
 ObjectForge[:point, :z] { puts "#{_1.id}: #{_1.x},#{_1.y}" }
   # outputs "Z_e: 0.0,0.0"
 ```
-> [!TIP] Forging can be done through any of `#[]`, `#forge`, or `#build` methods, they are aliases.
+> [!TIP]
+> Forging can be done through any of `#[]`, `#forge`, or `#build` methods, they are aliases.
 
 ### Separate forgeyards and forges
 
@@ -187,9 +203,10 @@ Of course, you can abuse this to your heart's content. Look at the documentation
 - `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), providing a way to easily use hashes to carry data;
 - `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct** subclasses.
 
-> [!TIP] **HashMold** and **StructMold** will be used automatically if you don't specify any mold based on the forged class.
+> [!TIP]
+> **HashMold** and **StructMold** will be used automatically, based on the forged class, if you don't specify any mold.
 
-There is an additional special mold: `ObjectForge::Molds::WrappedMold` allows to use custom classes (instead of instances) by building a new instance and calling it every time. DSL handles this case for you, auto-wrapping the class:
+There is an additional special mold: `ObjectForge::Molds::WrappedMold` allows to use classes by building a new instance and calling it every time. DSL handles this case for you, auto-wrapping the class:
 ```ruby
 forge = ObjectForge::Forge.define(Point) do |f|
   f.mold = MyPointBuilder
@@ -199,7 +216,8 @@ forge.parameters.mold
   # => #<ObjectForge::Molds::WrappedMold:0x00007fd1079774f0 @wrapped_mold=MyPointBuilder>
 ```
 
-> [!NOTE] I strongly recommend directly using mold instances and not classes. Doing that prevents memory churn which leads to performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
+> [!NOTE]
+> I strongly recommend directly using mold instances and not classes. Doing that prevents memory churn which leads to performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 
 ### Performance tips
 
@@ -213,7 +231,7 @@ forge.parameters.mold
 If you are used to FactoryBot, be aware that there are quite a few differences in specifics.
 
 General:
-- The user (you) is responsible for loading forge definitions, there are no search paths. If **ObjectForge** is used in tests, it should be enough to add something like `Dir["spec/forges/**/*.rb].each { require _1 }` to your `spec_helper.rb` (or `rails_helper.rb`).
+- The user (you) is responsible for loading forge definitions, there are no search paths. If **ObjectForge** is used in tests, it should be enough to add something like `Dir["spec/forges/**/*.rb].each { require _1 }` to your `spec_helper.rb` (or `rails_helper.rb`).
 - `Forgeyard.define` *is* the forge definition block, you don't need to nest it inside another `factory` block.
 - There is no forge inheritance or nesting, though it may be added in the future.
 
@@ -266,7 +284,11 @@ You can also run `bin/console` for an interactive prompt that will allow you to 
 
 To install this gem onto your local machine, run `rake install`. To release a new version, run `rake version:{major|minor|patch}`, and then run `rake release`, which will push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-Checklist for a new or updated feature:
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/trinistr/object_forge.
+
+### Checklist for a new or updated feature:
 - Tests cover the behavior and its interactions.
 - Running `rspec` reports 100% coverage (unless it's impossible to achieve in one run).
 - Running `rubocop` reports no offenses.
@@ -275,10 +297,6 @@ Checklist for a new or updated feature:
 - `CHANGELOG.md` lists the change if it has impact on users.
 - `README.md` is updated if the feature should be visible there, including the Kanban board.
 
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/trinistr/object_forge.
-
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT), see [LICENSE.txt](https://github.com/trinistr/object_forge/blob/main/LICENSE.txt).

@@ -7,3 +7,4 @@ plugins:
   - rubocop-rake
   - rubocop-rspec
   - rubocop-thread_safety
+  - rubocop-yard
