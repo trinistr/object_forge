@@ -1,10 +1,10 @@
 # ObjectForge
 
+[![Gem Version](https://badge.fury.io/rb/object_forge.svg?icon=si%3Arubygems)](https://rubygems.org/gems/object_forge)
+[![CI](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml/badge.svg)](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml)
+
 > [!TIP]
 > You may be viewing documentation for an older (or newer) version of the gem than intended. Look at [Changelog](https://github.com/trinistr/object_forge/blob/main/CHANGELOG.md) to see all versions, including unreleased changes.
-
-Latest: [![Gem Version](https://badge.fury.io/rb/object_forge.svg?icon=si%3Arubygems)](https://rubygems.org/gems/object_forge)
-[![CI](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml/badge.svg)](https://github.com/trinistr/object_forge/actions/workflows/CI.yaml)
 
 ***
 
@@ -43,6 +43,10 @@ gem "object_forge"
 ```
 
 ## Usage
+
+> [!Note]
+> - Latest documentation from `main` branch is automatically deployed to [GitHub Pages](https://trinistr.github.io/object_forge).
+> - Documentation for published versions is available on [RubyDoc](https://rubydoc.info/gems/object_forge).
 
 ### Basics
 
@@ -256,7 +260,7 @@ kanban
 
 ## Development
 
-After checking out the repo, run `bundle` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
 
 You can also run `bin/console` for an interactive prompt that will allow you to experiment, or `bin/benchmark` to run a benchmark script and generate a StackProf flamegraph.
 
