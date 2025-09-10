@@ -24,7 +24,6 @@ group :linting do
   gem "rubocop-rake", require: false
   gem "rubocop-rspec", require: false
   gem "rubocop-thread_safety", require: false
-  gem "rubocop-yard", require: false
 
   # Checking type signatures
   gem "rbs", require: false
