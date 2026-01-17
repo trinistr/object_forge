@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Require coverage helper first to ensure it's loaded before any other files
-require_relative "support/coverage_helper"
+Dir["#{__dir__}/support/**/*.rb"].each { require _1 unless _1.end_with?("coverage_helper.rb") }
 
-Dir["#{__dir__}/support/**/*.rb"].each { require _1 }
+# Require coverage helper before the gem to ensure proper coverage reporting.
+require_relative "support/coverage_helper"
 
 require "object_forge"
 
