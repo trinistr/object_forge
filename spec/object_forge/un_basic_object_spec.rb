@@ -81,7 +81,19 @@ RSpec.describe ObjectForge::UnBasicObject do
     end
   end
 
-  include_examples "has an alias", :kind_of?, :is_a?
+  # rubocop:disable Style/ClassCheck
+  describe "#kind_of?" do
+    it "returns true if the given class is the instance's ancestor" do
+      expect(instance.kind_of?(BasicObject)).to be true
+      expect(instance.kind_of?(described_class)).to be true
+      expect(instance.kind_of?(classy)).to be true
+    end
+
+    it "returns false if the instance is not an instance of the given class" do
+      expect(instance.kind_of?(Object)).to be false
+    end
+  end
+  # rubocop:enable Style/ClassCheck
 
   describe "#respond_to?" do
     it "returns true if a corresponding method exists" do
