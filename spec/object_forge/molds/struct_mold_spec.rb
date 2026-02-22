@@ -28,7 +28,12 @@ RSpec.describe ObjectForge::Molds::StructMold do
     end
   end
 
-  include_examples "has an alias", :lax?, :lax
+  describe "#lax?" do
+    it "returns the value of #lax" do
+      expect(described_class.new(lax: false).lax?).to be false
+      expect(described_class.new(lax: true).lax?).to be true
+    end
+  end
 
   describe "#call" do
     context "when lax is false" do
