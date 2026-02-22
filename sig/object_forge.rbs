@@ -178,8 +178,9 @@ class ObjectForge::UnBasicObject < BasicObject
   def inspect: -> String
 
   def is_a?: (Module klass) -> bool
+  def kind_of?: (Module klass) -> bool
 
-  def respond_to?: (Symbol name, ?bool include_private) -> bool
+  def respond_to?: (Symbol name, ?bool include_all) -> bool
 
   def to_s: -> String
 
@@ -192,4 +193,6 @@ class ObjectForge::UnBasicObject < BasicObject
   def block_given?: -> bool
 
   def raise: (_Exception exception, ?String message, ?Array[String] backtrace, ?cause: _Exception) -> void
+
+  def respond_to_missing?: (Symbol name, bool include_all) -> bool
 end

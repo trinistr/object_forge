@@ -34,13 +34,14 @@ module ObjectForge
     # @!method to_s
     #   @see Object#to_s
     #   @return [String]
-    %i[class eql? freeze frozen? hash inspect is_a? respond_to? to_s].each do |m|
+    %i[class eql? freeze frozen? hash inspect is_a? kind_of? respond_to? to_s].each do |m|
       define_method(m, ::Object.instance_method(m))
     end
-    alias kind_of? is_a?
     # @!endgroup
 
-    %i[block_given? raise].each { |m| private define_method(m, ::Object.instance_method(m)) }
+    %i[block_given? raise respond_to_missing?].each do |m|
+      private define_method(m, ::Object.instance_method(m))
+    end
 
     # @!macro pp_support
     #   Support for +pp+ (and IRB).

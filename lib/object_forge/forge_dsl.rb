@@ -278,7 +278,7 @@ module ObjectForge
     #
     # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, **nil, &)
-      return super if frozen?
+      return super(name) if frozen?
       return attribute(name, &) if respond_to_missing?(name, false)
 
       raise DSLError, "#{name.inspect} is a reserved name (in #{name.inspect})"

@@ -47,6 +47,9 @@ group :development do
   gem "benchmark-ips", require: false
   gem "stackprof", require: false
 
+  # For console
+  gem "irb", require: false
+
   # Useful for manual testing
   gem "dry-struct", require: false
 end
