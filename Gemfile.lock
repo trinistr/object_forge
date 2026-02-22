@@ -24,6 +24,7 @@ GEM
     benchmark (0.4.1)
     benchmark-ips (2.14.0)
     bigdecimal (3.2.2)
+    bigdecimal (3.2.2-java)
     bump (0.10.0)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.3)
@@ -58,6 +59,7 @@ GEM
     ffi (1.17.2-arm-linux-gnu)
     ffi (1.17.2-arm-linux-musl)
     ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-java)
     ffi (1.17.2-x86_64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
     ffi (1.17.2-x86_64-linux-musl)
@@ -66,6 +68,7 @@ GEM
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     json (2.13.2)
+    json (2.13.2-java)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     listen (3.9.0)
@@ -80,6 +83,7 @@ GEM
       racc
     prism (1.4.0)
     racc (1.8.1)
+    racc (1.8.1-java)
     rainbow (3.1.1)
     rake (13.3.0)
     rb-fsevent (0.11.2)
@@ -167,6 +171,7 @@ GEM
       terminal-table (>= 2, < 5)
       uri (>= 0.12.0)
     strscan (3.1.5)
+    strscan (3.1.5-java)
     terminal-table (4.0.0)
       unicode-display_width (>= 1.1.1, < 4)
     tsort (0.2.0)
@@ -185,6 +190,7 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
+  universal-java
   x86_64-darwin
   x86_64-linux-gnu
   x86_64-linux-musl
@@ -219,6 +225,7 @@ CHECKSUMS
   benchmark (0.4.1) sha256=d4ef40037bba27f03b28013e219b950b82bace296549ec15a78016552f8d2cce
   benchmark-ips (2.14.0) sha256=b72bc8a65d525d5906f8cd94270dccf73452ee3257a32b89fbd6684d3e8a9b1d
   bigdecimal (3.2.2) sha256=39085f76b495eb39a79ce07af716f3a6829bc35eb44f2195e2753749f2fa5adc
+  bigdecimal (3.2.2-java) sha256=1fcbead3efc3eae26956f7fef6bbdd342f987c0bdbf68f500a1467389f430205
   bump (0.10.0) sha256=07929cf79031d2863f55e7b111e164566be10c43f8c42d67db7cb3b5745f0975
   concurrent-ruby (1.3.5) sha256=813b3e37aca6df2a21a3b9f1d497f8cbab24a2b94cab325bffe65ee0f6cbebc6
   connection_pool (2.5.3) sha256=cfd74a82b9b094d1ce30c4f1a346da23ee19dc8a062a16a85f58eab1ced4305b
@@ -236,6 +243,7 @@ CHECKSUMS
   ffi (1.17.2-arm-linux-gnu) sha256=d4a438f2b40224ae42ec72f293b3ebe0ba2159f7d1bd47f8417e6af2f68dbaa5
   ffi (1.17.2-arm-linux-musl) sha256=977dfb7f3a6381206dbda9bc441d9e1f9366bf189a634559c3b7c182c497aaa3
   ffi (1.17.2-arm64-darwin) sha256=54dd9789be1d30157782b8de42d8f887a3c3c345293b57ffb6b45b4d1165f813
+  ffi (1.17.2-java) sha256=94c8516d7c97b21915497b994e41f69e7e8e21d5fc085c498b68e52044e191ec
   ffi (1.17.2-x86_64-darwin) sha256=981f2d4e32ea03712beb26e55e972797c2c5a7b0257955d8667ba58f2da6440e
   ffi (1.17.2-x86_64-linux-gnu) sha256=05d2026fc9dbb7cfd21a5934559f16293815b7ce0314846fee2ac8efbdb823ea
   ffi (1.17.2-x86_64-linux-musl) sha256=97c0eb3981414309285a64dc4d466bd149e981c279a56371ef811395d68cb95c
@@ -243,6 +251,7 @@ CHECKSUMS
   i18n (1.14.7) sha256=ceba573f8138ff2c0915427f1fc5bdf4aa3ab8ae88c8ce255eb3ecf0a11a5d0f
   ice_nine (0.11.2) sha256=5d506a7d2723d5592dc121b9928e4931742730131f22a1a37649df1c1e2e63db
   json (2.13.2) sha256=02e1f118d434c6b230a64ffa5c8dee07e3ec96244335c392eaed39e1199dbb68
+  json (2.13.2-java) sha256=2e1292c45598a3642216820a821cba89c623f99387b8cb90adb345878f4e5c7d
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   listen (3.9.0) sha256=db9e4424e0e5834480385197c139cb6b0ae0ef28cc13310cfd1ca78377d59c67
@@ -254,6 +263,7 @@ CHECKSUMS
   parser (3.3.9.0) sha256=94d6929354b1a6e3e1f89d79d4d302cc8f5aa814431a6c9c7e0623335d7687f2
   prism (1.4.0) sha256=dc0e3e00e93160213dc2a65519d9002a4a1e7b962db57d444cf1a71565bb703e
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
+  racc (1.8.1-java) sha256=54f2e6d1e1b91c154013277d986f52a90e5ececbe91465d29172e49342732b98
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.3.0) sha256=96f5092d786ff412c62fde76f793cc0541bd84d2eb579caa529aa8a059934493
   rb-fsevent (0.11.2) sha256=43900b972e7301d6570f64b850a5aa67833ee7d87b458ee92805d56b7318aefe
@@ -283,6 +293,7 @@ CHECKSUMS
   stackprof (0.2.27) sha256=aff6d28656c852e74cf632cc2046f849033dc1dedffe7cb8c030d61b5745e80c
   steep (1.10.0) sha256=1b295b55f9aaff1b8d3ee42453ee55bc2a1078fda0268f288edb2dc014f4d7d1
   strscan (3.1.5) sha256=f8413b90ea9395a69609a4414a8c88551bcda64337e234272c24fcd4c83e5947
+  strscan (3.1.5-java) sha256=84805eaad025f64854376608a6dbd49d4a22740ec3f21ba880434a6641621f1e
   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   tzinfo (2.0.6) sha256=8daf828cc77bcf7d63b0e3bdb6caa47e2272dcfaf4fbfe46f8c3a9df087a829b
