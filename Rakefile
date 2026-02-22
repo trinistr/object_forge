@@ -75,6 +75,7 @@ namespace :version do
     name = Dir["*.gemspec"].first.then { |f| Gem::Specification.load(f).name }
     new_version = Bump::Bump.current
     Rake::Task["version:_update_changelog"].invoke(name, new_version)
+    Rake::Task["version:_update_next_version"].invoke(new_version)
     Rake::Task["version:_commit_and_tag"].invoke(name, new_version)
   end
 
@@ -99,6 +100,17 @@ namespace :version do
     changelog.delete_if { _1.match?(/^## \[v0\.0\.0\]/) }
 
     File.write("CHANGELOG.md", changelog.join)
+  end
+
+  task :_update_next_version, [:new_version] do |_task, args| # rubocop:disable Rake/Desc
+    new_version = args[:new_version]
+    # Update <<next>> version across code.
+    Dir["lib/**/*.rb"].each do |file|
+      content = File.read(file)
+      content.gsub!("<<next>>", new_version)
+      File.write(file, content)
+      system("git", "add", "--update", file)
+    end
   end
 
   task :_commit_and_tag, [:name, :new_version] do |_task, args| # rubocop:disable Rake/Desc

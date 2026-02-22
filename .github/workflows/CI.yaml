@@ -26,28 +26,32 @@ on:
 jobs:
   CRuby:
     uses: ./.github/workflows/cruby.yaml
+  JRuby:
+    uses: ./.github/workflows/jruby.yaml
+  TruffleRuby:
+    uses: ./.github/workflows/truffle_ruby.yaml
   lint:
-    name: Code quality
+    name: Rubocop
     runs-on: ubuntu-latest
     env:
-      BUNDLE_ONLY: "default linting"
+      BUNDLE_ONLY: "default:linting"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-    - name: Run RuboCop
+    - name: Run Rubocop
       run: bundle exec rubocop -f github
-  typing:
+  signatures:
     name: Type checking
     runs-on: ubuntu-latest
     env:
-      BUNDLE_ONLY: "default linting"
+      BUNDLE_ONLY: "default:linting"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Ruby
@@ -63,12 +67,12 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: CRuby
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_ONLY: "default:test"
     permissions:
       pull-requests: write
-    env:
-      BUNDLE_ONLY: "default test"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
     - name: Set up Ruby

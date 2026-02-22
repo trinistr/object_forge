@@ -134,6 +134,10 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-ast (>= 1.44.0, < 2.0)
+    rubocop-yard (1.1.0)
+      lint_roller
+      rubocop (~> 1.72)
+      yard
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     simplecov (0.22.0)
@@ -201,6 +205,7 @@ DEPENDENCIES
   rubocop-rake
   rubocop-rspec
   rubocop-thread_safety
+  rubocop-yard
   simplecov
   simplecov_lcov_formatter
   stackprof
@@ -268,6 +273,7 @@ CHECKSUMS
   rubocop-rake (0.7.1) sha256=3797f2b6810c3e9df7376c26d5f44f3475eda59eb1adc38e6f62ecf027cbae4d
   rubocop-rspec (3.6.0) sha256=c0e4205871776727e54dee9cc91af5fd74578001551ba40e1fe1a1ab4b404479
   rubocop-thread_safety (0.7.3) sha256=067cdd52fbf5deffc18995437e45b5194236eaff4f71de3375a1f6052e48f431
+  rubocop-yard (1.1.0) sha256=a9a4051c852e58a1b967e41abb85c94698f482782e6261f747a9acae79fe6f73
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   simplecov (0.22.0) sha256=fe2622c7834ff23b98066bb0a854284b2729a569ac659f82621fc22ef36213a5
