@@ -85,6 +85,6 @@ module ObjectForge
     end
 
     include_examples "has an alias", :build, :forge
-    include_examples "has an alias", :[], :forge
+    include_examples "has an alias", :call, :forge
   end
 end

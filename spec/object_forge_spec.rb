@@ -48,6 +48,6 @@ RSpec.describe ObjectForge do
 
   describe described_class.singleton_class do
     include_examples "has an alias", :build, :forge
-    include_examples "has an alias", :[], :forge
+    include_examples "has an alias", :call, :forge
   end
 end

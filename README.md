@@ -103,7 +103,7 @@ end
 
 A forge builds objects, using attributes hash:
 ```ruby
-ObjectForge[:point]
+ObjectForge.call(:point)
   # => #<Point:0x00007f6109dcad40 @id="a", @x=0.17176955469852973, @y=0.3423901951181103>
 # Positional arguments define used traits:
 ObjectForge.build(:point, :z)
@@ -112,17 +112,17 @@ ObjectForge.build(:point, :z)
 ObjectForge.forge(:point, x: 10)
   # => #<Point:0x00007f6109aabf88 @id="c", @x=10, @y=-0.3458802496120402>
 # Traits and overrides are combined in the given order:
-ObjectForge[:point, :z, :invalid, id: "NaN"]
+ObjectForge.call(:point, :z, :invalid, id: "NaN")
   # => #<Point:0x00007f6109b82e48 @id="NaN", @x=0.0, @y=NaN>
 # A Proc override behaves the same as an attribute definition:
-ObjectForge[:point, :z, x: -> { rand(100..200) + delta }]
+ObjectForge.call(:point, :z, x: -> { rand(100..200) + delta })
   # => #<Point:0x00007f6109932418 @id="Z_d", @x=135.0, @y=0.0>
 # A block can be passed to do something with the created object:
-ObjectForge[:point, :z] { puts "#{_1.id}: #{_1.x},#{_1.y}" }
+ObjectForge.call(:point, :z) { puts "#{_1.id}: #{_1.x},#{_1.y}" }
   # outputs "Z_e: 0.0,0.0"
 ```
 > [!TIP]
-> Forging can be done through any of `#[]`, `#forge`, or `#build` methods, they are aliases.
+> Forging can be done through any of `#call`, `#forge`, or `#build` methods, they are aliases.
 
 ### Separate forgeyards and forges
 
@@ -140,13 +140,13 @@ end
 
 Now, this forgeyard can be used just like the default one:
 ```ruby
-forgeyard[:point, :z, id: "0"]
+forgeyard.forge(:point, :z, id: "0")
   # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
 ```
 
 Note how the forge isn't registered in the default forgeyard:
 ```ruby
-ObjectForge[:point]
+ObjectForge.forge(:point)
   # ArgumentError: unknown forge: point
 ```
 
@@ -159,7 +159,7 @@ forge = ObjectForge::Forge.define(Point) do |f|
   f.radius { 0.5 }
   f.trait :z do f.radius { 0 } end
 end
-forge[:z, id: "0"]
+forge.(:z, id: "0")
   # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
 ```
 
@@ -169,7 +169,7 @@ forge.build
   # => #<Point:0x00007f610deae578 @id="a", @x=0.3317733939650964, @y=-0.1363936629550252>
 forge.forge(:z)
   # => #<Point:0x00007f61099f6520 @id="b", @x=0, @y=0>
-forge[radius: 500]
+forge.(radius: 500)
   # => #<Point:0x00007f6109960048 @id="c", @x=-141, @y=109>
 ```
 
@@ -237,7 +237,7 @@ General:
 
 Forge definition:
 - Class specification for a forge is non-optional, there is no assumption about the class name.
-- If DSL block declares a block argument, `self` context is not changed, so DSL methods can't be called with an implicit receiver.
+- If the DSL block declares a block argument, `self` context is not changed, and DSL methods can't be called with an implicit receiver.
 
 Attributes:
 - For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
@@ -249,7 +249,7 @@ Traits:
 - There are no default traits.
 
 Sequences:
-- There is no way to define shared sequences, unless you pass the same object yourself to multiple `sequence` calls.
+- There is no explicit way to define shared sequences, unless you pass the same object yourself to multiple `sequence` calls.
 - Sequences work with values implementing `#succ`, not `#next`, expressly prohibiting `Enumerator`. This may be relaxed in the future.
 
 ## Current and planned features (roadmap)

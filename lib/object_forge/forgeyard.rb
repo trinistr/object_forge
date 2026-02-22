@@ -58,10 +58,10 @@ module ObjectForge
     #
     # @raise [KeyError] if forge with the specified name is not registered
     def forge(name, ...)
-      @forges.fetch(name).[](...)
+      @forges.fetch(name).call(...)
     end
 
     alias build forge
-    alias [] forge
+    alias call forge
   end
 end

@@ -55,7 +55,8 @@ module ObjectForge
 
     # @param forged [Class, Any] class or object to forge
     # @param parameters [Parameters, ForgeDSL] forge parameters
-    # @param name [Symbol, nil] forge name
+    # @param name [Symbol, nil] forge name;
+    #   only used for identification purposes
     def initialize(forged, parameters, name: nil)
       @name = name
       @forged = forged
@@ -92,7 +93,7 @@ module ObjectForge
     end
 
     alias build forge
-    alias [] forge
+    alias call forge
 
     private
 

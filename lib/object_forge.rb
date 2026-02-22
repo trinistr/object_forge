@@ -38,7 +38,7 @@ require_relative "object_forge/version"
 #   # => #<struct Frobinator frob="Frobinator", inator=#<Proc:...>>
 #   ObjectForge.build(:frobber, frob: -> { "Frob" + inator }, inator: "orn")
 #   # => #<struct Frobinator frob="Froborn", inator="orn">
-#   ObjectForge[:frobber, :static, inator: "Value"]
+#   ObjectForge.call(:frobber, :static, inator: "Value")
 #   # => #<struct Frobinator frob="Static", inator="Value">
 module ObjectForge
   # Base error class for ObjectForge.
@@ -104,9 +104,7 @@ module ObjectForge
   end
 
   class << self
-    # @since 0.1.0
     alias build forge
-    # @since 0.1.0
-    alias [] forge
+    alias call forge
   end
 end

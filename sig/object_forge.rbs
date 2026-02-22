@@ -35,6 +35,10 @@ module ObjectForge
 
   def self.forge
     : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
+  def self.build
+    : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
+  def self.call
+    : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
 end
 
 class ObjectForge::Sequence
@@ -67,7 +71,7 @@ class ObjectForge::Forgeyard
   def forge
     : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
   alias build forge
-  alias [] forge
+  alias call forge
 end
 
 class ObjectForge::Forge
@@ -93,7 +97,7 @@ class ObjectForge::Forge
   def forge
     : (*Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
   alias build forge
-  alias [] forge
+  alias call forge
 
   private
 

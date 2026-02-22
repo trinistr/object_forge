@@ -4,11 +4,11 @@ module ObjectForge
   RSpec.describe Forgeyard do
     subject(:forgeyard) { described_class.new }
 
-    let(:forge) { instance_double(Forge, "Forge", "[]": instance) }
+    let(:forge) { instance_double(Forge, "Forge", call: instance) }
     let(:instance) { Object.new }
 
     describe "#define" do
-      let(:definition) { forgeyard.define(:foo, Object) { |f| f.attribute(:[]) { nil } } }
+      let(:definition) { forgeyard.define(:foo, Object) { |f| f.attribute(:call) { nil } } }
 
       before { allow(Forge).to receive(:define).and_return(forge) }
 
@@ -69,14 +69,14 @@ module ObjectForge
       context "with a single argument" do
         it "builds an instance through named forge with default parameters" do
           expect(forgeyard.forge(:test)).to be instance
-          expect(forge).to have_received(:[]).with(no_args)
+          expect(forge).to have_received(:call).with(no_args)
         end
       end
 
       context "with multiple arguments" do
         it "builds an instance through named forge with specified parameters" do
           expect(forgeyard.forge(:test, :trait, attribute: 2)).to be instance
-          expect(forge).to have_received(:[]).with(:trait, attribute: 2)
+          expect(forge).to have_received(:call).with(:trait, attribute: 2)
         end
       end
 
@@ -84,17 +84,17 @@ module ObjectForge
         let(:forge) { Forge.new(forged_class, Forge::Parameters.new(attributes: { foo: 1, bar: 2 }, traits: {})) }
         let(:forged_class) { Struct.new(:foo, :bar, keyword_init: true) }
 
-        before { allow(forge).to receive(:[]).and_call_original }
+        before { allow(forge).to receive(:call).and_call_original }
 
         it "allows tapping into the object" do
-          expect(forgeyard[:test] { _1.foo = 33 }).to eq forged_class.new(foo: 33, bar: 2)
-          expect(forge).to have_received(:[]).with(no_args)
+          expect(forgeyard.(:test) { _1.foo = 33 }).to eq forged_class.new(foo: 33, bar: 2)
+          expect(forge).to have_received(:call).with(no_args)
         end
 
         it "runs the block after forging the object with resolved attributes" do
-          expect(forgeyard[:test, foo: :foo, bar: -> { foo }] { _1.foo = 33 })
+          expect(forgeyard.(:test, foo: :foo, bar: -> { foo }) { _1.foo = 33 })
             .to eq forged_class.new(foo: 33, bar: :foo)
-          expect(forge).to have_received(:[]).with(foo: :foo, bar: Proc)
+          expect(forge).to have_received(:call).with(foo: :foo, bar: Proc)
         end
       end
 
@@ -106,6 +106,6 @@ module ObjectForge
     end
 
     include_examples "has an alias", :build, :forge
-    include_examples "has an alias", :[], :forge
+    include_examples "has an alias", :call, :forge
   end
 end
