@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+**Added**
+- `Forgeyard#[]` to retrieve a forge by name.
+- `#call` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge` itself.
+
+**Removed**
+- `#[]` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge`.
+
 [Compare v0.2.0...main](https://github.com/trinistr/object_forge/compare/v0.2.0...main)
 
 ## [v0.2.0] — 2025-08-20

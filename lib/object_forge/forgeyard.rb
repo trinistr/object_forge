@@ -45,6 +45,16 @@ module ObjectForge
       @forges.put_if_absent(name, forge) || forge
     end
 
+    # Retrieve a forge by name.
+    #
+    # @param name [Symbol] name of the forge
+    # @return [Forge] registered forge
+    #
+    # @raise [KeyError] if forge with the specified name is not registered
+    def [](name)
+      @forges.fetch(name)
+    end
+
     # Build an instance using a forge.
     #
     # @see Forge#forge

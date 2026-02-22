@@ -7,18 +7,6 @@ module ObjectForge
     let(:forge) { instance_double(Forge, "Forge", call: instance) }
     let(:instance) { Object.new }
 
-    describe "#define" do
-      let(:definition) { forgeyard.define(:foo, Object) { |f| f.attribute(:call) { nil } } }
-
-      before { allow(Forge).to receive(:define).and_return(forge) }
-
-      it "defines and registers a forge" do
-        expect { definition }.to change(forgeyard.forges, :size).by(1)
-        expect(Forge).to have_received(:define).with(Object, name: :foo)
-        expect(forgeyard.forges[:foo]).to be forge
-      end
-    end
-
     describe "#forges" do
       before { forgeyard.register(:forage, forge) }
 
@@ -31,6 +19,18 @@ module ObjectForge
       it "can be used to get forges directly" do
         expect(forgeyard.forges[:forage]).to be forge
         expect(forgeyard.forges[:hunt]).to be nil
+      end
+    end
+
+    describe "#define" do
+      let(:definition) { forgeyard.define(:foo, Object) { |f| f.attribute(:call) { nil } } }
+
+      before { allow(Forge).to receive(:define).and_return(forge) }
+
+      it "defines and registers a forge" do
+        expect { definition }.to change(forgeyard.forges, :size).by(1)
+        expect(Forge).to have_received(:define).with(Object, name: :foo)
+        expect(forgeyard.forges[:foo]).to be forge
       end
     end
 
@@ -59,6 +59,20 @@ module ObjectForge
         it "registers the forge thread-safely, returning first registered forge" do
           expect(forgeyard.register(:test, forge)).to be forge
           expect(sleepy_thread.join.value).to be forge
+        end
+      end
+    end
+
+    describe "#[]" do
+      before { forgeyard.register(:test, forge) }
+
+      it "retrieves a forge by name" do
+        expect(forgeyard[:test]).to be forge
+      end
+
+      context "when name is not registered" do
+        it "raises KeyError" do
+          expect { forgeyard[:nonexistent] }.to raise_error KeyError
         end
       end
     end

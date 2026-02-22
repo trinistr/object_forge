@@ -67,6 +67,9 @@ class ObjectForge::Forgeyard
 
   def register
     : (Symbol name, ObjectForge::Forge forge) -> ObjectForge::Forge
+  
+  def []
+    : (Symbol name) -> ObjectForge::Forge
 
   def forge
     : (Symbol name, *Symbol traits, **untyped overrides) ?{ (untyped) -> void } -> ObjectForge::_Forgable
