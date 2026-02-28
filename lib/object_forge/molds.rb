@@ -74,7 +74,7 @@ module ObjectForge
     # @return [#call] an instance of a mold
     #
     # @thread_safety Thread-safe.
-    # @since <<next>>
+    # @since 0.3.0
     def self.mold_for(forged)
       if ::Class === forged
         if forged < ::Struct
@@ -97,7 +97,7 @@ module ObjectForge
     # If it is a Class with +#call+, wraps it in {WrappedMold}.
     # Otherwise, raises an error.
     #
-    # @since <<next>>
+    # @since 0.3.0
     #
     # @param mold [Class, #call, nil]
     # @return [#call, nil]
@@ -105,7 +105,7 @@ module ObjectForge
     # @raise [DSLError] if +mold+ does not respond to or implement +#call+
     #
     # @thread_safety Thread-safe.
-    # @since <<next>>
+    # @since 0.3.0
     def self.wrap_mold(mold)
       if mold.nil? || mold.respond_to?(:call)
         mold # : ObjectForge::mold?

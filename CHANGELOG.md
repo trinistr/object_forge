@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+[Compare v0.3.0...main](https://github.com/trinistr/object_forge/compare/v0.3.0...main)
+
+## [v0.3.0] — 2026-02-28
+
+This update replaces previous hardcoded "mold" setting in DSL with a generic system for passing settings to a Forge,
+useful for custom classes and future enhancements.
+Other than that, `#[]` as an alias to `#forge` was removed, as it clashes with planned features.
+
 **Added**
 - `Forgeyard#[]` to retrieve a forge by name.
 - `#call` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge` itself.
@@ -15,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - This replaces previous "mold" setting.
 
 **Removed**
-- `#[]` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge`.
+- [Breaking] `#[]` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge`.
 - `Molds::MoldMold`, replaced by `Molds.mold_for`.
 - `ForgeDSL#mold` and `#mold=`.
 
@@ -23,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Breaking] `Forge::Parameters` interface now includes `#settings` and no longer includes `#mold`.
 - `ForgeDSL` no longer checks or modifies set `mold`, this is now accomplished in `Forge`.
 
-[Compare v0.2.0...main](https://github.com/trinistr/object_forge/compare/v0.2.0...main)
+[Compare v0.2.0...v0.3.0](https://github.com/trinistr/object_forge/compare/v0.2.0...v0.3.0)
 
 ## [v0.2.0] — 2025-08-20
 
@@ -66,6 +74,7 @@ Initital implementation.
 [Compare v0.0.0...v0.1.0](https://github.com/trinistr/object_forge/compare/v0.0.0...v0.1.0)
 
 [Next]: https://github.com/trinistr/object_forge/tree/main
+[v0.3.0]: https://github.com/trinistr/object_forge/tree/v0.3.0
 [v0.2.0]: https://github.com/trinistr/object_forge/tree/v0.2.0
 [v0.1.1]: https://github.com/trinistr/object_forge/tree/v0.1.1
 [v0.1.0]: https://github.com/trinistr/object_forge/tree/v0.1.0

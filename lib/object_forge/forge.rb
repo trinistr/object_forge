@@ -25,7 +25,7 @@ module ObjectForge
     #   A forge's settings.
     #   Must include a +:mold+ key, containing an object that knows how to build the instance
     #   with a +call+ method that takes a class and a hash of attributes.
-    #   @since <<next>>
+    #   @since 0.3.0
     #   @return [Hash{Symbol => Any}]
     Parameters = Struct.new(:attributes, :traits, :settings, keyword_init: true)
 
@@ -108,7 +108,7 @@ module ObjectForge
     #
     # @raise [MoldError]
     #
-    # @since <<next>>
+    # @since 0.3.0
     def determine_mold(forged, mold)
       Molds.wrap_mold(mold) || Molds.mold_for(forged)
     end

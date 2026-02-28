@@ -49,7 +49,7 @@ module ObjectForge
   # @since 0.1.0
   class DSLError < Error; end
   # Error raised when object can not be used as a mold.
-  # @since <<next>>
+  # @since 0.3.0
   class MoldError < Error; end
 
   # Default {Forgeyard} that is used by {.define} and {.forge}.
