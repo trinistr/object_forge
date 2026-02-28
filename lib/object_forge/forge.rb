@@ -21,14 +21,13 @@ module ObjectForge
     #   Attributes belonging to traits.
     #   @return [Hash{Symbol => Hash{Symbol => Any}}]
     #
-    # @!attribute [r] mold
-    #   An object that knows how to build the instance.
-    #   Must have a +call+ method that takes a class and a hash of attributes.
-    #   @since 0.2.0
-    #   @return [#call, nil]
-    Parameters = Struct.new(:attributes, :traits, :mold, keyword_init: true)
-
-    MOLD_MOLD = Molds::MoldMold.new.freeze
+    # @!attribute [r] settings
+    #   A forge's settings.
+    #   Must include a +:mold+ key, containing an object that knows how to build the instance
+    #   with a +call+ method that takes a class and a hash of attributes.
+    #   @since <<next>>
+    #   @return [Hash{Symbol => Any}]
+    Parameters = Struct.new(:attributes, :traits, :settings, keyword_init: true)
 
     # Define (and create) a forge using DSL.
     #
@@ -61,7 +60,7 @@ module ObjectForge
       @name = name
       @forged = forged
       @parameters = parameters
-      @mold = parameters.mold || MOLD_MOLD.call(forged: forged)
+      @mold = determine_mold(forged, parameters.settings[:mold])
     end
 
     # Forge a new instance.
@@ -97,6 +96,28 @@ module ObjectForge
 
     private
 
+    # Get appropriate mold based on parameters.
+    #
+    # If +mold+ is already set, it will be used directly, or,
+    # if it is Class, it will be wrapped in {Molds::WrappedMold} if posssible.
+    # If +nil+, a mold will be selected based on +forged+ class.
+    #
+    # @param forged [Class, Any]
+    # @param mold [#call, Class, nil]
+    # @return [#call]
+    #
+    # @raise [MoldError]
+    #
+    # @since <<next>>
+    def determine_mold(forged, mold)
+      Molds.wrap_mold(mold) || Molds.mold_for(forged)
+    end
+
+    # Resolve attributes using default attributes, specified traits and overrides.
+    #
+    # @param traits [Array<Symbol>]
+    # @param overrides [Hash{Symbol => Any}]
+    # @return [Hash{Symbol => Any}]
     def resolve_attributes(traits, overrides)
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       Crucible.new(attributes).resolve!

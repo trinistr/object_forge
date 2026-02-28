@@ -22,6 +22,7 @@ require_relative "object_forge/version"
 #   It allows defining arbitrary attributes (possibly using sequences),
 #   with support for traits (collections of attributes with non-default values).
 # - {Crucible} is used to resolve attributes.
+# - {Molds} are objects used to instantiate objects in {Forge}.
 #
 # @example Quick example
 #   Frobinator = Struct.new(:frob, :inator, keyword_init: true)
@@ -47,6 +48,9 @@ module ObjectForge
   # Error raised when a mistake is made in using DSL.
   # @since 0.1.0
   class DSLError < Error; end
+  # Error raised when object can not be used as a mold.
+  # @since <<next>>
+  class MoldError < Error; end
 
   # Default {Forgeyard} that is used by {.define} and {.forge}.
   #

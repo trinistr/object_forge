@@ -54,9 +54,9 @@ module ObjectForge
         expect(forge_dsl.traits.values).to all be_frozen
       end
 
-      it "contains mold" do
-        expect(forge_dsl.mold).to be_a Molds::KeywordsMold
-        expect(forge_dsl.mold).to be_frozen
+      it "contains mold in settings" do
+        expect(forge_dsl.settings).to match(mold: Molds::KeywordsMold)
+        expect(forge_dsl.settings).to be_frozen
       end
 
       it "contains root attributes, including sequenced ones" do
@@ -149,66 +149,38 @@ module ObjectForge
           end
         end
 
-        it "fails, probably with ArgumentError" do
-          expect { forge_dsl }.to raise_error(ArgumentError, /wrong number of arguments/)
+        it "fails, probably with DSLError" do
+          expect { forge_dsl }.to raise_error(DSLError)
         end
       end
     end
 
-    describe "#mold=" do
+    describe "#setting" do
+      context "with a valid name and value" do
+        let(:definition) { proc { |f| f.setting(:caramba, value) } }
+        let(:value) { Object.new }
+
+        it "sets the setting to the specified value" do
+          expect(forge_dsl.settings[:caramba]).to be value
+        end
+      end
+
       context "when assigned nil" do
-        let(:definition) do
-          proc { |f|
-            f.mold = ->(**) { [] }
-            f.mold = nil
-          }
-        end
+        let(:definition) { proc { |f| f.setting(:caramba, nil) } }
 
-        it "clears the mold" do
-          expect(forge_dsl.mold).to be nil
+        it "clears the value" do
+          expect(forge_dsl.settings[:caramba]).to be nil
         end
       end
 
-      context "when assigned a proc" do
-        let(:definition) { proc { |f| f.mold = mold } }
-        let(:mold) { ->(attributes:, **) { attributes } }
+      context "when setting name is not a Symbol" do
+        let(:definition) { proc { |f| f.setting("caramba", "value") } }
 
-        it "sets it as the mold" do
-          expect(forge_dsl.mold).to be mold
-        end
-      end
-
-      context "when assigned a callable object" do
-        let(:definition) { proc { |f| f.mold = mold } }
-        let(:mold) { Molds::HashMold.new }
-
-        it "sets it as the mold" do
-          expect(forge_dsl.mold).to be mold
-        end
-      end
-
-      context "when assigned a class with #call" do
-        let(:definition) { proc { |f| f.mold = Proc } }
-
-        it "wraps the class" do
-          expect(forge_dsl.mold).to be_a Molds::WrappedMold
-          expect(forge_dsl.mold.wrapped_mold).to be Proc
-        end
-      end
-
-      context "when assigned a class without #call" do
-        let(:definition) { proc { |f| f.mold = Object } }
-
-        it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error(DSLError, "mold must respond to or implement #call")
-        end
-      end
-
-      context "when assigned an object without #call" do
-        let(:definition) { proc { |f| f.mold = Object.new } }
-
-        it "raises DSLError on definition" do
-          expect { forge_dsl }.to raise_error(DSLError, "mold must respond to or implement #call")
+        it "raises ArgumentError on definition" do
+          expect { forge_dsl }.to raise_error(
+            ArgumentError,
+            "setting name must be a Symbol, String given"
+          )
         end
       end
     end
@@ -416,7 +388,7 @@ module ObjectForge
     end
 
     describe "#method_missing" do
-      context "when called with a non-reserved not-defined name" do
+      context "when called with a non-reserved not-defined attribute name" do
         let(:definition) { proc { |f| f.non_reserved_name { "nAME" } } }
 
         it "defines corresponding attribute" do
@@ -424,9 +396,17 @@ module ObjectForge
         end
       end
 
+      context "when called with a non-reserved not-defined setting name" do
+        let(:definition) { proc { |f| f.non_reserved_name = "nAME" } }
+
+        it "sets corresponding setting" do
+          expect(forge_dsl.settings[:non_reserved_name]).to eq "nAME"
+        end
+      end
+
       context "when called with a reserved name" do
         %i[
-          name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
+          name? name! ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
         ].each do |reserved_name|
           describe "##{reserved_name}" do
             let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }

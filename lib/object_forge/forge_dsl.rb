@@ -27,6 +27,9 @@ module ObjectForge
     # @return [Hash{Symbol => Hash{Symbol => Proc}}] trait definitions
     attr_reader :traits
 
+    # @return [Hash{Symbol => Any}] settings for forge, such as mold
+    attr_reader :settings
+
     # Define forge's parameters through DSL.
     #
     # If the block has a parameter, an object will be yielded,
@@ -36,6 +39,7 @@ module ObjectForge
     #
     # @example with block parameter
     #   ForgeDSL.new do |f|
+    #     f.mold = ObjectForge::Molds::KeywordsMolds.new
     #     f.attribute(:name) { "Name" }
     #     f[:description] { name.upcase }
     #     f.duration { rand(1000) }
@@ -43,6 +47,7 @@ module ObjectForge
     #
     # @example without block parameter
     #   ForgeDSL.new do
+    #     self.mold = ::ObjectForge::Molds::KeywordsMolds.new
     #     attribute(:name) { "Name" }
     #     self[:description] { name.upcase }
     #     duration { rand(1000) }
@@ -55,56 +60,53 @@ module ObjectForge
       @attributes = {}
       @sequences = {}
       @traits = {}
+      @settings = {}
 
       dsl.arity.zero? ? instance_exec(&dsl) : yield(self)
 
       freeze
     end
 
-    # Freezes the instance, including +attributes+, +sequences+ and +traits+.
+    # Freezes the instance, including +settings+, +attributes+, +sequences+ and +traits+.
     # Prevents further responses through +#method_missing+.
     #
     # @note Called automatically in {#initialize}.
     #
     # @return [self]
     def freeze
-      ::Object.instance_method(:freeze).bind_call(self)
+      ::Kernel.instance_method(:freeze).bind_call(self)
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
-      @mold.freeze
+      @settings.freeze
       self
     end
 
-    # @return [#call, nil] forge mold
-    # @since 0.2.0
-    def mold # rubocop:disable Style/TrivialAccessors
-      # Not using attr_reader because YARD eats `#mold=` then.
-      @mold
-    end
-
-    # Set the forge mold.
+    # Set a value for a forge's setting.
     #
-    # Mold is an object that knows how to take a hash of attributes
-    # and create an object from them.
-    # It can also be a class with +#call+, in which case a new mold will be instantiated
-    # automatically for each build through {Molds::WrappedMold}.
-    # If a single instance is enough, please call +.new+ yourself once.
+    # Possible settings depend on used forge, but for default {Forge} a +mold+ is expected.
     #
-    # @since 0.2.0
+    # It is also possible to set settings through +method_missing+, using name with a +=+ suffix.
     #
-    # @param mold [Class, #call, nil]
-    # @return [#call, nil] the set mold
+    # @see Molds
     #
-    # @raise [DSLError] if +mold+ does not respond to or implement +#call+
-    def mold=(mold)
-      if nil == mold || mold.respond_to?(:call) # rubocop:disable Style/YodaCondition
-        @mold = mold
-      elsif ::Class === mold && mold.public_method_defined?(:call)
-        @mold = Molds::WrappedMold.new(mold)
-      else
-        raise DSLError, "mold must respond to or implement #call"
+    # @example
+    #   f.setting(:mold, ->(forged:, attributes:, **) { forge.new(**attributes) })
+    #   f.mold = ObjectForge::Molds::SingleArgumentMold.new
+    #
+    # @param name [Sumbol] setting name
+    # @param value [Any] value for the setting
+    # @return [Symbol] setting name
+    #
+    # @raise [ArgumentError] if +name+ is not a Symbol
+    def setting(name, value)
+      unless ::Symbol === name
+        raise ::ArgumentError, "setting name must be a Symbol, #{name.class} given"
       end
+
+      @settings[name] = value
+
+      name
     end
 
     # Define an attribute, possibly transient.
@@ -259,26 +261,30 @@ module ObjectForge
 
     private
 
-    # Define an attribute using a shorthand.
+    # Define an attribute (like +name+) or set a setting (like +name=+) using a shorthand.
     #
-    # Can not be used to define attributes with reserved names.
+    # Can not be used with reserved names.
     # Trying to use a conflicting name will lead to usual issues
     # with calling random methods.
-    # When in doubt, use {#attribute} or {#[]} instead.
+    # When in doubt, use {#attribute} or {#setting} instead.
     #
     # Reserved names are:
-    # - all names ending in +?+, +!+ or +=+
+    # - all names ending in +?+, +!+
     # - all names starting with a non-word ASCII character
     #   (operators, +`+, +[]+, +[]=+)
     # - +rand+
     #
-    # @param name [Symbol] attribute name
+    # @param name [Symbol] attribute or setting name
+    # @param value [Any] value for setting
     # @yieldreturn [Any] attribute value
-    # @return [Symbol] attribute name
+    # @return [Symbol] attribute or setting name
     #
     # @raise [DSLError] if a reserved +name+ is used
-    def method_missing(name, **nil, &)
+    def method_missing(name, value = nil, **nil, &)
       return super(name) if frozen?
+      if valid_setting_method?(name)
+        return setting(name[...-1].to_sym, value) # steep:ignore NoMethod
+      end
       return attribute(name, &) if respond_to_missing?(name, false)
 
       raise DSLError, "#{name.inspect} is a reserved name (in #{name.inspect})"
@@ -287,7 +293,11 @@ module ObjectForge
     def respond_to_missing?(name, _include_all)
       return false if frozen?
 
-      !name.end_with?("?", "!", "=") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
+      !name.end_with?("?", "!") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
+    end
+
+    def valid_setting_method?(name)
+      name.match?(/\A\p{Word}.*=\z/)
     end
   end
 end

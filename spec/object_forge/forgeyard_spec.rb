@@ -95,7 +95,7 @@ module ObjectForge
       end
 
       context "with a block" do
-        let(:forge) { Forge.new(forged_class, Forge::Parameters.new(attributes: { foo: 1, bar: 2 }, traits: {})) }
+        let(:forge) { Forge.new(forged_class, Forge::Parameters.new(settings: {}, attributes: { foo: 1, bar: 2 }, traits: {})) }
         let(:forged_class) { Struct.new(:foo, :bar, keyword_init: true) }
 
         before { allow(forge).to receive(:call).and_call_original }

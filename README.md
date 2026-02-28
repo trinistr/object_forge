@@ -206,24 +206,14 @@ Of course, you can abuse this to your heart's content. Look at the documentation
 > [!TIP]
 > **HashMold** and **StructMold** will be used automatically, based on the forged class, if you don't specify any mold.
 
-There is an additional special mold: `ObjectForge::Molds::WrappedMold` allows to use classes by building a new instance and calling it every time. DSL handles this case for you, auto-wrapping the class:
-```ruby
-forge = ObjectForge::Forge.define(Point) do |f|
-  f.mold = MyPointBuilder
-  # ...
-end
-forge.parameters.mold
-  # => #<ObjectForge::Molds::WrappedMold:0x00007fd1079774f0 @wrapped_mold=MyPointBuilder>
-```
 
-> [!NOTE]
-> I strongly recommend directly using mold instances and not classes. Doing that prevents memory churn which leads to performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
+I strongly recommend directly using mold instances and not classes. Doing this prevents memory churn which causes performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 
 ### Performance tips
 
 **ObjectForge** is pretty fast for what it is. However, if you are worried, there are certain things that can be done to make it faster.
 - The easiest thing is to enable [**YJIT**](https://docs.ruby-lang.org/en/master/yjit/yjit_md.html). It will probably speed up your whole application, but be aware that it is not always suitable and may even degrade performance on some workloads. It *is* considered production-ready though.
-- Calling **Forge** directly, instead of through **Forgeyard**, is faster due to not needing argument forwarding. This is consistent (but check on your system anyway!).
+- Calling a **Forge** directly, instead of through **Forgeyard**, is faster due to not needing argument forwarding. This is consistent (but check on your system anyway!).
 - Using `self[:name]` instead of plain `name` inside attribute definitions does not engage dynamic method dispatch, which *should* be faster. However, micro-benchmarking does not show conclusive results.
 
 ## Differences and limitations (compared to FactoryBot)

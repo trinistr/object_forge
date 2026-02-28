@@ -35,12 +35,12 @@ module ObjectForge
     #   @see Object#to_s
     #   @return [String]
     %i[class eql? freeze frozen? hash inspect is_a? kind_of? respond_to? to_s].each do |m|
-      define_method(m, ::Object.instance_method(m))
+      define_method(m, ::Kernel.instance_method(m))
     end
     # @!endgroup
 
     %i[block_given? raise respond_to_missing?].each do |m|
-      private define_method(m, ::Object.instance_method(m))
+      private define_method(m, ::Kernel.instance_method(m))
     end
 
     # @!macro pp_support
