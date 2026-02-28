@@ -5,7 +5,7 @@ require_relative "lib/object_forge/version"
 Gem::Specification.new do |spec|
   spec.name = "object_forge"
   spec.version = ObjectForge::VERSION
-  spec.authors = ["Alexandr Bulancov"]
+  spec.authors = ["Alexander Bulancov"]
 
   spec.homepage = "https://github.com/trinistr/#{spec.name}"
   spec.license = "MIT"
