@@ -14,7 +14,7 @@ module ObjectForge
   #   but modifies instance variables, making it unsafe to share the Crucible
   # @since 0.1.0
   class Crucible < UnBasicObject
-    %i[rand].each { |m| private define_method(m, ::Object.instance_method(m)) }
+    %i[rand].each { |m| private define_method(m, ::Kernel.instance_method(m)) }
 
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
     def initialize(attributes)

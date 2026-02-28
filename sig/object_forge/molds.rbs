@@ -1,14 +1,9 @@
 module ObjectForge
-  interface _Mold
-    def call
-      : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
-  end
-
   module Molds
-    class MoldMold
-      def call
-        : (forged: untyped, **untyped) -> ObjectForge::_Mold
-    end
+    def self.wrap_mold
+      : ((ObjectForge::mold | Class | nil) mold) -> ObjectForge::mold?
+    def self.mold_for
+      : (ObjectForge::_Forgable forged) -> ObjectForge::mold
 
     class SingleArgumentMold
       include ObjectForge::_Mold

@@ -10,9 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Added**
 - `Forgeyard#[]` to retrieve a forge by name.
 - `#call` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge` itself.
+- `Molds.mold_for` and `Molds.wrap_mold`. These are helper methods replacing previous scattered functionality.
+- Generic settings system in `ForgeDSL` through `#settings` reader, `#setting` method and `#setting_name=` shortcut.
+  - This replaces previous "mold" setting.
 
 **Removed**
 - `#[]` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge`.
+- `Molds::MoldMold`, replaced by `Molds.mold_for`.
+- `ForgeDSL#mold` and `#mold=`.
+
+**Changed**
+- [Breaking] `Forge::Parameters` interface now includes `#settings` and no longer includes `#mold`.
+- `ForgeDSL` no longer checks or modifies set `mold`, this is now accomplished in `Forge`.
 
 [Compare v0.2.0...main](https://github.com/trinistr/object_forge/compare/v0.2.0...main)
 

@@ -3,7 +3,9 @@
 module ObjectForge
   # This module provides a collection of predefined molds to be used in common cases.
   #
-  # Molds are +#call+able objects responsible for actually building objects produced by factories
+  # Mold is an object that knows how to take a hash of attributes
+  # and create an object from them. Molds are +#call+able objects
+  # responsible for actually building objects produced by factories
   # (or doing other, interesting things with them (truly, only the code review is the limit!)).
   # They are supposed to be immutable, shareable, and persistent:
   # initialize once, use for the whole runtime.
@@ -59,5 +61,59 @@ module ObjectForge
   # @since 0.2.0
   module Molds
     Dir["#{__dir__}/molds/*.rb"].each { require_relative _1 }
+
+    # Get maybe appropriate mold for the given +forged+ class or object.
+    #
+    # Currently provides specific recognition for:
+    # - subclasses of +Struct+ ({StructMold}),
+    # - subclasses of +Data+ ({KeywordsMold}),
+    # - +Hash+ and subclasses ({HashMold}).
+    # Other objects just get {SingleArgumentMold}.
+    #
+    # @param forged [Class, Any]
+    # @return [#call] an instance of a mold
+    #
+    # @thread_safety Thread-safe.
+    # @since <<next>>
+    def self.mold_for(forged)
+      if ::Class === forged
+        if forged < ::Struct
+          StructMold.new
+        elsif defined?(::Data) && forged < ::Data
+          KeywordsMold.new
+        elsif forged <= ::Hash
+          HashMold.new
+        else
+          SingleArgumentMold.new
+        end
+      else
+        SingleArgumentMold.new
+      end
+    end
+
+    # Wrap mold if needed.
+    #
+    # If +mold+ is +nil+ or a +call+able object, returns it.
+    # If it is a Class with +#call+, wraps it in {WrappedMold}.
+    # Otherwise, raises an error.
+    #
+    # @since <<next>>
+    #
+    # @param mold [Class, #call, nil]
+    # @return [#call, nil]
+    #
+    # @raise [DSLError] if +mold+ does not respond to or implement +#call+
+    #
+    # @thread_safety Thread-safe.
+    # @since <<next>>
+    def self.wrap_mold(mold)
+      if mold.nil? || mold.respond_to?(:call)
+        mold # : ObjectForge::mold?
+      elsif ::Class === mold && mold.public_method_defined?(:call)
+        WrappedMold.new(mold)
+      else
+        raise MoldError, "mold must respond to or implement #call"
+      end
+    end
   end
 end

@@ -1,5 +1,5 @@
 module ObjectForge
-  type mold = ObjectForge::_RespondTo & ObjectForge::_Mold
+  type mold = Object & ObjectForge::_Mold
   type sequenceable = ObjectForge::_RespondTo & ObjectForge::_Sequenceable
 
   interface _RespondTo
@@ -15,12 +15,18 @@ module ObjectForge
   interface _ForgeParameters
     def attributes: () -> Hash[Symbol, untyped]
     def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
-    def mold: () -> ObjectForge::mold?
+    def settings: () -> Hash[Symbol, untyped]
+  end
+  interface _Mold
+    def call
+      : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
   end
 
   class Error < StandardError
   end
   class DSLError < Error
+  end
+  class MoldError < Error
   end
 
   VERSION: String
@@ -85,8 +91,6 @@ class ObjectForge::Forge
       : (attributes: Hash[Symbol, untyped], traits: Hash[Symbol, Hash[Symbol, untyped]]) -> void
   end
 
-  MOLD_MOLD: ObjectForge::Molds::MoldMold
-
   attr_reader forged: ObjectForge::_Forgable
   attr_reader name: Symbol
 
@@ -104,6 +108,9 @@ class ObjectForge::Forge
 
   private
 
+  def determine_mold
+    : (ObjectForge::_Forgable forged, ObjectForge::mold mold) -> ObjectForge::mold
+
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
 end
@@ -116,6 +123,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   @attributes: Hash[Symbol, Proc]
   @sequences: Hash[Symbol, ObjectForge::Sequence]
   @traits: Hash[Symbol, Hash[Symbol, Proc]]
+  @settings: Hash[Symbol, untyped]
 
   def initialize
     : () { (ObjectForge::ForgeDSL) -> void } -> void
@@ -123,8 +131,8 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 
   def freeze: -> self
 
-  def mold=
-    : (ObjectForge::mold) -> void
+  def setting
+    : (Symbol name, untyped value) -> Symbol
 
   def attribute
     : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
@@ -147,8 +155,9 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 
   def respond_to_missing?
     : (Symbol name, bool include_all) -> bool
-
-  def rand: [T] (?(Float | Integer | Range[T])) -> (Float | Integer | T)
+  
+  def valid_setting_method?
+    : (Symbol name) -> bool
 end
 
 class ObjectForge::Crucible < ObjectForge::UnBasicObject
