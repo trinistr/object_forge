@@ -18,6 +18,7 @@
 - [Motivation (why *another* another factory gem?)](#motivation-why-another-another-factory-gem)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Quick start](#quick-start)
   - [Basics](#basics)
   - [Separate forgeyards and forges](#separate-forgeyards-and-forges)
   - [Molds: customized forging](#molds-customized-forging)
@@ -62,6 +63,45 @@ gem "object_forge"
 > [!Note]
 > - Latest documentation from `main` branch is automatically deployed to [GitHub Pages](https://trinistr.github.io/object_forge).
 > - Documentation for published versions is available on [RubyDoc](https://rubydoc.info/gems/object_forge).
+
+### Quick start
+
+Create your domain logic class:
+```ruby
+class Rectangle
+  def initialize(length:, width:)
+    @length = length
+    @width = width
+  end
+
+  def area = @length * @width
+
+  def inspect = "[#{@length}x#{@width}]"
+end
+```
+
+Define a forge:
+```ruby
+require "object_forge"
+ObjectForge.define(:rectangle, Rectangle) do |f|
+  f.mold = ObjectForge::Molds::KeywordsMold.new
+
+  f.length { rand(1..100) }
+  f.width { rand(1..100) }
+
+  f.trait :square do |t|
+    t.width { length }
+  end
+end
+```
+
+Forge some objects!
+```ruby
+ObjectForge.forge(:rectangle) # => [63x27]
+ObjectForge.forge(:rectangle, :square) # => [56x56]
+ObjectForge.forge(:rectangle, width: 3333) # => [79x3333]
+ObjectForge.forge(:rectangle, :square, length: 123) # => [123x123]
+```
 
 ### Basics
 
@@ -159,8 +199,6 @@ forge = ObjectForge::Forge.define(Point) do |f|
   f.radius { 0.5 }
   f.trait :z do f.radius { 0 } end
 end
-forge.(:z, id: "0")
-  # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
 ```
 
 **Forge** has the same building interface as a **Forgeyard**, but it doesn't have the name argument:
@@ -177,7 +215,7 @@ forge.(radius: 500)
 
 If you use core Ruby data containers, such as `Struct`, `Data` or even `Hash`, they will "just work". However, if a custom class is used, forging will probably fail, unless your class happens to take a hash of attributes in `#initialize`. It would be *really* bad if **ObjectForge** placed requirements on your classes, and indeed there is a solution.
 
-Whenever you need to change how your objects are built, you specify a *mold*. Molds are just `#call`able objects (including `Proc`s!) with specific arguments. They are specified in forge definition:
+Whenever you need to change how your objects are built, you specify a *mold*. Molds are just `#call`able objects (including `Proc`s!) with specific arguments. They are set in forge definition:
 ```ruby
 forge = ObjectForge::Forge.define(Point) do |f|
   f.mold = ->(forged:, attributes:, **) do
@@ -205,7 +243,6 @@ Of course, you can abuse this to your heart's content. Look at the documentation
 
 > [!TIP]
 > **HashMold** and **StructMold** will be used automatically, based on the forged class, if you don't specify any mold.
-
 
 I strongly recommend directly using mold instances and not classes. Doing this prevents memory churn which causes performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 

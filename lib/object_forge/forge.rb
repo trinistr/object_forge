@@ -119,6 +119,7 @@ module ObjectForge
     # @param overrides [Hash{Symbol => Any}]
     # @return [Hash{Symbol => Any}]
     def resolve_attributes(traits, overrides)
+      # TODO: catch unknown traits
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       Crucible.new(attributes).resolve!
     end
