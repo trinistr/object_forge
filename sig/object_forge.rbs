@@ -15,7 +15,7 @@ module ObjectForge
   interface _ForgeParameters
     def attributes: () -> Hash[Symbol, untyped]
     def traits: () -> Hash[Symbol, Hash[Symbol, untyped]]
-    def settings: () -> Hash[Symbol, untyped]
+    def options: () -> Hash[Symbol, untyped]
   end
   interface _Mold
     def call
@@ -123,7 +123,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   @attributes: Hash[Symbol, Proc]
   @sequences: Hash[Symbol, ObjectForge::Sequence]
   @traits: Hash[Symbol, Hash[Symbol, Proc]]
-  @settings: Hash[Symbol, untyped]
+  @options: Hash[Symbol, untyped]
 
   def initialize
     : () { (ObjectForge::ForgeDSL) -> void } -> void
@@ -131,7 +131,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 
   def freeze: -> self
 
-  def setting
+  def option
     : (Symbol name, untyped value) -> Symbol
 
   def attribute
@@ -156,7 +156,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   def respond_to_missing?
     : (Symbol name, bool include_all) -> bool
   
-  def valid_setting_method?
+  def valid_option_method?
     : (Symbol name) -> bool
 end
 

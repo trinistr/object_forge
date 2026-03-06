@@ -54,9 +54,9 @@ module ObjectForge
         expect(forge_dsl.traits.values).to all be_frozen
       end
 
-      it "contains mold in settings" do
-        expect(forge_dsl.settings).to match(mold: Molds::KeywordsMold)
-        expect(forge_dsl.settings).to be_frozen
+      it "contains mold in options" do
+        expect(forge_dsl.options).to match(mold: Molds::KeywordsMold)
+        expect(forge_dsl.options).to be_frozen
       end
 
       it "contains root attributes, including sequenced ones" do
@@ -155,31 +155,31 @@ module ObjectForge
       end
     end
 
-    describe "#setting" do
+    describe "#option" do
       context "with a valid name and value" do
-        let(:definition) { proc { |f| f.setting(:caramba, value) } }
+        let(:definition) { proc { |f| f.option(:caramba, value) } }
         let(:value) { Object.new }
 
-        it "sets the setting to the specified value" do
-          expect(forge_dsl.settings[:caramba]).to be value
+        it "sets the option to the specified value" do
+          expect(forge_dsl.options[:caramba]).to be value
         end
       end
 
       context "when assigned nil" do
-        let(:definition) { proc { |f| f.setting(:caramba, nil) } }
+        let(:definition) { proc { |f| f.option(:caramba, nil) } }
 
         it "clears the value" do
-          expect(forge_dsl.settings[:caramba]).to be nil
+          expect(forge_dsl.options[:caramba]).to be nil
         end
       end
 
-      context "when setting name is not a Symbol" do
-        let(:definition) { proc { |f| f.setting("caramba", "value") } }
+      context "when option name is not a Symbol" do
+        let(:definition) { proc { |f| f.option("caramba", "value") } }
 
         it "raises ArgumentError on definition" do
           expect { forge_dsl }.to raise_error(
             ArgumentError,
-            "setting name must be a Symbol, String given"
+            "option name must be a Symbol, String given"
           )
         end
       end
@@ -396,11 +396,11 @@ module ObjectForge
         end
       end
 
-      context "when called with a non-reserved not-defined setting name" do
+      context "when called with a non-reserved not-defined option name" do
         let(:definition) { proc { |f| f.non_reserved_name = "nAME" } }
 
-        it "sets corresponding setting" do
-          expect(forge_dsl.settings[:non_reserved_name]).to eq "nAME"
+        it "sets corresponding option" do
+          expect(forge_dsl.options[:non_reserved_name]).to eq "nAME"
         end
       end
 

@@ -8,7 +8,7 @@ module ObjectForge
     let(:name) { "ASDFg" }
     let(:parameters) do
       described_class::Parameters.new(
-        settings: {},
+        options: {},
         attributes: { foo: -> { 1 }, bar: -> { 2 } },
         traits: {
           barfoo: { bar: -> { foo } }, foofoo: { foo: -> { :foo } }, bazoo: { foo: -> { :baz } },

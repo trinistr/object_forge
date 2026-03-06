@@ -21,13 +21,13 @@ module ObjectForge
     #   Attributes belonging to traits.
     #   @return [Hash{Symbol => Hash{Symbol => Any}}]
     #
-    # @!attribute [r] settings
-    #   A forge's settings.
+    # @!attribute [r] options
+    #   A forge's options.
     #   Must include a +:mold+ key, containing an object that knows how to build the instance
     #   with a +call+ method that takes a class and a hash of attributes.
     #   @since 0.3.0
     #   @return [Hash{Symbol => Any}]
-    Parameters = Struct.new(:attributes, :traits, :settings, keyword_init: true)
+    Parameters = Struct.new(:attributes, :traits, :options, keyword_init: true)
 
     # Define (and create) a forge using DSL.
     #
@@ -60,7 +60,7 @@ module ObjectForge
       @name = name
       @forged = forged
       @parameters = parameters
-      @mold = determine_mold(forged, parameters.settings[:mold])
+      @mold = determine_mold(forged, parameters.options[:mold])
     end
 
     # Forge a new instance.

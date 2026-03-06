@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+**Changed**
+- "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.
+
 [Compare v0.3.0...main](https://github.com/trinistr/object_forge/compare/v0.3.0...main)
 
 ## [v0.3.0] — 2026-02-28

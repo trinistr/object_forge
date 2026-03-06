@@ -27,8 +27,8 @@ module ObjectForge
     # @return [Hash{Symbol => Hash{Symbol => Proc}}] trait definitions
     attr_reader :traits
 
-    # @return [Hash{Symbol => Any}] settings for forge, such as mold
-    attr_reader :settings
+    # @return [Hash{Symbol => Any}] options for forge, such as mold
+    attr_reader :options
 
     # Define forge's parameters through DSL.
     #
@@ -60,14 +60,14 @@ module ObjectForge
       @attributes = {}
       @sequences = {}
       @traits = {}
-      @settings = {}
+      @options = {}
 
       dsl.arity.zero? ? instance_exec(&dsl) : yield(self)
 
       freeze
     end
 
-    # Freezes the instance, including +settings+, +attributes+, +sequences+ and +traits+.
+    # Freezes the instance, including +options+, +attributes+, +sequences+ and +traits+.
     # Prevents further responses through +#method_missing+.
     #
     # @note Called automatically in {#initialize}.
@@ -78,33 +78,33 @@ module ObjectForge
       @attributes.freeze
       @sequences.freeze
       @traits.freeze
-      @settings.freeze
+      @options.freeze
       self
     end
 
-    # Set a value for a forge's setting.
+    # Set a value for a forge's option.
     #
-    # Possible settings depend on used forge, but for default {Forge} a +mold+ is expected.
+    # Possible options depend on used forge, but for default {Forge} a +mold+ is expected.
     #
-    # It is also possible to set settings through +method_missing+, using name with a +=+ suffix.
+    # It is also possible to set options through +method_missing+, using name with a +=+ suffix.
     #
     # @see Molds
     #
     # @example
-    #   f.setting(:mold, ->(forged:, attributes:, **) { forge.new(**attributes) })
+    #   f.option(:mold, ->(forged:, attributes:, **) { forge.new(**attributes) })
     #   f.mold = ObjectForge::Molds::SingleArgumentMold.new
     #
-    # @param name [Sumbol] setting name
-    # @param value [Any] value for the setting
-    # @return [Symbol] setting name
+    # @param name [Sumbol] option name
+    # @param value [Any] value for the option
+    # @return [Symbol] option name
     #
     # @raise [ArgumentError] if +name+ is not a Symbol
-    def setting(name, value)
+    def option(name, value)
       unless ::Symbol === name
-        raise ::ArgumentError, "setting name must be a Symbol, #{name.class} given"
+        raise ::ArgumentError, "option name must be a Symbol, #{name.class} given"
       end
 
-      @settings[name] = value
+      @options[name] = value
 
       name
     end
@@ -261,12 +261,12 @@ module ObjectForge
 
     private
 
-    # Define an attribute (like +name+) or set a setting (like +name=+) using a shorthand.
+    # Define an attribute (like +name+) or set a option (like +name=+) using a shorthand.
     #
     # Can not be used with reserved names.
     # Trying to use a conflicting name will lead to usual issues
     # with calling random methods.
-    # When in doubt, use {#attribute} or {#setting} instead.
+    # When in doubt, use {#attribute} or {#option} instead.
     #
     # Reserved names are:
     # - all names ending in +?+, +!+
@@ -274,16 +274,16 @@ module ObjectForge
     #   (operators, +`+, +[]+, +[]=+)
     # - +rand+
     #
-    # @param name [Symbol] attribute or setting name
-    # @param value [Any] value for setting
+    # @param name [Symbol] attribute or option name
+    # @param value [Any] value for option
     # @yieldreturn [Any] attribute value
-    # @return [Symbol] attribute or setting name
+    # @return [Symbol] attribute or option name
     #
     # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, value = nil, **nil, &)
       return super(name) if frozen?
-      if valid_setting_method?(name)
-        return setting(name[...-1].to_sym, value) # steep:ignore NoMethod
+      if valid_option_method?(name)
+        return option(name[...-1].to_sym, value) # steep:ignore NoMethod
       end
       return attribute(name, &) if respond_to_missing?(name, false)
 
@@ -296,7 +296,7 @@ module ObjectForge
       !name.end_with?("?", "!") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
     end
 
-    def valid_setting_method?(name)
+    def valid_option_method?(name)
       name.match?(/\A\p{Word}.*=\z/)
     end
   end
