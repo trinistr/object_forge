@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+**Added**
+- `:crucible` option (previously known as settings) in `Forge`, allowing to replace `Crucible` with any `call`-able object. May be useful to provide a faster attributes resolver.
+
 **Changed**
-- "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.
+- [Breaking] "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.
 
 [Compare v0.3.0...main](https://github.com/trinistr/object_forge/compare/v0.3.0...main)
 
@@ -24,6 +27,7 @@ Other than that, `#[]` as an alias to `#forge` was removed, as it clashes with p
 - `Molds.mold_for` and `Molds.wrap_mold`. These are helper methods replacing previous scattered functionality.
 - Generic settings system in `ForgeDSL` through `#settings` reader, `#setting` method and `#setting_name=` shortcut.
   - This replaces previous "mold" setting.
+- `:mold` setting for `Forge`, accessible via generic settings in DSL.
 
 **Removed**
 - [Breaking] `#[]` alias to `#forge` in `Forge`, `Forgeyard`, and `ObjectForge`.

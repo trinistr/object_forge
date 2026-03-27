@@ -11,9 +11,25 @@ module ObjectForge
   #   but it's not a private API.
   #
   # @thread_safety Attribute resolution is idempotent,
-  #   but modifies instance variables, making it unsafe to share the Crucible
+  #   and using {.resolve} is thread-safe
   # @since 0.1.0
   class Crucible < UnBasicObject
+    class << self
+      # Resolve all attributes by calling their +Proc+s,
+      # using a new instance as evaluation context.
+      #
+      # @note This method destructively modifies initial attributes.
+      # @see #resolve!
+      #
+      # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
+      # @return [Hash{Symbol => Any}] resolved attributes
+      def resolve(attributes)
+        new(attributes).resolve!
+      end
+
+      alias call resolve
+    end
+
     %i[rand].each { |m| private define_method(m, ::Kernel.instance_method(m)) }
 
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes

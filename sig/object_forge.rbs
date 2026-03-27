@@ -21,6 +21,10 @@ module ObjectForge
     def call
       : (forged: untyped, attributes: Hash[Symbol, untyped], **untyped) -> untyped
   end
+  interface _Crucible
+    def call
+      : (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+  end
 
   class Error < StandardError
   end
@@ -109,7 +113,10 @@ class ObjectForge::Forge
   private
 
   def determine_mold
-    : (ObjectForge::_Forgable forged, ObjectForge::mold mold) -> ObjectForge::mold
+    : (ObjectForge::_Forgable forged, ObjectForge::mold? mold) -> ObjectForge::mold
+  
+  def determine_crucible
+    : (ObjectForge::_Crucible? crucible) -> ObjectForge::_Crucible
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
@@ -161,6 +168,11 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 end
 
 class ObjectForge::Crucible < ObjectForge::UnBasicObject
+  def self.call
+    : (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+  def self.resolve
+    : (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
+
   @attributes: Hash[Symbol, untyped]
   @resolved_attributes: Set[Symbol]
 

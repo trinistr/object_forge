@@ -6,6 +6,29 @@ module ObjectForge
 
     let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bar } } }
 
+    describe ".resolve" do
+      subject(:resolved_attributes) { described_class.resolve(attributes) }
+
+      it "resolves all attributes by calling their procs" do
+        expect(resolved_attributes).to eq({ foo: 1, bar: 2, baz: 3 })
+      end
+
+      it "modifies initial attributes" do
+        expect { resolved_attributes }.to change(attributes, :itself).to({ foo: 1, bar: 2, baz: 3 })
+      end
+
+      it "works by using `new.resolve!` chain" do
+        fake_instance = instance_double(described_class, resolve!: { success: true })
+        allow(described_class).to receive(:new).and_return(fake_instance)
+
+        expect(resolved_attributes).to eq({ success: true })
+      end
+    end
+
+    describe described_class.singleton_class do
+      include_examples "has an alias", :call, :resolve
+    end
+
     describe "#resolve!" do
       it "resolves all attributes by calling their procs" do
         expect(crucible.resolve!).to eq({ foo: 1, bar: 2, baz: 3 })

@@ -21,6 +21,22 @@ FORGE =
     end
   end
 
+FAST_FORGE =
+  FORGEYARD.define(:sea, Hash) do |f|
+    f.crucible = ->(attributes) { attributes.transform_values(&:call) }
+
+    f.wide { true }
+    f.deep { false }
+
+    f.trait :pond do
+      f.wide { false }
+    end
+
+    f.trait :ocean do
+      f.deep { true }
+    end
+  end
+
 # Start interactive console
 require "irb"
 IRB.start(__FILE__)

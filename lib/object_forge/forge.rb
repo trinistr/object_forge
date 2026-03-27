@@ -23,8 +23,11 @@ module ObjectForge
     #
     # @!attribute [r] options
     #   A forge's options.
-    #   Must include a +:mold+ key, containing an object that knows how to build the instance
-    #   with a +call+ method that takes a class and a hash of attributes.
+    #   Known options:
+    #   - +:mold+ — an object that knows how to build the instance
+    #     with a +call+ method taking a class and a hash of attributes.
+    #   - +:crucible+ — an object that knows how to resolve attributes
+    #     with a +call+ method taking a hash of initial attributes.
     #   @since 0.3.0
     #   @return [Hash{Symbol => Any}]
     Parameters = Struct.new(:attributes, :traits, :options, keyword_init: true)
@@ -61,6 +64,7 @@ module ObjectForge
       @forged = forged
       @parameters = parameters
       @mold = determine_mold(forged, parameters.options[:mold])
+      @crucible = determine_crucible(parameters.options[:crucible])
     end
 
     # Forge a new instance.
@@ -113,6 +117,18 @@ module ObjectForge
       Molds.wrap_mold(mold) || Molds.mold_for(forged)
     end
 
+    # Get a crucible object based on parameters.
+    #
+    # It's either the object provided in options, or {Crucible}.
+    #
+    # @param crucible [#call, nil]
+    # @return [#call]
+    #
+    # @since <<next>>
+    def determine_crucible(crucible)
+      crucible || Crucible
+    end
+
     # Resolve attributes using default attributes, specified traits and overrides.
     #
     # @param traits [Array<Symbol>]
@@ -121,7 +137,7 @@ module ObjectForge
     def resolve_attributes(traits, overrides)
       # TODO: catch unknown traits
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
-      Crucible.new(attributes).resolve!
+      @crucible.call(attributes)
     end
   end
 end
