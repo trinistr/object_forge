@@ -23,7 +23,7 @@ module ObjectForge
     #
     # @param name [Symbol] name to register forge under
     # @param forged [Class, Any] class or object to forge
-    # @yieldparam f [ForgeDSL]
+    # @yieldparam dsl [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge
     def define(name, forged, &)
@@ -59,12 +59,13 @@ module ObjectForge
     #
     # @see Forge#forge
     #
-    # @param name [Symbol] name of the forge
-    # @param traits [Array<Symbol>] traits to apply
-    # @param overrides [Hash{Symbol => Any}] attribute overrides
-    # @yieldparam object [Any] forged instance
-    # @yieldreturn [void]
-    # @return [Any] built instance
+    # @overload forge(name, *traits, **overrides)
+    #   @param name [Symbol] name of the forge
+    #   @param traits [Array<Symbol>] traits to apply
+    #   @param overrides [Hash{Symbol => Any}] attribute overrides
+    #   @yieldparam object [Any] forged instance
+    #   @yieldreturn [void]
+    #   @return [Any] built instance
     #
     # @raise [KeyError] if forge with the specified name is not registered
     def forge(name, ...)

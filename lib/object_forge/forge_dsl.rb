@@ -39,7 +39,7 @@ module ObjectForge
     #
     # @example with block parameter
     #   ForgeDSL.new do |f|
-    #     f.mold = ObjectForge::Molds::KeywordsMolds.new
+    #     f.mold = ObjectForge::Molds::KeywordsMold.new
     #     f.attribute(:name) { "Name" }
     #     f[:description] { name.upcase }
     #     f.duration { rand(1000) }
@@ -47,13 +47,13 @@ module ObjectForge
     #
     # @example without block parameter
     #   ForgeDSL.new do
-    #     self.mold = ::ObjectForge::Molds::KeywordsMolds.new
+    #     self.mold = ::ObjectForge::Molds::KeywordsMold.new
     #     attribute(:name) { "Name" }
     #     self[:description] { name.upcase }
     #     duration { rand(1000) }
     #   end
     #
-    # @yieldparam f [ForgeDSL] self
+    # @yieldparam dsl [ForgeDSL] self
     # @yieldreturn [void]
     def initialize(&dsl)
       super
@@ -94,7 +94,7 @@ module ObjectForge
     #   f.option(:mold, ->(forged:, attributes:, **) { forge.new(**attributes) })
     #   f.mold = ObjectForge::Molds::SingleArgumentMold.new
     #
-    # @param name [Sumbol] option name
+    # @param name [Symbol] option name
     # @param value [Any] value for the option
     # @return [Symbol] option name
     #

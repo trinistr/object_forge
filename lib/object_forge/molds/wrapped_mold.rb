@@ -20,10 +20,10 @@ module ObjectForge
         @wrapped_mold = wrapped_mold
       end
 
-      # @overload call(...)
       # Instantiate {wrapped_mold} and call it.
       #
-      # @return [Any] result of +wrapped_mold.new.call(...)+
+      # @overload call(...)
+      #   @return [Any] result of +wrapped_mold.new.call(...)+
       def call(...)
         wrapped_mold.new.call(...)
       end

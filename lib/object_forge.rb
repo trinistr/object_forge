@@ -62,47 +62,47 @@ module ObjectForge
   # @since 0.1.0
   DEFAULT_YARD = Forgeyard.new
 
-  # @overload sequence(initial)
   # Create a sequence, to be used wherever it needs to be.
   #
   # @see Sequence.new
   # @since 0.1.0
   #
-  # @param initial [#succ, Sequence]
-  # @return [Sequence]
+  # @overload sequence(initial)
+  #   @param initial [#succ, Sequence]
+  #   @return [Sequence]
   def self.sequence(...)
     Sequence.new(...)
   end
 
-  # @overload define(name, forged, &)
   # Define and create a forge in {DEFAULT_YARD}.
   #
   # @!macro default_forgeyard
   # @see Forgeyard#define
   # @since 0.1.0
   #
-  # @param name [Symbol] forge name
-  # @param forged [Class, Any] class or object to forge
-  # @yieldparam f [ForgeDSL]
-  # @yieldreturn [void]
-  # @return [Forge] forge
+  # @overload define(name, forged)
+  #   @param name [Symbol] forge name
+  #   @param forged [Class, Any] class or object to forge
+  #   @yieldparam dsl [ForgeDSL]
+  #   @yieldreturn [void]
+  #   @return [Forge] forge
   def self.define(...)
     DEFAULT_YARD.define(...)
   end
 
-  # @overload forge(name, *traits, **overrides, &)
   # Build an instance using a forge from {DEFAULT_YARD}.
   #
   # @!macro default_forgeyard
   # @see Forgeyard#forge
   # @since 0.1.0
   #
-  # @param name [Symbol] name of the forge
-  # @param traits [Array<Symbol>] traits to apply
-  # @param overrides [Hash{Symbol => Any}] attribute overrides
-  # @yieldparam object [Any] forged instance
-  # @yieldreturn [void]
-  # @return [Any] built instance
+  # @overload forge(name, *traits, **overrides)
+  #   @param name [Symbol] name of the forge
+  #   @param traits [Array<Symbol>] traits to apply
+  #   @param overrides [Hash{Symbol => Any}] attribute overrides
+  #   @yieldparam object [Any] forged instance
+  #   @yieldreturn [void]
+  #   @return [Any] built instance
   def self.forge(...)
     DEFAULT_YARD.forge(...)
   end

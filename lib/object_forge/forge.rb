@@ -39,7 +39,7 @@ module ObjectForge
     #
     # @param forged [Class, Any] class or object to forge
     # @param name [Symbol, nil] forge name
-    # @yieldparam f [ForgeDSL]
+    # @yieldparam dsl [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge
     def self.define(forged, name: nil, &)
@@ -69,11 +69,7 @@ module ObjectForge
 
     # Forge a new instance.
     #
-    # @overload forge(*traits, **overrides, &)
-    # @overload forge(traits, overrides, &)
-    #
-    # Positional arguments are taken as trait names, keyword arguments as attribute overrides,
-    # unless there are exactly two positional arguments: an array and a hash.
+    # Positional arguments are taken as trait names, keyword arguments as attribute overrides.
     #
     # All traits and overrides are applied in argument order,
     # with overrides always applied after traits.

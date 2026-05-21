@@ -236,13 +236,13 @@ forge.forge
 Of course, you can abuse this to your heart's content. Look at the documentation for `ObjectForge::Molds` for inspiration.
 
 **ObjectForge** comes pre-equipped with a selection of molds for common cases:
-- `ObjectForge::Molds::SingleArgumentMold` (*the default*) — calls `new(attributes)`, suitable for **Dry::Struct**, for example;
-- `ObjectForge::Molds::KeywordsMold` — calls `new(**attributes)`, suitable for **Data** and similar classes;
+- `ObjectForge::Molds::SingleArgumentMold` (*the default*) calls `new(attributes)`, suitable for **ActiveModel**-style objects and **Dry::Struct**, for example;
+- `ObjectForge::Molds::KeywordsMold` calls `new(**attributes)`, suitable for **Data** and similar classes;
 - `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), providing a way to easily use hashes to carry data;
 - `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct** subclasses.
 
 > [!TIP]
-> **HashMold** and **StructMold** will be used automatically, based on the forged class, if you don't specify any mold.
+> If you don't specify a mold, **ObjectForge** will infer one for core data containers, including **Hash**, **Struct**, and **Data** subclasses.
 
 I strongly recommend directly using mold instances and not classes. Doing this prevents memory churn which causes performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 
@@ -305,7 +305,9 @@ kanban
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
+After checking out the repo, run `bundle install` to install dependencies. If you will be running typing checks (Steep), also execute `rbs collection install`.
+
+Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
 
 You can also run `bin/console` for an interactive prompt that will allow you to experiment, or `bin/benchmark` to run a benchmark script and generate a StackProf flamegraph.
 
