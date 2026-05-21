@@ -18,9 +18,9 @@ module ObjectForge
       context "when initial value does not respond to #succ" do
         let(:initial) { [1] }
 
-        it "raises ArgumentError" do
+        it "raises TypeError" do
           expect { described_class.new(initial) }.to raise_error(
-            ArgumentError,
+            TypeError,
             "initial value must respond to #succ, Array given"
           )
         end

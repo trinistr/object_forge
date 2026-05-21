@@ -176,9 +176,9 @@ module ObjectForge
       context "when option name is not a Symbol" do
         let(:definition) { proc { |f| f.option("caramba", "value") } }
 
-        it "raises ArgumentError on definition" do
+        it "raises TypeError on definition" do
           expect { forge_dsl }.to raise_error(
-            ArgumentError,
+            TypeError,
             "option name must be a Symbol, String given"
           )
         end
@@ -219,9 +219,9 @@ module ObjectForge
       context "when attribute name is not a Symbol" do
         let(:definition) { proc { |f| f.attribute("attr_string") { "Name" } } }
 
-        it "raises ArgumentError on definition" do
+        it "raises TypeError on definition" do
           expect { forge_dsl }.to raise_error(
-            ArgumentError,
+            TypeError,
             "attribute name must be a Symbol, String given (in \"attr_string\")"
           )
         end
@@ -297,9 +297,9 @@ module ObjectForge
       context "when attribute name is not a Symbol" do
         let(:definition) { proc { |f| f.sequence(15) } }
 
-        it "raises ArgumentError on definition" do
+        it "raises TypeError on definition" do
           expect { forge_dsl }.to raise_error(
-            ArgumentError,
+            TypeError,
             "sequence name must be a Symbol, Integer given (in 15)"
           )
         end
@@ -308,9 +308,9 @@ module ObjectForge
       context "when initial value is not a Sequence and does not respond to #succ" do
         let(:definition) { proc { |f| f.sequence(:seq_invalid, -> { "a" }) } }
 
-        it "raises ArgumentError on definition (proxied from Sequence)" do
+        it "raises TypeError on definition (proxied from Sequence)" do
           expect { forge_dsl }.to raise_error(
-            ArgumentError,
+            TypeError,
             "initial value must respond to #succ, Proc given"
           )
         end
@@ -352,9 +352,9 @@ module ObjectForge
       context "when trait name is not a Symbol" do
         let(:definition) { proc { |f| f.trait("trait_string") } }
 
-        it "raises ArgumentError on definition" do
+        it "raises TypeError on definition" do
           expect { forge_dsl }.to raise_error(
-            ArgumentError,
+            TypeError,
             "trait name must be a Symbol, String given (in \"trait_string\")"
           )
         end
@@ -425,7 +425,7 @@ module ObjectForge
         let(:definition) { proc { |f| f.eql? { "Name!!!" } } }
 
         it "behaves in an undefined manner" do
-          expect { forge_dsl }.to raise_error ArgumentError
+          expect { forge_dsl }.to raise_error StandardError
         end
       end
 

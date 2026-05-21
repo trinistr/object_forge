@@ -98,10 +98,10 @@ module ObjectForge
     # @param value [Any] value for the option
     # @return [Symbol] option name
     #
-    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [TypeError] if +name+ is not a Symbol
     def option(name, value)
       unless ::Symbol === name
-        raise ::ArgumentError, "option name must be a Symbol, #{name.class} given"
+        raise ::TypeError, "option name must be a Symbol, #{name.class} given"
       end
 
       @options[name] = value
@@ -134,11 +134,11 @@ module ObjectForge
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
     #
-    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [TypeError] if +name+ is not a Symbol
     # @raise [DSLError] if no block is given
     def attribute(name, &definition)
       unless ::Symbol === name
-        raise ::ArgumentError,
+        raise ::TypeError,
               "attribute name must be a Symbol, #{name.class} given (in #{name.inspect})"
       end
       unless block_given?
@@ -181,11 +181,11 @@ module ObjectForge
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
     #
-    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [TypeError] if +name+ is not a Symbol
     # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
       unless ::Symbol === name
-        raise ::ArgumentError,
+        raise ::TypeError,
               "sequence name must be a Symbol, #{name.class} given (in #{name.inspect})"
       end
 
@@ -227,13 +227,12 @@ module ObjectForge
     # @yieldreturn [void]
     # @return [Symbol] trait name
     #
-    # @raise [ArgumentError] if +name+ is not a Symbol
+    # @raise [TypeError] if +name+ is not a Symbol
     # @raise [DSLError] if no block is given
     # @raise [DSLError] if called inside of another trait definition
     def trait(name, **nil)
       unless ::Symbol === name
-        raise ::ArgumentError,
-              "trait name must be a Symbol, #{name.class} given (in #{name.inspect})"
+        raise ::TypeError, "trait name must be a Symbol, #{name.class} given (in #{name.inspect})"
       end
       if @current_trait
         raise DSLError, "can not define trait inside of another trait (in #{name.inspect})"

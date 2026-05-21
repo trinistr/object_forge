@@ -187,7 +187,7 @@ forgeyard.forge(:point, :z, id: "0")
 Note how the forge isn't registered in the default forgeyard:
 ```ruby
 ObjectForge.forge(:point)
-  # ArgumentError: unknown forge: point
+  # KeyError: key not found
 ```
 
 If you find it more convenient not to use a forgeyard (for example, if you only need a single forge for your service), you can create individual forges:

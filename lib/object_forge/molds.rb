@@ -102,7 +102,7 @@ module ObjectForge
     # @param mold [Class, #call, nil]
     # @return [#call, nil]
     #
-    # @raise [DSLError] if +mold+ does not respond to or implement +#call+
+    # @raise [MoldError] if +mold+ does not respond to or implement +#call+
     #
     # @thread_safety Thread-safe.
     # @since 0.3.0
