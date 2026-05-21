@@ -30,6 +30,8 @@ module ObjectForge
   end
   class DSLError < Error
   end
+  class CircularAttributeDependencyError < DSLError
+  end
   class MoldError < Error
   end
 
@@ -176,6 +178,7 @@ class ObjectForge::Crucible < ObjectForge::UnBasicObject
 
   @attributes: Hash[Symbol, untyped]
   @resolved_attributes: Set[Symbol]
+  @resolving_attributes: Array[Symbol]
 
   def initialize
     : (Hash[Symbol, untyped] attributes) -> void
@@ -191,6 +194,9 @@ class ObjectForge::Crucible < ObjectForge::UnBasicObject
 
   def respond_to_missing?
     : (Symbol name, bool include_all) -> bool
+  
+  def raise_circular_dependency_error!
+    : (Symbol name) -> void
 end
 
 class ObjectForge::UnBasicObject < BasicObject

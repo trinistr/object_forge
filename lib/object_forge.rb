@@ -48,6 +48,9 @@ module ObjectForge
   # Error raised when a mistake is made in using DSL.
   # @since 0.1.0
   class DSLError < Error; end
+  # Error raised when attribute resolution surfaces a circular dependency.
+  # @since <<next>>
+  class CircularAttributeDependencyError < DSLError; end
   # Error raised when object can not be used as a mold.
   # @since 0.3.0
   class MoldError < Error; end

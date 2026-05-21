@@ -72,6 +72,42 @@ module ObjectForge
         end
       end
 
+      context "if attributes create a dependency cycle" do
+        let(:attributes) do
+          {
+            foo: -> { bar - baz },
+            bar: -> { baz * 3 },
+            baz: -> { bla - bar },
+            bla: -> { 31 },
+          }
+        end
+
+        it "raises CircularAttributeDependencyError" do
+          expect { crucible.resolve! }.to raise_error(
+            CircularAttributeDependencyError,
+            # Note that this is the exact loop, not the full chain and not the resolution graph.
+            "attribute depends on itself: bar -> baz -> bar"
+          )
+        end
+      end
+
+      context "if the same instance is resolved after an error" do
+        let(:attributes) do
+          context = self
+          {
+            token: -> { context.token_source.fetch(:token) },
+            header: -> { "Bearer #{token}" },
+          }
+        end
+        let(:token_source) { {} }
+
+        it "does not raise CircularAttributeDependencyError" do
+          expect { crucible.resolve! }.to raise_error KeyError
+          token_source[:token] = "abcde"
+          expect { crucible.resolve! }.not_to raise_error
+        end
+      end
+
       context "if attributes conflict with Object (but not BasicObject) methods" do
         let(:attributes) { dsl.attributes.dup }
         let(:dsl) do

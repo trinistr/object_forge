@@ -37,6 +37,7 @@ module ObjectForge
       super()
       @attributes = attributes
       @resolved_attributes = ::Set.new
+      @resolving_attributes = []
     end
 
     # Resolve all attributes by calling their +Proc+s,
@@ -45,11 +46,13 @@ module ObjectForge
     # Attributes can freely refer to each other inside +Proc+s
     # through bareword names or +#[]+.
     # However, make sure to avoid cyclic dependencies:
-    # they aren't specially detected or handled, and will cause +SystemStackError+.
+    # they can't be resolved and will raise {CircularAttributeDependencyError}.
     #
     # @note This method destructively modifies initial attributes.
     #
     # @return [Hash{Symbol => Any}] resolved attributes
+    #
+    # @raise [CircularAttributeDependencyError] if a dependency cycle is detected
     def resolve!
       @attributes.each_key { |name| method_missing(name) }
       @attributes
@@ -81,14 +84,22 @@ module ObjectForge
     #
     # @param name [Symbol]
     # @return [Any]
-    def method_missing(name)
+    #
+    # @raise [CircularAttributeDependencyError] if a dependency cycle is detected
+    def method_missing(name) # rubocop:disable Metrics/MethodLength
       if @attributes.key?(name)
-        if @resolved_attributes.include?(name) || !(::Proc === @attributes[name])
-          @attributes[name]
-        else
-          @resolved_attributes << name
-          @attributes[name] = instance_exec(&@attributes[name])
+        if @resolving_attributes.include?(name)
+          raise_circular_dependency_error!(name)
+        elsif !@resolved_attributes.include?(name) && (::Proc === @attributes[name])
+          begin
+            @resolving_attributes << name
+            @attributes[name] = instance_exec(&@attributes[name])
+            @resolved_attributes << name
+          ensure
+            @resolving_attributes.pop
+          end
         end
+        @attributes[name]
       else
         super
       end
@@ -98,6 +109,13 @@ module ObjectForge
 
     def respond_to_missing?(name, _include_all)
       @attributes.key?(name)
+    end
+
+    def raise_circular_dependency_error!(name)
+      loop_start = @resolving_attributes.index(name)
+      loop = @resolving_attributes[loop_start..] # : Array[Symbol]
+      raise CircularAttributeDependencyError,
+            "attribute depends on itself: #{loop.join(" -> ")} -> #{name}"
     end
   end
 end
