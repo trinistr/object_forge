@@ -11,31 +11,31 @@ module ObjectForge
   # initialize once, use for the whole runtime.
   #
   # A simple mold can easily be just a +Proc+.
-  # All molds must have the following +#call+ signature: +call(forged:, attributes:, **)+.
+  # All molds must have the following +#call+ signature: +call(forge_target:, attributes:, **)+.
   # The extra keywords are ignored for possibility of future extensions.
   #
   # @example A very basic FactoryBot replacement
-  #   creator = ->(forged:, attributes:, **) do
-  #     instance = forged.new
+  #   creator = ->(forge_target:, attributes:, **) do
+  #     instance = forge_target.new
   #     attributes.each_pair { instance.public_send(:"#{_1}=", _2) }
   #     instance.save!
   #   end
-  #   creator.call(forged: User, attributes: { name: "John", age: 30 })
+  #   creator.call(forge_target: User, attributes: { name: "John", age: 30 })
   #     # => <User name="John" age=30>
   # @example Using a mold to serialize collection of objects (contrivedly)
-  #   dumpy = ->(forged:, attributes:, **) do
+  #   dumpy = ->(forge_target:, attributes:, **) do
   #     Enumerator.new(attributes.size) do |y|
-  #       attributes.each_pair { y << forged.dump(_1 => _2) }
+  #       attributes.each_pair { y << forge_target.dump(_1 => _2) }
   #     end
   #   end
-  #   dumpy.call(forged: JSON, attributes: {a:1, b:2}).to_a
+  #   dumpy.call(forge_target: JSON, attributes: {a:1, b:2}).to_a
   #     # => ["{\"a\":1}", "{\"b\":2}"]
-  #   dumpy.call(forged: YAML, attributes: {a:1, b:2}).to_a
+  #   dumpy.call(forge_target: YAML, attributes: {a:1, b:2}).to_a
   #     # => ["---\n:a: 1\n", "---\n:b: 2\n"]
   # @example Abstract factory pattern (kind of)
   #   class FurnitureFactory
-  #     def call(forged:, attributes:, **)
-  #       concrete_factory = concrete_factory(forged)
+  #     def call(forge_target:, attributes:, **)
+  #       concrete_factory = concrete_factory(forge_target)
   #       attributes[:pieces].map do |piece|
   #         concrete_factory.public_send(piece, attributes.dig(:color, piece))
   #       end
@@ -49,20 +49,20 @@ module ObjectForge
   #       end
   #     end
   #   end
-  #   FurnitureFactory.new.call(forged: :hitech, attributes: {
+  #   FurnitureFactory.new.call(forge_target: :hitech, attributes: {
   #     pieces: [:chair, :table], color: { chair: :black, table: :white }
   #   })
   #     # => [<#HiTech::Chair color=:black>, <#HiTech::Table color=:white>]
   # @example Abusing molds
-  #   printer = ->(forged:, attributes:, **) { PP.pp(attributes, forged) }
-  #   printer.call(forged: $stderr, attributes: {a:1, b:2})
+  #   printer = ->(forge_target:, attributes:, **) { PP.pp(attributes, forge_target) }
+  #   printer.call(forge_target: $stderr, attributes: {a:1, b:2})
   #     # outputs "{:a=>1, :b=>2}" to $stderr
   #
   # @since 0.2.0
   module Molds
     Dir["#{__dir__}/molds/*.rb"].each { require_relative _1 }
 
-    # Get maybe appropriate mold for the given +forged+ class or object.
+    # Get maybe appropriate mold for the given forge target.
     #
     # Currently provides specific recognition for:
     # - subclasses of +Struct+ ({StructMold}),
@@ -70,18 +70,18 @@ module ObjectForge
     # - +Hash+ and subclasses ({HashMold}).
     # Other objects just get {SingleArgumentMold}.
     #
-    # @param forged [Class, Any]
+    # @param forge_target [Class, Any]
     # @return [#call] an instance of a mold
     #
     # @thread_safety Thread-safe.
     # @since 0.3.0
-    def self.mold_for(forged)
-      if ::Class === forged
-        if forged < ::Struct
+    def self.mold_for(forge_target)
+      if ::Class === forge_target
+        if forge_target < ::Struct
           StructMold.new
-        elsif defined?(::Data) && forged < ::Data
+        elsif defined?(::Data) && forge_target < ::Data
           KeywordsMold.new
-        elsif forged <= ::Hash
+        elsif forge_target <= ::Hash
           HashMold.new
         else
           SingleArgumentMold.new

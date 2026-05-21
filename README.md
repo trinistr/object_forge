@@ -218,9 +218,9 @@ If you use core Ruby data containers, such as `Struct`, `Data` or even `Hash`, t
 Whenever you need to change how your objects are built, you specify a *mold*. Molds are just `#call`able objects (including `Proc`s!) with specific arguments. They are set in forge definition:
 ```ruby
 forge = ObjectForge::Forge.define(Point) do |f|
-  f.mold = ->(forged:, attributes:, **) do
+  f.mold = ->(forge_target:, attributes:, **) do
     puts "Pointing at #{attributes[:x]},#{attributes[:y]}"
-    forged.new(attributes[:id], attributes[:x], attributes[:y])
+    forge_target.new(attributes[:id], attributes[:x], attributes[:y])
   end
   #... rest of the definition
 end

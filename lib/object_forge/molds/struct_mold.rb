@@ -32,18 +32,22 @@ module ObjectForge
         @lax = lax
       end
 
-      # Instantiate +forged+ struct with a hash of attributes.
+      # Instantiate target struct with a hash of attributes.
       #
-      # @param forged [Class] a subclass of Struct
+      # @param forge_target [Class] a subclass of Struct
       # @param attributes [Hash{Symbol => Any}]
       # @return [Struct]
-      def call(forged:, attributes:, **_)
-        if forged.keyword_init?
-          lax ? forged.new(attributes.slice(*forged.members)) : forged.new(attributes)
-        elsif forged.keyword_init? == false
-          forged.new(*attributes.values_at(*forged.members))
+      def call(forge_target:, attributes:, **_)
+        if forge_target.keyword_init?
+          if lax
+            forge_target.new(attributes.slice(*forge_target.members))
+          else
+            forge_target.new(attributes)
+          end
+        elsif forge_target.keyword_init? == false
+          forge_target.new(*attributes.values_at(*forge_target.members))
         else
-          build_struct_with_unspecified_keyword_init(forged, attributes)
+          build_struct_with_unspecified_keyword_init(forge_target, attributes)
         end
       end
 
@@ -51,18 +55,18 @@ module ObjectForge
 
       if RUBY_FEATURE_AUTO_KEYWORDS
         # Build struct by using keywords to specify member values.
-        def build_struct_with_unspecified_keyword_init(forged, attributes)
+        def build_struct_with_unspecified_keyword_init(forge_target, attributes)
           if lax
-            forged.new(**attributes.slice(*forged.members))
+            forge_target.new(**attributes.slice(*forge_target.members))
           else
-            forged.new(**attributes)
+            forge_target.new(**attributes)
           end
         end
       else
         # :nocov:
         # Build struct by using positional arguments to specify member values.
-        def build_struct_with_unspecified_keyword_init(forged, attributes)
-          forged.new(*attributes.values_at(*forged.members))
+        def build_struct_with_unspecified_keyword_init(forge_target, attributes)
+          forge_target.new(*attributes.values_at(*forge_target.members))
         end
         # :nocov:
       end

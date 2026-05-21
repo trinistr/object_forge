@@ -37,33 +37,35 @@ module ObjectForge
     # @see ForgeDSL
     # @thread_safety Thread-safe if DSL definition is thread-safe.
     #
-    # @param forged [Class, Any] class or object to forge
+    # @param forge_target [Class, Any] class or object to forge
     # @param name [Symbol, nil] forge name
     # @yieldparam dsl [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge
-    def self.define(forged, name: nil, &)
-      new(forged, ForgeDSL.new(&), name:)
+    def self.define(forge_target, name: nil, &)
+      new(forge_target, ForgeDSL.new(&), name:)
     end
 
     # @return [Symbol, nil] forge name
     attr_reader :name
 
     # @return [Class, Any] class or object to forge
-    attr_reader :forged
+    # @since <<next>>
+    attr_reader :forge_target
+    alias target forge_target
 
     # @return [Parameters, ForgeDSL] forge parameters
     attr_reader :parameters
 
-    # @param forged [Class, Any] class or object to forge
+    # @param forge_target [Class, Any] class or object to forge
     # @param parameters [Parameters, ForgeDSL] forge parameters
     # @param name [Symbol, nil] forge name;
     #   only used for identification purposes
-    def initialize(forged, parameters, name: nil)
+    def initialize(forge_target, parameters, name: nil)
       @name = name
-      @forged = forged
+      @forge_target = forge_target
       @parameters = parameters
-      @mold = determine_mold(forged, parameters.options[:mold])
+      @mold = determine_mold(forge_target, parameters.options[:mold])
       @crucible = determine_crucible(parameters.options[:crucible])
     end
 
@@ -88,7 +90,7 @@ module ObjectForge
     # @raise [ArgumentError] if a trait name is unknown
     def forge(*traits, **overrides)
       resolved_attributes = resolve_attributes(traits, overrides)
-      instance = @mold.call(forged: @forged, attributes: resolved_attributes)
+      instance = @mold.call(forge_target: @forge_target, attributes: resolved_attributes)
       yield instance if block_given?
       instance
     end
@@ -102,17 +104,17 @@ module ObjectForge
     #
     # If +mold+ is already set, it will be used directly, or,
     # if it is Class, it will be wrapped in {Molds::WrappedMold} if posssible.
-    # If +nil+, a mold will be selected based on +forged+ class.
+    # If +nil+, a mold will be selected based on +forge_target+ class.
     #
-    # @param forged [Class, Any]
+    # @param forge_target [Class, Any]
     # @param mold [#call, Class, nil]
     # @return [#call]
     #
     # @raise [MoldError]
     #
     # @since 0.3.0
-    def determine_mold(forged, mold)
-      Molds.wrap_mold(mold) || Molds.mold_for(forged)
+    def determine_mold(forge_target, mold)
+      Molds.wrap_mold(mold) || Molds.mold_for(forge_target)
     end
 
     # Get a crucible object based on parameters.

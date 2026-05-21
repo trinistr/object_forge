@@ -26,7 +26,7 @@ require_relative "object_forge/version"
 #
 # @example Quick example
 #   Frobinator = Struct.new(:frob, :inator, keyword_init: true)
-#   # Forge's name and forged class are completely independent.
+#   # Forge's name and target class are completely independent.
 #   ObjectForge.define(:frobber, Frobinator) do |f|
 #     f.frob { "Frob" + inator.call }
 #     f.inator { -> { "inator" } }
@@ -80,9 +80,9 @@ module ObjectForge
   # @see Forgeyard#define
   # @since 0.1.0
   #
-  # @overload define(name, forged)
+  # @overload define(name, forge_target)
   #   @param name [Symbol] forge name
-  #   @param forged [Class, Any] class or object to forge
+  #   @param forge_target [Class, Any] class or object to forge
   #   @yieldparam dsl [ForgeDSL]
   #   @yieldreturn [void]
   #   @return [Forge] forge

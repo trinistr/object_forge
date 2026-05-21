@@ -36,15 +36,15 @@ module ObjectForge
         @default_proc = default_proc
       end
 
-      # Build a new hash using +forged.[]+.
+      # Build a new hash using +forge_target.[]+.
       #
       # @see Hash.[]
       #
-      # @param forged [Class] Hash or a subclass of Hash
+      # @param forge_target [Class] Hash or a subclass of Hash
       # @param attributes [Hash{Symbol => Any}]
       # @return [Hash]
-      def call(forged:, attributes:, **_)
-        hash = forged[attributes]
+      def call(forge_target:, attributes:, **_)
+        hash = forge_target[attributes]
         hash.default = @default if @default
         hash.default_proc = @default_proc if @default_proc
         hash

@@ -39,41 +39,45 @@ RSpec.describe ObjectForge::Molds::StructMold do
     context "when lax is false" do
       context "when extra attributes are not present" do
         it "can instantiate structs with keyword_init: true" do
-          expect(mold.call(forged: struct_keyword_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_keyword_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with keyword_init: false" do
-          expect(mold.call(forged: struct_positional_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_positional_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with unspecified keyword_init" do
-          expect(mold.call(forged: struct_unspecified_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_unspecified_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
       end
 
       context "when extra attributes are present" do
         it "fails to instantiate structs with keyword_init: true" do
-          expect { mold.call(forged: struct_keyword_init, attributes: { a: 1, b: 2, c: 3 }) }
+          expect { mold.call(forge_target: struct_keyword_init, attributes: { a: 1, b: 2, c: 3 }) }
             .to raise_error ArgumentError
         end
 
         it "can instantiate structs with keyword_init: false" do
-          expect(mold.call(forged: struct_positional_init, attributes: { a: 1, b: 2, c: 3 }))
+          expect(mold.call(forge_target: struct_positional_init, attributes: { a: 1, b: 2, c: 3 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         if described_class::RUBY_FEATURE_AUTO_KEYWORDS
           it "fails to instantiate structs with unspecified keyword_init" do
-            expect { mold.call(forged: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 }) }
+            expect {
+              mold.call(forge_target: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 })
+            }
               .to raise_error ArgumentError
           end
         else
           # :nocov:
           it "can instantiate structs with unspecified keyword_init" do
-            expect(mold.call(forged: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 }))
+            expect(
+              mold.call(forge_target: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 })
+            )
               .to have_attributes(a: 1, b: 2)
           end
           # :nocov:
@@ -86,41 +90,41 @@ RSpec.describe ObjectForge::Molds::StructMold do
 
       context "when extra attributes are not present" do
         it "can instantiate structs with keyword_init: true" do
-          expect(mold.call(forged: struct_keyword_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_keyword_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with keyword_init: false" do
-          expect(mold.call(forged: struct_positional_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_positional_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with unspecified keyword_init" do
-          expect(mold.call(forged: struct_unspecified_init, attributes: { a: 1, b: 2 }))
+          expect(mold.call(forge_target: struct_unspecified_init, attributes: { a: 1, b: 2 }))
             .to have_attributes(a: 1, b: 2)
         end
       end
 
       context "when extra attributes are present" do
         it "can instantiate structs with keyword_init: true" do
-          expect(mold.call(forged: struct_keyword_init, attributes: { a: 1, b: 2, c: 3 }))
+          expect(mold.call(forge_target: struct_keyword_init, attributes: { a: 1, b: 2, c: 3 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with keyword_init: false" do
-          expect(mold.call(forged: struct_positional_init, attributes: { a: 1, b: 2, c: 3 }))
+          expect(mold.call(forge_target: struct_positional_init, attributes: { a: 1, b: 2, c: 3 }))
             .to have_attributes(a: 1, b: 2)
         end
 
         it "can instantiate structs with unspecified keyword_init" do
-          expect(mold.call(forged: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 }))
+          expect(mold.call(forge_target: struct_unspecified_init, attributes: { a: 1, b: 2, c: 3 }))
             .to have_attributes(a: 1, b: 2)
         end
       end
     end
 
     it "can be called with arbitrary extra arguments" do
-      expect(mold.call(forged: struct_keyword_init, attributes: { a: 1, b: 2 }, extra: 3))
+      expect(mold.call(forge_target: struct_keyword_init, attributes: { a: 1, b: 2 }, extra: 3))
         .to have_attributes(a: 1, b: 2)
     end
   end

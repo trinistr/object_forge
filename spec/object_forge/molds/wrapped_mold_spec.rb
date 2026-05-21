@@ -38,17 +38,19 @@ RSpec.describe ObjectForge::Molds::WrappedMold do
 
   describe "#call" do
     it "instantiates wrapped mold and calls it" do
-      expect(mold.call(forged: 1, attributes: 2)).to eq(forged: 1, attributes: 2)
+      expect(mold.call(forge_target: 1, attributes: 2)).to eq(forge_target: 1, attributes: 2)
     end
 
     it "can be called as many times as needed" do
-      expect(mold.call(forged: 1, attributes: 2)).to eq(forged: 1, attributes: 2)
-      expect(mold.call(forged: "s", attributes: "c")).to eq(forged: "s", attributes: "c")
+      expect(mold.call(forge_target: 1, attributes: 2)).to eq(forge_target: 1, attributes: 2)
+      expect(mold.call(forge_target: "s",
+                       attributes: "c")).to eq(forge_target: "s",
+                                               attributes: "c")
     end
 
     it "can be called with arbitrary extra arguments" do
-      expect(mold.call(forged: 1, attributes: 2, extra: 3))
-        .to eq(forged: 1, attributes: 2, extra: 3)
+      expect(mold.call(forge_target: 1, attributes: 2, extra: 3))
+        .to eq(forge_target: 1, attributes: 2, extra: 3)
     end
   end
 end

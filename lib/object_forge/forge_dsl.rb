@@ -91,7 +91,7 @@ module ObjectForge
     # @see Molds
     #
     # @example
-    #   f.option(:mold, ->(forged:, attributes:, **) { forge.new(**attributes) })
+    #   f.option(:mold, ->(forge_target:, attributes:, **) { forge.new(**attributes) })
     #   f.mold = ObjectForge::Molds::SingleArgumentMold.new
     #
     # @param name [Symbol] option name
@@ -111,7 +111,7 @@ module ObjectForge
 
     # Define an attribute, possibly transient.
     #
-    # DSL does not know or care what attributes the forged class has,
+    # DSL does not know or care what attributes the target class has,
     # so the only difference between "real" and "transient" attributes
     # is how the class itself treats them.
     #

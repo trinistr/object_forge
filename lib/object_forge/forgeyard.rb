@@ -22,12 +22,12 @@ module ObjectForge
     # @see Forge.define
     #
     # @param name [Symbol] name to register forge under
-    # @param forged [Class, Any] class or object to forge
+    # @param forge_target [Class, Any] class or object to forge
     # @yieldparam dsl [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge
-    def define(name, forged, &)
-      register(name, Forge.define(forged, name: name, &))
+    def define(name, forge_target, &)
+      register(name, Forge.define(forge_target, name: name, &))
     end
 
     # Add a forge under a specified name.

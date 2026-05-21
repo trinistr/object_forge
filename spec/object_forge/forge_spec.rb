@@ -16,11 +16,13 @@ module ObjectForge
       )
     end
 
-    describe "#forged" do
+    describe "#forge_target" do
       it "returns the class to forge" do
-        expect(forge.forged).to be forged_class
+        expect(forge.forge_target).to be forged_class
       end
     end
+
+    include_examples "has an alias", :target, :forge_target
 
     describe "#name" do
       it "returns the name of the forge" do

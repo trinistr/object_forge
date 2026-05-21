@@ -47,14 +47,14 @@ RSpec.describe ObjectForge::Molds::HashMold do
 
   describe "#call" do
     it "calls +[]+ on the forged object with the attributes hash" do
-      expect(mold.call(forged: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1, b: 2)
+      expect(mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1, b: 2)
     end
 
     context "when default value is set" do
       subject(:mold) { described_class.new(37) }
 
       it "assigns default value to the produced hash" do
-        hash = mold.call(forged: forged_object, attributes: { a: 1, b: 2 })
+        hash = mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 })
         expect(hash).to eq(a: 1, b: 2)
         expect(hash.default).to eq 37
         expect(hash[:c]).to eq 37
@@ -67,7 +67,7 @@ RSpec.describe ObjectForge::Molds::HashMold do
       let(:default_proc) { ->(_hash, key) { key } }
 
       it "assigns default value to the produced hash" do
-        hash = mold.call(forged: forged_object, attributes: { a: 1, b: 2 })
+        hash = mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 })
         expect(hash).to eq(a: 1, b: 2)
         expect(hash.default_proc).to be default_proc
         expect(hash[:c]).to eq :c
@@ -78,14 +78,14 @@ RSpec.describe ObjectForge::Molds::HashMold do
       require "concurrent/hash"
 
       it "builds an instance of the specified class correctly" do
-        hash = mold.call(forged: Concurrent::Hash, attributes: { a: 1, b: 2 })
+        hash = mold.call(forge_target: Concurrent::Hash, attributes: { a: 1, b: 2 })
         expect(hash).to be_a Concurrent::Hash
         expect(hash).to eq(a: 1, b: 2)
       end
     end
 
     it "can be called with arbitrary extra arguments" do
-      expect(mold.call(forged: forged_object, attributes: { b: 12, d: 21 }, extra: 3))
+      expect(mold.call(forge_target: forged_object, attributes: { b: 12, d: 21 }, extra: 3))
         .to eq(b: 12, d: 21)
     end
   end

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Changed**
 - [Breaking] "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.
+- [Breaking] `forged` parameter was renamed to `forge_target` everywhere. `Forge#forged` was renamed to `#forge_target` accordingly.
 - [Breaking] Methods that raised `ArgumentError` on type mismatch now raise `TypeError`.
 
 **Fixed**

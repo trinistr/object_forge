@@ -5,7 +5,7 @@ module ObjectForge
     describe ".mold_for" do
       subject(:mold) { described_class.mold_for(klass) }
 
-      let(:built_object) { mold.call(forged: klass, attributes: { a: 1, b: 2 }) }
+      let(:built_object) { mold.call(forge_target: klass, attributes: { a: 1, b: 2 }) }
 
       context "when called with a Struct subclass" do
         let(:klass) { Struct.new(:a, :b) }

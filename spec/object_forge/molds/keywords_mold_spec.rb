@@ -11,16 +11,18 @@ RSpec.describe ObjectForge::Molds::KeywordsMold do
 
   describe "#call" do
     it "calls +new+ on the forged object with attributes keywords" do
-      expect(mold.call(forged: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1)
+      expect(mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1)
     end
 
     it "can be called as many times as needed" do
-      expect(mold.call(forged: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1)
-      expect(mold.call(forged: forged_object, attributes: { a: "s", c: "c" })).to eq(a: "s", c: "c")
+      expect(mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 })).to eq(a: 1)
+      expect(mold.call(forge_target: forged_object,
+                       attributes: { a: "s", c: "c" })).to eq(a: "s", c: "c")
     end
 
     it "can be called with arbitrary extra arguments" do
-      expect(mold.call(forged: forged_object, attributes: { a: 1, b: 2 }, extra: 3)).to eq(a: 1)
+      expect(mold.call(forge_target: forged_object, attributes: { a: 1, b: 2 },
+                       extra: 3)).to eq(a: 1)
     end
   end
 end
