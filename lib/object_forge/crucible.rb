@@ -23,11 +23,11 @@ module ObjectForge
       #
       # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
       # @return [Hash{Symbol => Any}] resolved attributes
-      def resolve(attributes)
+      def call(attributes)
         new(attributes).resolve!
       end
 
-      alias call resolve
+      alias resolve call
     end
 
     %i[rand].each { |m| private define_method(m, ::Kernel.instance_method(m)) }
@@ -68,7 +68,7 @@ module ObjectForge
     #     description: -> { name.downcase },
     #     duration: -> { rand(1000) }
     #   }
-    #   Crucible.new(attrs).resolve!
+    #   Crucible.call(attrs)
     #   # => { name: "Name", description: "name", duration: 123 }
     # @example using conflicting and reserved names
     #   attrs = {
@@ -76,7 +76,7 @@ module ObjectForge
     #     "[]=": -> { "#{self[:[]]} are brackets" },
     #     "!": -> { "#{self[:[]=]}!" }
     #   }
-    #   Crucible.new(attrs).resolve!
+    #   Crucible.resolve(attrs)
     #   # => { "[]": "Brackets", "[]=": "Brackets are brackets", "!": "Brackets are brackets!" }
     #
     # @param name [Symbol]

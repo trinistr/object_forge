@@ -6,8 +6,8 @@ module ObjectForge
 
     let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bar } } }
 
-    describe ".resolve" do
-      subject(:resolved_attributes) { described_class.resolve(attributes) }
+    describe ".call" do
+      subject(:resolved_attributes) { described_class.call(attributes) }
 
       it "resolves all attributes by calling their procs" do
         expect(resolved_attributes).to eq({ foo: 1, bar: 2, baz: 3 })
@@ -26,7 +26,7 @@ module ObjectForge
     end
 
     describe described_class.singleton_class do
-      include_examples "has an alias", :call, :resolve
+      include_examples "has an alias", :resolve, :call
     end
 
     describe "#resolve!" do
