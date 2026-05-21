@@ -96,13 +96,7 @@ module ObjectForge
   # @see Forgeyard#forge
   # @since 0.1.0
   #
-  # @overload forge(name, *traits, **overrides)
-  #   @param name [Symbol] name of the forge
-  #   @param traits [Array<Symbol>] traits to apply
-  #   @param overrides [Hash{Symbol => Any}] attribute overrides
-  #   @yieldparam object [Any] forged instance
-  #   @yieldreturn [void]
-  #   @return [Any] built instance
+  # @overload (see Forgeyard#forge)
   def self.forge(...)
     DEFAULT_YARD.forge(...)
   end

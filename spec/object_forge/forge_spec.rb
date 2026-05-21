@@ -39,6 +39,26 @@ module ObjectForge
         it "builds an instance of the forged class, applying traits in order" do
           expect(forge.forge(:barfoo, :bazoo, :foofoo)).to eq forged_class.new(foo: :foo, bar: :foo)
         end
+
+        context "when some trait names are unknown" do
+          context "and forge is named" do
+            it "raises ArgumentError with unknown trait names and forge name" do
+              expect { forge.forge(:bafoo, :bazoo, :foofo) }.to raise_error(
+                ArgumentError, "unknown traits for forge ASDFg: bafoo, foofo"
+              )
+            end
+          end
+
+          context "and forge is unnamed" do
+            let(:name) { nil }
+
+            it "raises ArgumentError with unknown trait names" do
+              expect { forge.forge(:bafoo, :bazoo, :foofo) }.to raise_error(
+                ArgumentError, "unknown traits for forge: bafoo, foofo"
+              )
+            end
+          end
+        end
       end
 
       context "with overrides" do

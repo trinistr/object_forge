@@ -84,6 +84,8 @@ module ObjectForge
     # @yieldparam object [Any] forged instance
     # @yieldreturn [void]
     # @return [Any] built instance
+    #
+    # @raise [ArgumentError] if a trait name is unknown
     def forge(*traits, **overrides)
       resolved_attributes = resolve_attributes(traits, overrides)
       instance = @mold.call(forged: @forged, attributes: resolved_attributes)
@@ -130,8 +132,14 @@ module ObjectForge
     # @param traits [Array<Symbol>]
     # @param overrides [Hash{Symbol => Any}]
     # @return [Hash{Symbol => Any}]
+    #
+    # @raise [ArgumentError]
     def resolve_attributes(traits, overrides)
-      # TODO: catch unknown traits
+      unless (unknown_traits = traits.difference(@parameters.traits.keys)).empty?
+        raise ArgumentError,
+              "unknown traits for forge#{" #{name}" if name}: #{unknown_traits.join(", ")}"
+      end
+
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       @crucible.call(attributes)
     end

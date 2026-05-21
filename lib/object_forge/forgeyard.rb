@@ -66,8 +66,8 @@ module ObjectForge
     #   @yieldparam object [Any] forged instance
     #   @yieldreturn [void]
     #   @return [Any] built instance
-    #
-    # @raise [KeyError] if forge with the specified name is not registered
+    #   @raise [ArgumentError] if a trait name is unknown
+    #   @raise [KeyError] if forge with the specified name is not registered
     def forge(name, ...)
       @forges.fetch(name).call(...)
     end
