@@ -44,10 +44,11 @@ module ObjectForge
       end
 
       context "if an attribute contains a Proc" do
-        foo_proc = ->(v) { v + 1 }
+        let(:foo_proc) { ->(v) { v + 1 } }
         let(:attributes) do
+          context = self
           {
-            foo: -> { foo_proc },
+            foo: -> { context.foo_proc },
             bar: -> { foo.call(1) },
             baz: -> { foo.call(2) },
           }

@@ -116,9 +116,9 @@ RSpec.describe ObjectForge::UnBasicObject do
   describe "#pretty_print" do
     require "pp"
 
-    it "pretty prints the instance" do
-      instance.change
-      expect { pp instance }.to output.to_stdout
+    it "pretty prints the instance to buffer" do
+      pp = PP.new
+      expect { instance.pretty_print(pp) }.to change(pp, :output)
     end
   end
 

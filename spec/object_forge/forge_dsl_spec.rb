@@ -112,12 +112,18 @@ module ObjectForge
         let(:definition) do
           proc do |f|
             f.attr { "Name" }
-            puts f.attributes[:attr].call
+            external_method(f.attributes[:attr].call)
           end
+        end
+        let(:external_called) { [] }
+
+        def external_method(value)
+          external_called << value
         end
 
         it "calls the method successfully" do
-          expect { forge_dsl }.to output("Name\n").to_stdout
+          expect(forge_dsl.attributes[:attr].call).to eq "Name"
+          expect(external_called).to eq ["Name"]
         end
       end
     end
@@ -145,9 +151,11 @@ module ObjectForge
         let(:definition) do
           proc do
             attr { "Name" }
-            puts attributes[:attr].call
+            external_method(attributes[:attr].call)
           end
         end
+
+        def external_method(_value); end
 
         it "fails, probably with DSLError" do
           expect { forge_dsl }.to raise_error(DSLError)
