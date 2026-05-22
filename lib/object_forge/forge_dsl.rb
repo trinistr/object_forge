@@ -84,11 +84,13 @@ module ObjectForge
 
     # Set a value for a forge's option.
     #
-    # Possible options depend on used forge, but for default {Forge} a +mold+ is expected.
+    # Possible options depend on used forge, but for default {Forge} a +:mold+ is expected.
+    # Check its documentation for full list of available options.
     #
     # It is also possible to set options through +method_missing+, using name with a +=+ suffix.
     #
     # @see Molds
+    # @see Forge::Parameters#options
     #
     # @example
     #   f.option(:mold, ->(forge_target:, attributes:, **) { forge.new(**attributes) })

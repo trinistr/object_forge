@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Breaking] "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.
 - [Breaking] `forged` parameter was renamed to `forge_target` everywhere. `Forge#forged` was renamed to `#forge_target` accordingly.
 - Methods that raised `ArgumentError` on class mismatch now raise `TypeError`.
-- `Forge` and `Sequence` will now raise new `ObjectInterfaceError` (inheriting from `TypeError`) when passed objects that don't implement the required interface.
+- `Forge` and other classes will now raise new `ObjectInterfaceError` (inheriting from `TypeError`) when passed objects that don't implement the required interface.
 - `Crucible` will now raise new `CircularAttributeDependencyError` when detecting a cycle in attribute dependencies.
 
 **Fixed**

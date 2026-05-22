@@ -296,7 +296,7 @@ Forge definition:
 - If the DSL block declares a block argument, `self` context is not changed, and DSL methods can't be called with an implicit receiver.
 
 Attributes:
-- For now, transient attributes have no difference to regular ones, they just aren't set in the final object.
+- For now, transient attributes have no difference to regular ones, their handling depends on the mold.
 - *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
 
 Traits:
