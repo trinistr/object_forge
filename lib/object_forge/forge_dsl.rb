@@ -182,7 +182,7 @@ module ObjectForge
     # @return [Symbol] attribute name
     #
     # @raise [TypeError] if +name+ is not a Symbol
-    # @raise [DSLError] if +initial+ does not respond to #succ and is not a {Sequence}
+    # @raise [ObjectInterfaceError] if +initial+ does not respond to #succ and is not a {Sequence}
     def sequence(name, initial = 1, **nil, &)
       unless ::Symbol === name
         raise ::TypeError,

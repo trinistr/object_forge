@@ -136,6 +136,14 @@ module ObjectForge
             expect(forge.forge).to be_an_instance_of forged_class
           end
         end
+
+        context "with invalid value" do
+          let(:options) { { mold: "invalid" } }
+
+          it "raises ObjectInterfaceError" do
+            expect { forge.forge }.to raise_error(ObjectInterfaceError)
+          end
+        end
       end
 
       describe ":crucible" do
@@ -152,6 +160,14 @@ module ObjectForge
 
           it "uses Crucible for attribute resolution" do
             expect(forge.forge).to have_attributes(foo: 1, bar: 2)
+          end
+        end
+
+        context "with invalid value" do
+          let(:options) { { crucible: "invalid" } }
+
+          it "raises ObjectInterfaceError" do
+            expect { forge.forge }.to raise_error(ObjectInterfaceError)
           end
         end
       end
@@ -188,6 +204,14 @@ module ObjectForge
 
           specify "hook runs before the block" do
             expect(forge.forge(:barfoo) { _1.foo = 3 }).to have_attributes(foo: 3, bar: 1)
+          end
+        end
+
+        context "with invalid value" do
+          let(:options) { { after_forge: "invalid" } }
+
+          it "raises ObjectInterfaceError" do
+            expect { forge.forge }.to raise_error(ObjectInterfaceError)
           end
         end
       end

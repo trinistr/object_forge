@@ -63,6 +63,9 @@ module ObjectForge
     # @param parameters [Parameters, ForgeDSL] forge parameters
     # @param name [Symbol, nil] forge name;
     #   only used for identification purposes
+    #
+    # @raise [ObjectInterfaceError] if forge options do not have expected interface,
+    #   see {Parameters#options}
     def initialize(forge_target, parameters, name: nil)
       @name = name
       @forge_target = forge_target
@@ -114,9 +117,17 @@ module ObjectForge
     # @option options [#call, nil] :crucible
     # @return [#call]
     #
+    # @raise [ObjectInterfaceError]
+    #
     # @since <<next>>
     def determine_crucible(options)
-      options[:crucible] || Crucible
+      crucible = options[:crucible] || Crucible
+
+      unless crucible.respond_to?(:call)
+        raise ObjectInterfaceError, "crucible must respond to #call"
+      end
+
+      crucible
     end
 
     # Get appropriate mold based on parameters.
@@ -130,7 +141,7 @@ module ObjectForge
     # @option options [#call, Class, nil] :mold
     # @return [#call]
     #
-    # @raise [MoldError]
+    # @raise [ObjectInterfaceError]
     #
     # @since 0.3.0
     def determine_mold(forge_target, options)
@@ -147,9 +158,17 @@ module ObjectForge
     # @option options [#call, nil] :after_build
     # @return [#call, nil]
     #
+    # @raise [ObjectInterfaceError]
+    #
     # @since <<next>>
     def determine_after_forge_hook(options)
-      options[:after_forge] || options[:after_build] || nil
+      hook = options[:after_forge] || options[:after_build] || nil
+
+      unless hook.nil? || hook.respond_to?(:call)
+        raise ObjectInterfaceError, "after-forge hook must respond to #call"
+      end
+
+      hook
     end
 
     # Resolve attributes using default attributes, specified traits and overrides.

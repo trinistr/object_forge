@@ -50,10 +50,12 @@ module ObjectForge
   class DSLError < Error; end
   # Error raised when attribute resolution surfaces a circular dependency.
   # @since <<next>>
-  class CircularAttributeDependencyError < DSLError; end
-  # Error raised when object can not be used as a mold.
-  # @since 0.3.0
-  class MoldError < Error; end
+  class CircularAttributeDependencyError < Error; end
+
+  # Error raised when object does not conform to expected interface,
+  # most commonly lacking +#call+.
+  # @since <<next>>
+  class ObjectInterfaceError < ::TypeError; end
 
   # Default {Forgeyard} that is used by {.define} and {.forge}.
   #

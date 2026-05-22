@@ -114,9 +114,9 @@ module ObjectForge
       context "with a Class without #call" do
         let(:mold) { Object }
 
-        it "raises MoldError" do
+        it "raises ObjectInterfaceError" do
           expect { wrapped_mold }.to raise_error(
-            MoldError, "mold must respond to or implement #call"
+            ObjectInterfaceError, "mold must respond to or implement #call"
           )
         end
       end
@@ -137,9 +137,9 @@ module ObjectForge
       context "with an object without #call" do
         let(:mold) { Object.new }
 
-        it "raises MoldError" do
+        it "raises ObjectInterfaceError" do
           expect { wrapped_mold }.to raise_error(
-            MoldError, "mold must respond to or implement #call"
+            ObjectInterfaceError, "mold must respond to or implement #call"
           )
         end
       end

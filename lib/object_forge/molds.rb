@@ -97,12 +97,10 @@ module ObjectForge
     # If it is a Class with +#call+, wraps it in {WrappedMold}.
     # Otherwise, raises an error.
     #
-    # @since 0.3.0
-    #
     # @param mold [Class, #call, nil]
     # @return [#call, nil]
     #
-    # @raise [MoldError] if +mold+ does not respond to or implement +#call+
+    # @raise [ObjectInterfaceError] if +mold+ does not respond to or implement +#call+
     #
     # @thread_safety Thread-safe.
     # @since 0.3.0
@@ -112,7 +110,7 @@ module ObjectForge
       elsif ::Class === mold && mold.public_method_defined?(:call)
         WrappedMold.new(mold)
       else
-        raise MoldError, "mold must respond to or implement #call"
+        raise ObjectInterfaceError, "mold must respond to or implement #call"
       end
     end
   end

@@ -34,9 +34,9 @@ module ObjectForge
   end
   class DSLError < Error
   end
-  class CircularAttributeDependencyError < DSLError
+  class CircularAttributeDependencyError < Error
   end
-  class MoldError < Error
+  class ObjectInterfaceError < Error
   end
 
   VERSION: String

@@ -25,10 +25,10 @@ module ObjectForge
     #
     # @param initial [#succ] initial value for the sequence
     #
-    # @raise [TypeError] if +initial+ does not respond to #succ
+    # @raise [ObjectInterfaceError] if +initial+ does not respond to #succ
     def initialize(initial)
       unless initial.respond_to?(:succ)
-        raise TypeError, "initial value must respond to #succ, #{initial.class} given"
+        raise ObjectInterfaceError, "initial value must respond to #succ"
       end
 
       @initial = initial

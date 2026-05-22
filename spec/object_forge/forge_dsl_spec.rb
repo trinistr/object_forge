@@ -316,10 +316,10 @@ module ObjectForge
       context "when initial value is not a Sequence and does not respond to #succ" do
         let(:definition) { proc { |f| f.sequence(:seq_invalid, -> { "a" }) } }
 
-        it "raises TypeError on definition (proxied from Sequence)" do
+        it "raises ObjectInterfaceError on definition (proxied from Sequence)" do
           expect { forge_dsl }.to raise_error(
-            TypeError,
-            "initial value must respond to #succ, Proc given"
+            ObjectInterfaceError,
+            "initial value must respond to #succ"
           )
         end
       end
