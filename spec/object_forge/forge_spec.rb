@@ -155,6 +155,42 @@ module ObjectForge
           end
         end
       end
+
+      describe ":after_forge/:after_build" do
+        let(:hook) { ->(object) { object.foo = 100 } }
+
+        context "with non-nil :after_forge" do
+          let(:options) { { after_forge: hook } }
+
+          it "uses the hook to act on built object after building it" do
+            expect(forge.forge(:barfoo)).to have_attributes(foo: 100, bar: 1)
+          end
+        end
+
+        context "with non-nil :after_build" do
+          let(:options) { { after_build: hook } }
+
+          it "uses the hook to act on built object after building it" do
+            expect(forge.forge(:barfoo)).to have_attributes(foo: 100, bar: 1)
+          end
+        end
+
+        context "if both options are specified" do
+          let(:options) { { after_forge: hook, after_build: ->(o) { o.bar = 5 } } }
+
+          specify ":after_forge wins" do
+            expect(forge.forge).to have_attributes(foo: 100, bar: 2)
+          end
+        end
+
+        context "when block is also used" do
+          let(:options) { { after_forge: hook } }
+
+          specify "hook runs before the block" do
+            expect(forge.forge(:barfoo) { _1.foo = 3 }).to have_attributes(foo: 3, bar: 1)
+          end
+        end
+      end
     end
   end
 end

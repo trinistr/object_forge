@@ -22,6 +22,7 @@
   - [Basics](#basics)
   - [Separate forgeyards and forges](#separate-forgeyards-and-forges)
   - [Molds: customized forging](#molds-customized-forging)
+  - [After-build customization](#after-build-customization)
   - [Performance tips](#performance-tips)
 - [Differences and limitations (compared to FactoryBot)](#differences-and-limitations-compared-to-factorybot)
 - [Current and planned features (roadmap)](#current-and-planned-features-roadmap)
@@ -246,6 +247,34 @@ Of course, you can abuse this to your heart's content. Look at the documentation
 
 I strongly recommend directly using mold instances and not classes. Doing this prevents memory churn which causes performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 
+### After-build customization
+
+If you have a need to modify the object or perform additional actions after it is forged, there are two mechanisms you can employ:
+- after-forge hook
+- customization block
+
+After-forge hook is a `#call`able object specified as part of forge definition. It runs every time forging happens:
+```ruby
+forge = ObjectForge::Forge.define(Point) do |f|
+  # can also be specified as `after_build`
+  f.after_forge = ->(object) { puts "Forged #{object}" }
+  #... rest of the definition
+end
+forge.forge(id: 123)
+  # Forged #<struct Point id=123, ...>
+  # #<struct Point id=123, ...>
+```
+
+Customization block is an optional block argument to `#forge` and is only executed in that specific call:
+```ruby
+forge.forge { |point| DB.save_point(point); puts "saved" }
+  # Forged #<struct Point ...>
+  # saved
+  # => #<struct Point ...>
+```
+
+If both hook and block are used, the hook runs before the block. 
+
 ### Performance tips
 
 **ObjectForge** is pretty fast for what it is. However, if you are worried, there are certain things that can be done to make it faster.
@@ -293,8 +322,8 @@ kanban
     [Custom builders / molds]
     [Built-in Hash, Struct, Data builders / molds]
     [Ability to replace resolver]
-  [⚗️ To do]
     [After-build hook]
+  [⚗️ To do]
   [❔Under consideration]
     [Calling traits from traits]
     [Default traits]

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Added**
 - `:crucible` option (previously known as settings) in `Forge`, allowing to replace `Crucible` with any `call`-able object. May be useful to provide a faster attributes resolver.
+- `:after_forge`/`:after_build` option to specify a `call`-able hook to be run after mold builds the object and before the optional block. 
 
 **Changed**
 - [Breaking] "Settings" added in last update were renamed to "options" due to unwieldy name. All methods and references were changed to reflect new name.

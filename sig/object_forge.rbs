@@ -25,6 +25,10 @@ module ObjectForge
     def call
       : (Hash[Symbol, untyped]) -> Hash[Symbol, untyped]
   end
+  interface _Hook
+    def call
+      : (ObjectForge::_Forgable) -> void
+  end
 
   class Error < StandardError
   end
@@ -114,12 +118,15 @@ class ObjectForge::Forge
   alias call forge
 
   private
-
-  def determine_mold
-    : (ObjectForge::_Forgable forge_target, ObjectForge::mold? mold) -> ObjectForge::mold
   
   def determine_crucible
-    : (ObjectForge::_Crucible? crucible) -> ObjectForge::_Crucible
+    : (Hash[Symbol, untyped]) -> ObjectForge::_Crucible
+
+  def determine_mold
+    : (ObjectForge::_Forgable forge_target, Hash[Symbol, untyped]) -> ObjectForge::mold
+
+  def determine_after_forge_hook
+    : (Hash[Symbol, untyped] options) -> ObjectForge::_Hook?
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]

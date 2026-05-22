@@ -24,10 +24,12 @@ module ObjectForge
     # @!attribute [r] options
     #   A forge's options.
     #   Known options:
-    #   - +:mold+ — an object that knows how to build the instance
-    #     with a +call+ method taking a class and a hash of attributes.
-    #   - +:crucible+ — an object that knows how to resolve attributes
-    #     with a +call+ method taking a hash of initial attributes.
+    #   - +:mold+ — a +call+able object that knows how to build the instance,
+    #     taking a class and a hash of attributes.
+    #   - +:crucible+ — a +call+able object that knows how to resolve attributes,
+    #     taking a hash of initial attributes.
+    #   - +:after_forge+/+:after_build+ — a +call+able object that is passed
+    #     the forged instance and can do anything with it.
     #   @since 0.3.0
     #   @return [Hash{Symbol => Any}]
     Parameters = Struct.new(:attributes, :traits, :options, keyword_init: true)
@@ -65,8 +67,11 @@ module ObjectForge
       @name = name
       @forge_target = forge_target
       @parameters = parameters
-      @mold = determine_mold(forge_target, parameters.options[:mold])
-      @crucible = determine_crucible(parameters.options[:crucible])
+
+      options = @parameters.options
+      @crucible = determine_crucible(options)
+      @mold = determine_mold(forge_target, options)
+      @after_forge_hook = determine_after_forge_hook(options)
     end
 
     # Forge a new instance.
@@ -91,6 +96,7 @@ module ObjectForge
     def forge(*traits, **overrides)
       resolved_attributes = resolve_attributes(traits, overrides)
       instance = @mold.call(forge_target: @forge_target, attributes: resolved_attributes)
+      @after_forge_hook&.call(instance)
       yield instance if block_given?
       instance
     end
@@ -100,6 +106,19 @@ module ObjectForge
 
     private
 
+    # Get a crucible object based on parameters.
+    #
+    # It's either the object provided in options, or {Crucible}.
+    #
+    # @param options [Hash]
+    # @option options [#call, nil] :crucible
+    # @return [#call]
+    #
+    # @since <<next>>
+    def determine_crucible(options)
+      options[:crucible] || Crucible
+    end
+
     # Get appropriate mold based on parameters.
     #
     # If +mold+ is already set, it will be used directly, or,
@@ -107,26 +126,30 @@ module ObjectForge
     # If +nil+, a mold will be selected based on +forge_target+ class.
     #
     # @param forge_target [Class, Any]
-    # @param mold [#call, Class, nil]
+    # @param options [Hash]
+    # @option options [#call, Class, nil] :mold
     # @return [#call]
     #
     # @raise [MoldError]
     #
     # @since 0.3.0
-    def determine_mold(forge_target, mold)
-      Molds.wrap_mold(mold) || Molds.mold_for(forge_target)
+    def determine_mold(forge_target, options)
+      Molds.wrap_mold(options[:mold]) || Molds.mold_for(forge_target)
     end
 
-    # Get a crucible object based on parameters.
+    # Get after-forge hook if specified.
     #
-    # It's either the object provided in options, or {Crucible}.
+    # Both +:after_forge+ and +:after_build+ are accepted, but +:after_forge+
+    # wins of both are present.
     #
-    # @param crucible [#call, nil]
-    # @return [#call]
+    # @param options [Hash]
+    # @option options [#call, nil] :after_forge
+    # @option options [#call, nil] :after_build
+    # @return [#call, nil]
     #
     # @since <<next>>
-    def determine_crucible(crucible)
-      crucible || Crucible
+    def determine_after_forge_hook(options)
+      options[:after_forge] || options[:after_build] || nil
     end
 
     # Resolve attributes using default attributes, specified traits and overrides.
