@@ -121,6 +121,19 @@ module ObjectForge
         end
       end
 
+      context "with a Class with .call and #call" do
+        let(:mold) do
+          Class.new do
+            def self.call = new.call
+            def call = rand
+          end
+        end
+
+        it "returns it as the mold" do
+          expect(wrapped_mold).to be mold
+        end
+      end
+
       context "with an object without #call" do
         let(:mold) { Object.new }
 

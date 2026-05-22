@@ -8,13 +8,14 @@ module ObjectForge
     let(:name) { "ASDFg" }
     let(:parameters) do
       described_class::Parameters.new(
-        options: {},
+        options: options,
         attributes: { foo: -> { 1 }, bar: -> { 2 } },
         traits: {
           barfoo: { bar: -> { foo } }, foofoo: { foo: -> { :foo } }, bazoo: { foo: -> { :baz } },
         }
       )
     end
+    let(:options) { {} }
 
     describe "#forge_target" do
       it "returns the class to forge" do
@@ -97,7 +98,7 @@ module ObjectForge
             end
           end
 
-          it "works correctly" do
+          it "yields object correctly" do
             instance = forge.forge { _1.foo = 33 }
             expect(forged_class === instance).to be true
             expect(instance.foo).to eq 33
@@ -109,5 +110,51 @@ module ObjectForge
 
     include_examples "has an alias", :build, :forge
     include_examples "has an alias", :call, :forge
+
+    describe "forge options" do
+      describe ":mold" do
+        before do
+          allow(Molds).to receive(:mold_for).and_call_original
+          allow(Molds).to receive(:wrap_mold).and_call_original
+        end
+
+        context "with a non-nil object" do
+          let(:options) { { mold: ->(**) { 123 } } }
+
+          it "calls Molds.wrap_mold with it" do
+            expect(Molds).to receive(:wrap_mold).with(options[:mold])
+            expect(Molds).not_to receive(:mold_for)
+            expect(forge.forge).to eq 123
+          end
+        end
+
+        context "with nil" do
+          let(:options) { { mold: nil } }
+
+          it "calls Molds.mold_for to determine mold" do
+            expect(Molds).to receive(:mold_for).with(forged_class)
+            expect(forge.forge).to be_an_instance_of forged_class
+          end
+        end
+      end
+
+      describe ":crucible" do
+        context "with a non-nil object" do
+          let(:options) { { crucible: ->(attributes) { attributes.transform_values(&:inspect) } } }
+
+          it "uses the object to resolve attributes" do
+            expect(forge.forge).to have_attributes(foo: /Proc/, bar: /Proc/)
+          end
+        end
+
+        context "with nil" do
+          let(:options) { { crucible: nil } }
+
+          it "uses Crucible for attribute resolution" do
+            expect(forge.forge).to have_attributes(foo: 1, bar: 2)
+          end
+        end
+      end
+    end
   end
 end
