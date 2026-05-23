@@ -47,18 +47,21 @@ module ObjectForge
       end
 
       context "when running in a threaded environment" do
-        let(:sleepy_thread) do
+        let(:start) { Queue.new }
+        let(:thread) do
           Thread.new do
-            sleep 0.001
+            start.pop
             forgeyard.register(:test, another_forge)
           end
         end
 
-        before { sleepy_thread }
-
         it "registers the forge thread-safely, returning first registered forge" do
-          expect(forgeyard.register(:test, forge)).to be forge
-          expect(sleepy_thread.join.value).to be forge
+          start << true
+          # Note that there is no specific guarantee which thread wins.
+          registered_forge = forgeyard.register(:test, forge)
+          expect(registered_forge).to be thread.join.value
+          expect([forge, another_forge]).to include registered_forge
+          expect(forgeyard[:test]).to be registered_forge
         end
       end
     end

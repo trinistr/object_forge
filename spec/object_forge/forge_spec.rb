@@ -23,7 +23,12 @@ module ObjectForge
       end
     end
 
-    include_examples "has an alias", :target, :forge_target
+    # This isn't an alias test due to a bug with `original_name` on JRuby.
+    describe "#target" do
+      it "returns the class to forge" do
+        expect(forge.target).to be forged_class
+      end
+    end
 
     describe "#name" do
       it "returns the name of the forge" do
