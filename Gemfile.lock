@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    object_forge (0.3.0)
+    object_forge (0.4.0)
       concurrent-ruby (~> 1.2)
 
 GEM
@@ -255,6 +255,7 @@ CHECKSUMS
   bigdecimal (3.2.2) sha256=39085f76b495eb39a79ce07af716f3a6829bc35eb44f2195e2753749f2fa5adc
   bigdecimal (3.2.2-java) sha256=1fcbead3efc3eae26956f7fef6bbdd342f987c0bdbf68f500a1467389f430205
   bump (0.10.0) sha256=07929cf79031d2863f55e7b111e164566be10c43f8c42d67db7cb3b5745f0975
+  bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
   concurrent-ruby (1.3.5) sha256=813b3e37aca6df2a21a3b9f1d497f8cbab24a2b94cab325bffe65ee0f6cbebc6
   connection_pool (2.5.3) sha256=cfd74a82b9b094d1ce30c4f1a346da23ee19dc8a062a16a85f58eab1ced4305b
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
@@ -294,7 +295,7 @@ CHECKSUMS
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
   minitest (5.25.5) sha256=391b6c6cb43a4802bfb7c93af1ebe2ac66a210293f4a3fb7db36f2fc7dc2c756
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
-  object_forge (0.3.0)
+  object_forge (0.4.0)
   parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
@@ -347,4 +348,4 @@ CHECKSUMS
   zeitwerk (2.7.3) sha256=b2e86b4a9b57d26ba68a15230dcc7fe6f040f06831ce64417b0621ad96ba3e85
 
 BUNDLED WITH
-   4.0.12
+  4.0.12

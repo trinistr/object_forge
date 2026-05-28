@@ -57,7 +57,7 @@ module ObjectForge
     attr_reader :name
 
     # @return [Class, Any] class or object to forge
-    # @since <<next>>
+    # @since 0.4.0
     attr_reader :forge_target
     alias target forge_target
 
@@ -124,7 +124,7 @@ module ObjectForge
     #
     # @raise [ObjectInterfaceError]
     #
-    # @since <<next>>
+    # @since 0.4.0
     def determine_crucible(options)
       crucible = options[:crucible] || Crucible
 
@@ -165,7 +165,7 @@ module ObjectForge
     #
     # @raise [ObjectInterfaceError]
     #
-    # @since <<next>>
+    # @since 0.4.0
     def determine_after_forge_hook(options)
       hook = options[:after_forge] || options[:after_build] || nil
 

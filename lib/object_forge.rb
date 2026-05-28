@@ -103,13 +103,13 @@ module ObjectForge
   # @since 0.1.0
   class DSLError < Error; end
   # Error raised when attribute resolution surfaces a circular dependency.
-  # @since <<next>>
+  # @since 0.4.0
   class CircularAttributeDependencyError < Error; end
 
   # Error raised when object does not conform to expected interface,
   # most commonly lacking +#call+.
   # @note This class inherits from +TypeError+, not {Error}.
-  # @since <<next>>
+  # @since 0.4.0
   class ObjectInterfaceError < ::TypeError; end
 
   # Default {Forgeyard} that is used by {.define} and {.forge}.

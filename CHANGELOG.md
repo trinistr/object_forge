@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+[Compare v0.4.0...main](https://github.com/trinistr/object_forge/compare/v0.4.0...main)
+
+## [v0.4.0] — 2026-05-28
+
 **Added**
 - `:crucible` option (previously known as settings) in `Forge`, allowing to replace `Crucible` with any `call`-able object. May be useful to provide a faster attributes resolver.
 - `:after_forge`/`:after_build` option to specify a `call`-able hook to be run after mold builds the object and before the optional block. 
@@ -21,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Fixed**
 - Calling `Forge#forge` with an unknown trait name now raises a clear `ArgumentError`.
 
-[Compare v0.3.0...main](https://github.com/trinistr/object_forge/compare/v0.3.0...main)
+[Compare v0.3.0...v0.4.0](https://github.com/trinistr/object_forge/compare/v0.3.0...v0.4.0)
 
 ## [v0.3.0] — 2026-02-28
 
@@ -89,6 +93,7 @@ Initital implementation.
 [Compare v0.0.0...v0.1.0](https://github.com/trinistr/object_forge/compare/v0.0.0...v0.1.0)
 
 [Next]: https://github.com/trinistr/object_forge/tree/main
+[v0.4.0]: https://github.com/trinistr/object_forge/tree/v0.4.0
 [v0.3.0]: https://github.com/trinistr/object_forge/tree/v0.3.0
 [v0.2.0]: https://github.com/trinistr/object_forge/tree/v0.2.0
 [v0.1.1]: https://github.com/trinistr/object_forge/tree/v0.1.1
