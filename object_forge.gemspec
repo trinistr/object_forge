@@ -10,14 +10,20 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/trinistr/#{spec.name}"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.3"
-  spec.summary = "A simple factory for objects with minimal assumptions."
+  spec.summary =
+    "A small, flexible factory library for plain Ruby objects, " \
+    "hashes, structs and custom build flows."
   spec.description = <<~TEXT
-    ObjectForge provides a familiar way to build objects in any context
-    with minimal assumptions about usage environment.
-    It has no connection to any framework and, indeed, has nothing to do with a database.
-    To use, just define some factories and call them wherever you need,
-    be it in tests, console, or application code.
-    If needed, almost any part of the process can be easily replaced with a custom solution.
+    ObjectForge is a small factory library for Ruby objects with minimal assumptions
+    about framework, persistence, or runtime environment.
+
+    It is designed for cases where factory-style object construction is useful,
+    but Rails-oriented or database-oriented tooling is a poor fit. ObjectForge
+    works well with plain Ruby objects, hashes, structs, and custom build flows.
+
+    The library focuses on explicit configuration, independent registries and factories,
+    and replaceable components. It aims to provide a familiar workflow without
+    coupling object generation to a framework or persistence layer.
   TEXT
 
   spec.add_dependency "concurrent-ruby", "~> 1.2"

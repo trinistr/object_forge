@@ -4,7 +4,7 @@ module ObjectForge
   # This module provides a collection of predefined molds to be used in common cases.
   #
   # Mold is an object that knows how to take a hash of attributes
-  # and create an object from them. Molds are +#call+able objects
+  # and create an object from them. Molds are +call+able objects
   # responsible for actually building objects produced by factories
   # (or doing other, interesting things with them (truly, only the code review is the limit!)).
   # They are supposed to be immutable, shareable, and persistent:
@@ -20,18 +20,22 @@ module ObjectForge
   #     attributes.each_pair { instance.public_send(:"#{_1}=", _2) }
   #     instance.save!
   #   end
+  #
   #   creator.call(forge_target: User, attributes: { name: "John", age: 30 })
   #     # => <User name="John" age=30>
+  #
   # @example Using a mold to serialize collection of objects (contrivedly)
   #   dumpy = ->(forge_target:, attributes:, **) do
   #     Enumerator.new(attributes.size) do |y|
   #       attributes.each_pair { y << forge_target.dump(_1 => _2) }
   #     end
   #   end
+  #
   #   dumpy.call(forge_target: JSON, attributes: {a:1, b:2}).to_a
   #     # => ["{\"a\":1}", "{\"b\":2}"]
   #   dumpy.call(forge_target: YAML, attributes: {a:1, b:2}).to_a
   #     # => ["---\n:a: 1\n", "---\n:b: 2\n"]
+  #
   # @example Abstract factory pattern (kind of)
   #   class FurnitureFactory
   #     def call(forge_target:, attributes:, **)
@@ -40,6 +44,7 @@ module ObjectForge
   #         concrete_factory.public_send(piece, attributes.dig(:color, piece))
   #       end
   #     end
+  #
   #     private def concrete_factory(style)
   #       case style
   #       when :hitech
@@ -49,14 +54,64 @@ module ObjectForge
   #       end
   #     end
   #   end
+  #
   #   FurnitureFactory.new.call(forge_target: :hitech, attributes: {
   #     pieces: [:chair, :table], color: { chair: :black, table: :white }
   #   })
   #     # => [<#HiTech::Chair color=:black>, <#HiTech::Table color=:white>]
+  #
   # @example Abusing molds
   #   printer = ->(forge_target:, attributes:, **) { PP.pp(attributes, forge_target) }
   #   printer.call(forge_target: $stderr, attributes: {a:1, b:2})
   #     # outputs "{:a=>1, :b=>2}" to $stderr
+  #
+  # @example Abuse above is just not enough, we need something even better
+  #   class Character
+  #     attr_reader :hp
+  #
+  #     def initialize(hp)
+  #       @hp = hp
+  #       @damage_factory = ObjectForge::Forge.new(self, DamageParameters.new)
+  #     end
+  #
+  #     def hit(damage)
+  #       if damage <= 0
+  #         @damage_factory.call(:shielded, apply: ->(damage) { @hp -= damage })
+  #       else
+  #         @damage_factory.call(amount: damage, apply: ->(damage) { @hp -= damage })
+  #       end
+  #     end
+  #
+  #     def heal(amount)
+  #       @damage_factory.call(amount: amount, apply: ->(amount) { @hp += amount }) if amount >= 0
+  #     end
+  #
+  #     def die!
+  #       puts "Character died!"
+  #     end
+  #   end
+  #
+  #   class DamageParameters
+  #     def attributes = {}
+  #     def traits = { shielded: { amount: 1 } }
+  #     def options
+  #       {
+  #         crucible: lambda(&:itself),
+  #         mold: ->(forge_target:, attributes:, **) {
+  #           attributes[:apply].call(attributes[:amount])
+  #           forge_target
+  #         },
+  #         after_build: ->(forge_target) { forge_target.die! if forge_target.hp <= 0 }
+  #       }
+  #     end
+  #   end
+  #
+  #   mc = Character.new(100)
+  #   mc.hit(50)
+  #   mc.heal(25)
+  #   mc.hit(-10)
+  #   mc.hit(75)
+  #     # outputs "Character died!"
   #
   # @since 0.2.0
   module Molds

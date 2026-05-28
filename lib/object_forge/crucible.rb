@@ -11,7 +11,7 @@ module ObjectForge
   #   but it's not a private API.
   #
   # @thread_safety Attribute resolution is idempotent,
-  #   and using {.resolve} is thread-safe
+  #   and using {.call} is thread-safe.
   # @since 0.1.0
   class Crucible < UnBasicObject
     class << self
@@ -20,6 +20,7 @@ module ObjectForge
       #
       # @note This method destructively modifies initial attributes.
       # @see #resolve!
+      # @thread_safety This method is thread-safe.
       #
       # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
       # @return [Hash{Symbol => Any}] resolved attributes
@@ -72,7 +73,8 @@ module ObjectForge
     #     duration: -> { rand(1000) }
     #   }
     #   Crucible.call(attrs)
-    #   # => { name: "Name", description: "name", duration: 123 }
+    #     # => { name: "Name", description: "name", duration: 123 }
+    #
     # @example using conflicting and reserved names
     #   attrs = {
     #     "[]": -> { "Brackets" },
@@ -80,7 +82,7 @@ module ObjectForge
     #     "!": -> { "#{self[:[]=]}!" }
     #   }
     #   Crucible.resolve(attrs)
-    #   # => { "[]": "Brackets", "[]=": "Brackets are brackets", "!": "Brackets are brackets!" }
+    #     # => { "[]": "Brackets", "[]=": "Brackets are brackets", "!": "Brackets are brackets!" }
     #
     # @param name [Symbol]
     # @return [Any]
@@ -108,7 +110,7 @@ module ObjectForge
     alias [] method_missing
 
     def respond_to_missing?(name, _include_all)
-      @attributes.key?(name)
+      @attributes.key?(name) || super
     end
 
     def raise_circular_dependency_error!(name)

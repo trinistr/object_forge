@@ -8,20 +8,27 @@
 
 ***
 
-**ObjectForge** provides a familiar way to build objects in any context with minimal assumptions about usage environment.
-- It is not connected to any framework and, indeed, has nothing to do with a database.
-- To use, just define some factories and call them wherever you need, be it in tests, console, or application code.
-- If you need, almost any part of the process can be easily replaced with a custom solution.
+**ObjectForge** is a small factory library for Ruby objects with minimal assumptions about framework, persistence, or runtime environment.
+
+It is designed for cases where factory-style object construction is useful, but Rails-oriented or database-oriented tooling is a poor fit. **ObjectForge** works well with plain Ruby objects, hashes, structs, and custom build flows.
+
+The library focuses on:
+- explicit configuration over hidden conventions
+- support for independent registries and standalone factories
+- replaceable components based on simple interfaces
+- usefulness both outside of tests and inside them
+
+If you need factory-style object generation without coupling it to Rails, ActiveRecord, or a particular application structure, **ObjectForge** might be for you.
 
 ## Table of contents
 
-- [Motivation (why *another* another factory gem?)](#motivation-why-another-another-factory-gem)
+- [Motivation](#motivation)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Quick start](#quick-start)
   - [Basics](#basics)
-  - [Separate forgeyards and forges](#separate-forgeyards-and-forges)
-  - [Molds: customized forging](#molds-customized-forging)
+  - [Independent forgeyards and forges](#independent-forgeyards-and-forges)
+  - [Molds: configuring object construction](#molds-configuring-object-construction)
   - [After-build customization](#after-build-customization)
   - [Performance tips](#performance-tips)
 - [Differences and limitations (compared to FactoryBot)](#differences-and-limitations-compared-to-factorybot)
@@ -30,22 +37,25 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-## Motivation (why *another* another factory gem?)
+## Motivation
 
-There are a bunch of gems that provide object generation functionality, chief among them [FactoryBot](https://github.com/thoughtbot/factory_bot) and [Fabrication](https://fabricationgem.org/).
-However, such gems make a lot of assumptions about why, how and what for they will be used, making them complicated and, at the same time, severely limited. Such assumptions commonly are:
-- assuming that every Ruby project is a Rails project;
-- assuming that "generating objects" equates "saving records to database";
-- assuming that objects are mutable and provide attribute writers;
-- assuming that streamlined object generation is only useful for testing;
-- (related to the previous point) assuming that there will never be a need to
-  have more than one configuration of a library in the same project;
-- assuming that adding global methods or objects is a good idea.
+Ruby already has well-known factory libraries, especially FactoryBot and Fabrication. Those tools are effective in many projects, particularly when working in Rails applications and persistence-oriented test setups.
 
-I notice that there is also a problem of thinking that Rails's "convention-over-configuration" approach is always appropriate, but then making configuration convoluted, instead of making it easy for the user to do the things they want in the way they want in the first place.
+**ObjectForge** aims at a different problem space: building objects with a factory-style workflow while making as few assumptions as possible about framework, storage, object lifecycle, or application structure.
 
-There are some projects that tried to address these issues, like [Progenitor](https://github.com/pavlos/progenitor) (the closest to **ObjectForge**) and [Workbench](https://github.com/leadtune/workbench), but they still didn't manage to go around the pitfalls.
-Most factory projects are also quite dead, having not been updated in *many* years.
+**ObjectForge** is particularly useful when:
+- the objects being built are plain Ruby objects rather than database-backed records
+- object generation is needed outside of tests, such as in services, scripts, or fixtures
+- multiple independent sets of factories need to coexist in the same project
+- construction behavior should be explicit and configurable rather than hidden behind framework conventions
+
+The project is intentionally small in scope. Rather than trying to model every style of factory workflow, it focuses on a compact, understandable core:
+- a DSL for defining attributes, sequences, and traits
+- forges (factories) and forgeyards (registries)
+- several object molds (constructors)
+- a couple other helper components
+
+The goal is to have a simple, composable tool that you can easily reach for when heavier libraries don't fit or feel like overkill.
 
 ## Installation
 
@@ -58,6 +68,7 @@ Or, if using Bundler, add to your Gemfile:
 ```ruby
 gem "object_forge"
 ```
+and run `bundle install`.
 
 ## Usage
 
@@ -106,7 +117,7 @@ ObjectForge.forge(:rectangle, :square, length: 123) # => [123x123]
 
 ### Basics
 
-In the simplest cases, **ObjectForge** can be used much like other factory libraries, with definitions living in a global object (`ObjectForge::DEFAULT_YARD`).
+In the simplest cases, **ObjectForge** can be used much like other factory libraries, with definitions living in a global object (`ObjectForge::DEFAULT_YARD`). In this case, methods are called directly on `ObjectForge` module.
 
 Forges are defined using a DSL:
 ```ruby
@@ -145,19 +156,19 @@ end
 A forge builds objects, using attributes hash:
 ```ruby
 ObjectForge.call(:point)
-  # => #<Point:0x00007f6109dcad40 @id="a", @x=0.17176955469852973, @y=0.3423901951181103>
+  # => #<struct Point id="a", x=0.17176955469852973, y=0.3423901951181103>
 # Positional arguments define used traits:
 ObjectForge.build(:point, :z)
-  # => #<Point:0x00007f61099e7980 @id="Z_b", @x=0.0, @y=0.0>
+  # => #<struct Point id="Z_b", x=0.0, y=0.0>
 # Attributes can be overridden with keyword arguments:
 ObjectForge.forge(:point, x: 10)
-  # => #<Point:0x00007f6109aabf88 @id="c", @x=10, @y=-0.3458802496120402>
+  # => #<struct Point id="c", x=10, y=-0.3458802496120402>
 # Traits and overrides are combined in the given order:
 ObjectForge.call(:point, :z, :invalid, id: "NaN")
-  # => #<Point:0x00007f6109b82e48 @id="NaN", @x=0.0, @y=NaN>
+  # => #<struct Point id="NaN", x=0.0, y=NaN>
 # A Proc override behaves the same as an attribute definition:
 ObjectForge.call(:point, :z, x: -> { rand(100..200) + delta })
-  # => #<Point:0x00007f6109932418 @id="Z_d", @x=135.0, @y=0.0>
+  # => #<struct Point id="Z_d", x=135.0, y=0.0>
 # A block can be passed to do something with the created object:
 ObjectForge.call(:point, :z) { puts "#{_1.id}: #{_1.x},#{_1.y}" }
   # outputs "Z_e: 0.0,0.0"
@@ -165,12 +176,12 @@ ObjectForge.call(:point, :z) { puts "#{_1.id}: #{_1.x},#{_1.y}" }
 > [!TIP]
 > Forging can be done through any of `#call`, `#forge`, or `#build` methods, they are aliases.
 
-### Separate forgeyards and forges
+### Independent forgeyards and forges
 
 It is possible and *encouraged* to create multiple forgeyards, each with its own set of forges:
 ```ruby
 forgeyard = ObjectForge::Forgeyard.new
-forgeyard.define(:point, Point) do |f|
+forgeyard.define(:dot, Point) do |f|
   f.sequence(:id, "a")
   f.x { rand(-radius..radius) }
   f.y { rand(-radius..radius) }
@@ -181,13 +192,13 @@ end
 
 Now, this forgeyard can be used just like the default one:
 ```ruby
-forgeyard.forge(:point, :z, id: "0")
-  # => #<Point:0x00007f6109b719e0 @id="0", @x=0, @y=0>
+forgeyard.forge(:dot, :z, id: "0")
+  # => #<struct Point id="0", x=0, y=0>
 ```
 
 Note how the forge isn't registered in the default forgeyard:
 ```ruby
-ObjectForge.forge(:point)
+ObjectForge.forge(:dot)
   # KeyError: key not found
 ```
 
@@ -205,72 +216,71 @@ end
 **Forge** has the same building interface as a **Forgeyard**, but it doesn't have the name argument:
 ```ruby
 forge.build
-  # => #<Point:0x00007f610deae578 @id="a", @x=0.3317733939650964, @y=-0.1363936629550252>
+  # => #<struct Point id="a", x=0.3317733939650964, y=-0.1363936629550252>
 forge.forge(:z)
-  # => #<Point:0x00007f61099f6520 @id="b", @x=0, @y=0>
+  # => #<struct Point id="b", x=0, y=0>
 forge.(radius: 500)
-  # => #<Point:0x00007f6109960048 @id="c", @x=-141, @y=109>
+  # => #<struct Point id="c", x=-141, y=109>
 ```
 
-### Molds: customized forging
+### Molds: configuring object construction
 
-If you use core Ruby data containers, such as `Struct`, `Data` or even `Hash`, they will "just work". However, if a custom class is used, forging will probably fail, unless your class happens to take a hash of attributes in `#initialize`. It would be *really* bad if **ObjectForge** placed requirements on your classes, and indeed there is a solution.
+If you use core Ruby data containers, such as `Struct`, `Data` or even `Hash`, they will "just work". However, if a custom class is used, forging will probably fail, unless your class happens to take a hash of attributes in `#initialize`. It would be against the goal of **ObjectForge** to place requirements on your classes, and indeed there is a solution.
 
-Whenever you need to change how your objects are built, you specify a *mold*. Molds are just `#call`able objects (including `Proc`s!) with specific arguments. They are set in forge definition:
+Whenever you need to change how your objects are built, you specify a *mold*. Molds are just `call`able objects (including `Proc`s!) with specific arguments. They are set in forge definition:
 ```ruby
 forge = ObjectForge::Forge.define(Point) do |f|
   f.mold = ->(forge_target:, attributes:, **) do
-    puts "Pointing at #{attributes[:x]},#{attributes[:y]}"
-    forge_target.new(attributes[:id], attributes[:x], attributes[:y])
+    forge_target.new(attributes[:id], attributes[:x].round(3), attributes[:y].round(3))
   end
-  #... rest of the definition
+  #... rest of the definition from the previous example
 end
 ```
 
 Now the specified **mold** will be called to build your objects:
 ```ruby
 forge.forge
-  # Pointing at 0.3317733939650964,-0.1363936629550252
-  # => #<Point:0x00007f610deae578 @id="a", @x=0.3317733939650964, @y=-0.1363936629550252>
+  # => #<struct Point id="a", x=0.331, y=-0.136>
 ```
 
 Of course, you can abuse this to your heart's content. Look at the documentation for `ObjectForge::Molds` for inspiration.
 
 **ObjectForge** comes pre-equipped with a selection of molds for common cases:
-- `ObjectForge::Molds::SingleArgumentMold` (*the default*) calls `new(attributes)`, suitable for **ActiveModel**-style objects and **Dry::Struct**, for example;
-- `ObjectForge::Molds::KeywordsMold` calls `new(**attributes)`, suitable for **Data** and similar classes;
-- `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), providing a way to easily use hashes to carry data;
-- `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct** subclasses.
+- `ObjectForge::Molds::SingleArgumentMold` (*the default*) calls `new(attributes)`, suitable for **ActiveModel**-style objects and **Dry::Struct**, as an example
+- `ObjectForge::Molds::KeywordsMold` calls `new(**attributes)`, suitable for **Data** and similar classes
+- `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), providing a way to easily use build hashes
+- `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct**s
 
-> [!TIP]
+> [!NOTE]
 > If you don't specify a mold, **ObjectForge** will infer one for core data containers, including **Hash**, **Struct**, and **Data** subclasses.
 
-I strongly recommend directly using mold instances and not classes. Doing this prevents memory churn which causes performance issues. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
+> [!TIP]
+> It is recommended to use molds instances directly. Using classes causes memory churn and lowered performance. Not only that, but having a stateful mold is a code smell and probably represents a significant design issue.
 
 ### After-build customization
 
-If you have a need to modify the object or perform additional actions after it is forged, there are two mechanisms you can employ:
+If there is a need to modify the object or perform additional actions after it is forged, there are two mechanisms you can employ:
 - after-forge hook
 - customization block
 
-After-forge hook is a `#call`able object specified as part of forge definition. It runs every time forging happens:
+After-forge hook is a `call`able object specified as part of forge definition. It runs every time forging happens:
 ```ruby
-forge = ObjectForge::Forge.define(Point) do |f|
+forge = ObjectForge::Forge.define(Rectangle) do |f|
   # can also be specified as `after_build`
-  f.after_forge = ->(object) { puts "Forged #{object}" }
-  #... rest of the definition
+  f.after_forge = ->(rect) { puts "Used #{rect.area} sq. units" }
+  #... rest of the definition from the Quick start example
 end
-forge.forge(id: 123)
-  # Forged #<struct Point id=123, ...>
-  # #<struct Point id=123, ...>
+forge.forge
+  # Used 621 sq. units
+  # => [23x27]
 ```
 
-Customization block is an optional block argument to `#forge` and is only executed in that specific call:
+Customization block is an optional block argument to `#forge` and is only executed in that specific invocation:
 ```ruby
-forge.forge { |point| DB.save_point(point); puts "saved" }
-  # Forged #<struct Point ...>
-  # saved
-  # => #<struct Point ...>
+forge.forge { |rect| RectangleRepository.save(rect); puts "persisted!" }
+  # Used 621 sq. units
+  # persisted!
+  # => [23x27]
 ```
 
 If both hook and block are used, the hook runs before the block. 
@@ -288,24 +298,24 @@ If you are used to FactoryBot, be aware that there are quite a few differences i
 
 General:
 - The user (you) is responsible for loading forge definitions, there are no search paths. If **ObjectForge** is used in tests, it should be enough to add something like `Dir["spec/forges/**/*.rb].each { require _1 }` to your `spec_helper.rb` (or `rails_helper.rb`).
-- `Forgeyard.define` *is* the forge definition block, you don't need to nest it inside another `factory` block.
-- There is no forge inheritance or nesting, though it may be added in the future.
+- `Forgeyard.define` *is* the forge definition block, there is no separate `factory` block.
 
 Forge definition:
 - Class specification for a forge is non-optional, there is no assumption about the class name.
 - If the DSL block declares a block argument, `self` context is not changed, and DSL methods can't be called with an implicit receiver.
+- There is no forge inheritance or nesting.
 
 Attributes:
-- For now, transient attributes have no difference to regular ones, their handling depends on the mold.
+- Currently, there is no concept of transient attributes. Attribute selection needs to be handled by the mold.
 - *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
 
 Traits:
-- Traits can't be defined inside of other traits. (I feel that nesting is needlessly confusing.)
+- Traits can't be defined inside of other traits.
 - Traits can't be called from other traits. This may change in the future.
 - There are no default traits.
 
 Sequences:
-- There is no explicit way to define shared sequences, unless you pass the same object yourself to multiple `sequence` calls.
+- There is no explicit way to define shared sequences, but a freestanding `Sequence` can be created manually and passed into `sequence` calls.
 - Sequences work with values implementing `#succ`, not `#next`, expressly prohibiting `Enumerator`. This may be relaxed in the future.
 
 ## Current and planned features (roadmap)
@@ -324,7 +334,8 @@ kanban
     [Ability to replace resolver]
     [After-build hook]
   [⚗️ To do]
-  [❔ Unlikely to be done]
+    [Transient attributes / attribute filtering]
+  [❔ Maybe, maybe not]
     [Calling traits from traits]
     [Default traits]
     [Forge inheritance]
@@ -334,7 +345,7 @@ kanban
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies. If you will be running typing checks (Steep), also execute `rbs collection install`.
+After checking out the repo, run `bundle install` to install dependencies. If you will be running typing checks (RBS/Steep), also execute `rbs collection install`.
 
 Then, run `rake spec` to run the tests, `rake rubocop` to lint code and check style compliance, `rake rbs` to validate signatures or just `rake` to do everything above. There is also `rake steep` to check typing, and `rake docs` to generate YARD documentation.
 

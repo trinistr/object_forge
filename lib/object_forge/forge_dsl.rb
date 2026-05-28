@@ -127,6 +127,7 @@ module ObjectForge
     #   f.attribute(:name) { "Name" }
     #   f[:description] { name.downcase }
     #   f.duration { rand(1000) }
+    #
     # @example using conflicting and reserved names
     #   f.attribute(:[]) { "Brackets" }
     #   f.attribute(:[]=) { "#{self[:[]]} are brackets" }
@@ -168,9 +169,11 @@ module ObjectForge
     #   f.sequence(:date, Date.today)
     #   f.sequence(:id) { _1.to_s }
     #   f.sequence(:dated_id, 10) { |n| "#{Date.today}/#{n}-#{id}" }
+    #
     # @example using external sequence
     #   seq = Sequence.new(1)
     #   f.sequence(:global_id, seq)
+    #
     # @example sequence reuse
     #   f.sequence(:id, "a") # => "a", "b", ...
     #   f.trait :new_id do
@@ -212,6 +215,7 @@ module ObjectForge
     #     f.name { "***xXxSPECIALxXx***" }
     #     f.sequence(:special_id) { "~~~ SpEcIaL #{_1} ~~~" }
     #   end
+    #
     # @example externally defined trait
     #   # Variable defined outside of DSL:
     #   success_trait = ->(ft) do
@@ -292,7 +296,7 @@ module ObjectForge
     end
 
     def respond_to_missing?(name, _include_all)
-      return false if frozen?
+      return super if frozen?
 
       !name.end_with?("?", "!") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
     end

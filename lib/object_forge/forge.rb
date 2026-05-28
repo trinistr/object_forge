@@ -5,7 +5,12 @@ require_relative "forge_dsl"
 require_relative "molds"
 
 module ObjectForge
-  # Object instantitation forge.
+  # Object building forge.
+  #
+  # Usually created through {.define} or {Forgeyard#define} using {ForgeDSL}.
+  # Alternatively, can be directly initalized with {Parameters} if you prefer not using the DSL.
+  #
+  # Then, {#forge} can be called to build instances of {#forge_target}.
   #
   # @since 0.1.0
   class Forge
@@ -14,12 +19,12 @@ module ObjectForge
     # through means other than {ForgeDSL}.
     #
     # @!attribute [r] attributes
-    #   Non-trait values of the attributes.
-    #   @return [Hash{Symbol => Any}]
+    #   Default values of the attributes.
+    #   @return [Hash{Symbol => Proc, Any}]
     #
     # @!attribute [r] traits
     #   Attributes belonging to traits.
-    #   @return [Hash{Symbol => Hash{Symbol => Any}}]
+    #   @return [Hash{Symbol => Hash{Symbol => Proc, Any}}]
     #
     # @!attribute [r] options
     #   A forge's options.
@@ -34,7 +39,7 @@ module ObjectForge
     #   @return [Hash{Symbol => Any}]
     Parameters = Struct.new(:attributes, :traits, :options, keyword_init: true)
 
-    # Define (and create) a forge using DSL.
+    # Define (and initialize) a forge using DSL.
     #
     # @see ForgeDSL
     # @thread_safety Thread-safe if DSL definition is thread-safe.
@@ -48,7 +53,7 @@ module ObjectForge
       new(forge_target, ForgeDSL.new(&), name:)
     end
 
-    # @return [Symbol, nil] forge name
+    # @return [Symbol, nil] forge name, only used for identification purposes
     attr_reader :name
 
     # @return [Class, Any] class or object to forge
@@ -59,13 +64,13 @@ module ObjectForge
     # @return [Parameters, ForgeDSL] forge parameters
     attr_reader :parameters
 
-    # @param forge_target [Class, Any] class or object to forge
+    # @param forge_target [Class, Any] class or object to forge,
+    #   will be passed to mold as +forge_target+ argument
     # @param parameters [Parameters, ForgeDSL] forge parameters
-    # @param name [Symbol, nil] forge name;
-    #   only used for identification purposes
+    # @param name [Symbol, nil] forge name
     #
-    # @raise [ObjectInterfaceError] if forge options do not have expected interface,
-    #   see {Parameters#options}
+    # @raise [ObjectInterfaceError] if forge options do not have expected interface;
+    #   see {Parameters#options} for details
     def initialize(forge_target, parameters, name: nil)
       @name = name
       @forge_target = forge_target
@@ -77,7 +82,7 @@ module ObjectForge
       @after_forge_hook = determine_after_forge_hook(options)
     end
 
-    # Forge a new instance.
+    # Forge a new instance, applying attributes to forge target.
     #
     # Positional arguments are taken as trait names, keyword arguments as attribute overrides.
     #
@@ -90,10 +95,10 @@ module ObjectForge
     #   +traits+ and +overrides+ are thread-safe.
     #
     # @param traits [Array<Symbol>] traits to apply
-    # @param overrides [Hash{Symbol => Any}] attribute overrides
+    # @param overrides [Hash{Symbol => Proc, Any}] attribute overrides
     # @yieldparam object [Any] forged instance
     # @yieldreturn [void]
-    # @return [Any] built instance
+    # @return [Any] forged instance
     #
     # @raise [ArgumentError] if a trait name is unknown
     def forge(*traits, **overrides)
@@ -151,7 +156,7 @@ module ObjectForge
     # Get after-forge hook if specified.
     #
     # Both +:after_forge+ and +:after_build+ are accepted, but +:after_forge+
-    # wins of both are present.
+    # wins if both are present.
     #
     # @param options [Hash]
     # @option options [#call, nil] :after_forge
@@ -174,7 +179,7 @@ module ObjectForge
     # Resolve attributes using default attributes, specified traits and overrides.
     #
     # @param traits [Array<Symbol>]
-    # @param overrides [Hash{Symbol => Any}]
+    # @param overrides [Hash{Symbol => Proc, Any}]
     # @return [Hash{Symbol => Any}]
     #
     # @raise [ArgumentError]
