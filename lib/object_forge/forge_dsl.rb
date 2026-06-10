@@ -17,7 +17,7 @@ module ObjectForge
   #   The instance itself is frozen after initialization,
   #   so it should be safe to share.
   # @since 0.1.0
-  class ForgeDSL < UnBasicObject
+  class ForgeDSL < UnBasicObject # rubocop:disable Metrics/ClassLength
     # @return [Hash{Symbol => Proc}] attribute definitions
     attr_reader :attributes
 
@@ -61,9 +61,11 @@ module ObjectForge
       @sequences = {}
       @traits = {}
       @options = {}
+      @transient_attributes = []
 
       dsl.arity.zero? ? instance_exec(&dsl) : yield(self)
 
+      shape_attribute_list!
       freeze
     end
 
@@ -79,6 +81,7 @@ module ObjectForge
       @sequences.freeze
       @traits.freeze
       @options.freeze
+      @options[:attribute_list].freeze
       self
     end
 
@@ -133,13 +136,20 @@ module ObjectForge
     #   f.attribute(:[]=) { "#{self[:[]]} are brackets" }
     #   f.attribute(:!) { "#{self[:[]=]}!" }
     #
+    # @example using transient attributes
+    #   f.attribute(:range) { (base - delta)..(base + delta) }
+    #   f.attribute(:base, transient: true) { 1 }
+    #   f.transient(:delta) { 0.05 }
+    #
     # @param name [Symbol] attribute name
+    # @param transient [Boolean] whether the attribute is transient
+    #   (automatically excluded from attribute list)
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
     #
     # @raise [TypeError] if +name+ is not a Symbol
     # @raise [DSLError] if no block is given
-    def attribute(name, &definition)
+    def attribute(name, transient: false, &definition)
       unless ::Symbol === name
         raise ::TypeError,
               "attribute name must be a Symbol, #{name.class} given (in #{name.inspect})"
@@ -153,11 +163,19 @@ module ObjectForge
       else
         @attributes[name] = definition
       end
+      @transient_attributes << name if transient
 
       name
     end
 
     alias [] attribute
+
+    # Define a transient attribute.
+    #
+    # @see #attribute
+    def transient(name, &)
+      attribute(name, transient: true, &)
+    end
 
     # Define an attribute, using a sequence.
     #
@@ -182,13 +200,15 @@ module ObjectForge
     #
     # @param name [Symbol] attribute name
     # @param initial [Sequence, #succ] existing sequence, or initial value for a new sequence
+    # @param transient [Boolean] whether the attribute is transient
+    #   (automatically excluded from attribute list)
     # @yieldparam value [#succ] current value of the sequence to calculate attribute value
     # @yieldreturn [Any] attribute value
     # @return [Symbol] attribute name
     #
     # @raise [TypeError] if +name+ is not a Symbol
     # @raise [ObjectInterfaceError] if +initial+ does not respond to #succ and is not a {Sequence}
-    def sequence(name, initial = 1, **nil, &)
+    def sequence(name, initial = 1, transient: false, &)
       unless ::Symbol === name
         raise ::TypeError,
               "sequence name must be a Symbol, #{name.class} given (in #{name.inspect})"
@@ -197,9 +217,9 @@ module ObjectForge
       seq = @sequences[name] ||= Sequence.new(initial)
 
       if block_given?
-        attribute(name) { instance_exec(seq.next, &) }
+        attribute(name, transient: transient) { instance_exec(seq.next, &) }
       else
-        attribute(name) { seq.next }
+        attribute(name, transient: transient) { seq.next }
       end
 
       name
@@ -303,6 +323,19 @@ module ObjectForge
 
     def valid_option_method?(name)
       name.match?(/\A\p{Word}.*=\z/)
+    end
+
+    def shape_attribute_list!
+      return if @transient_attributes.empty?
+
+      if @options.key?(:attribute_list)
+        return if (conflicting_attrs = @transient_attributes & @options[:attribute_list]).empty?
+
+        list = conflicting_attrs.map(&:inspect).join(", ")
+        raise DSLError, "attribute_list must not include transient attributes (#{list})"
+      end
+
+      @options[:attribute_list] = @attributes.merge(*@traits.values).keys - @transient_attributes
     end
   end
 end

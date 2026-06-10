@@ -144,6 +144,7 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   @sequences: Hash[Symbol, ObjectForge::Sequence]
   @traits: Hash[Symbol, Hash[Symbol, Proc]]
   @options: Hash[Symbol, untyped]
+  @transient_attributes: Array[Symbol]
 
   def initialize
     : () { (ObjectForge::ForgeDSL) -> void } -> void
@@ -155,11 +156,14 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
     : (Symbol name, untyped value) -> Symbol
 
   def attribute
-    : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
+    : (Symbol name, ?transient: bool) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
   alias [] attribute
 
+  def transient
+    : (Symbol name) { [self: ObjectForge::Crucible] -> untyped } -> Symbol
+
   def sequence
-    : (Symbol name, ?(ObjectForge::sequenceable | ObjectForge::Sequence) initial) { (ObjectForge::sequenceable) [self: ObjectForge::Crucible] -> untyped } -> Symbol
+    : (Symbol name, ?(ObjectForge::sequenceable | ObjectForge::Sequence) initial, ?transient: bool) { (ObjectForge::sequenceable) [self: ObjectForge::Crucible] -> untyped } -> Symbol
 
   def trait
     : (Symbol name) { (self) -> void } -> Symbol
@@ -178,6 +182,9 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
   
   def valid_option_method?
     : (Symbol name) -> bool
+  
+  def shape_attribute_list!
+    : -> void
 end
 
 class ObjectForge::Crucible < ObjectForge::UnBasicObject
