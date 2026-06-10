@@ -116,7 +116,7 @@ module ObjectForge
     include_examples "has an alias", :build, :forge
     include_examples "has an alias", :call, :forge
 
-    describe "forge options" do
+    describe "forge options", :aggregate_failures do
       describe ":mold" do
         before do
           allow(Molds).to receive(:mold_for).and_call_original
@@ -217,6 +217,52 @@ module ObjectForge
 
           it "raises ObjectInterfaceError" do
             expect { forge.forge }.to raise_error(ObjectInterfaceError)
+          end
+        end
+      end
+
+      describe ":attribute_list" do
+        context "when an attribute list is specified" do
+          let(:options) { { attribute_list: [:foo] } }
+
+          it "limits final attributes to those in the list but resolves using all attributes" do
+            expect(forge.forge).to eq forged_class.new(foo: 1)
+            expect(forge.forge(bar: 5)).to eq forged_class.new(foo: 1)
+            expect(forge.forge(foo: -> { bar + 3 }, bar: 5)).to eq forged_class.new(foo: 8)
+          end
+        end
+
+        context "when attribute list includes extra attributes" do
+          let(:options) { { attribute_list: %i[foo baz] } }
+
+          it "ignores the extra attributes" do
+            expect(forge.forge).to eq forged_class.new(foo: 1)
+          end
+        end
+
+        context "when attribute list reorders attributes" do
+          let(:options) do
+            { attribute_list: %i[bar foo], mold: ->(attributes:, **) { attributes.keys } }
+          end
+
+          it "passes attributes in the order specified to the mold" do
+            expect(forge.forge).to eq %i[bar foo]
+          end
+        end
+
+        context "when attribute list is empty" do
+          let(:options) { { attribute_list: [] } }
+
+          it "uses no attributes for forging" do
+            expect(forge.forge).to eq forged_class.new
+          end
+        end
+
+        context "when attribute list is nil" do
+          let(:options) { { attribute_list: nil } }
+
+          it "behaves as if no attribute list was specified" do
+            expect(forge.forge).to eq forged_class.new(foo: 1, bar: 2)
           end
         end
       end

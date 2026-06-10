@@ -130,6 +130,9 @@ class ObjectForge::Forge
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, untyped] overrides) -> Hash[Symbol, untyped]
+  
+  def apply_attribute_list
+    : (Hash[Symbol, untyped] attributes) -> Hash[Symbol, untyped]
 end
 
 class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject

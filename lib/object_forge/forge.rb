@@ -29,10 +29,12 @@ module ObjectForge
     # @!attribute [r] options
     #   A forge's options.
     #   Known options:
-    #   - +:mold+ — a +call+able object that knows how to build the instance,
-    #     taking a class and a hash of attributes.
     #   - +:crucible+ — a +call+able object that knows how to resolve attributes,
     #     taking a hash of initial attributes.
+    #   - +:attribute_list+ — an array of attribute names to filter and sort by
+    #     before passing attributes to the mold.
+    #   - +:mold+ — a +call+able object that knows how to build the instance,
+    #     taking a class and a hash of attributes.
     #   - +:after_forge+/+:after_build+ — a +call+able object that is passed
     #     the forged instance and can do anything with it.
     #   @since 0.3.0
@@ -103,6 +105,7 @@ module ObjectForge
     # @raise [ArgumentError] if a trait name is unknown
     def forge(*traits, **overrides)
       resolved_attributes = resolve_attributes(traits, overrides)
+      resolved_attributes = apply_attribute_list(resolved_attributes)
       instance = @mold.call(forge_target: @forge_target, attributes: resolved_attributes)
       @after_forge_hook&.call(instance)
       yield instance if block_given?
@@ -191,6 +194,16 @@ module ObjectForge
 
       attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
       @crucible.call(attributes)
+    end
+
+    # Filter and sort attributes based on the attribute list.
+    #
+    # @param attributes [Hash{Symbol => Any}]
+    # @return [Hash{Symbol => Any}]
+    def apply_attribute_list(attributes)
+      return attributes unless (attribute_list = @parameters.options[:attribute_list])
+
+      attributes.slice(*attribute_list)
     end
   end
 end
