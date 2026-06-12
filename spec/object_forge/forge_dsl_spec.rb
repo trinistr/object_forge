@@ -22,6 +22,7 @@ module ObjectForge
       let(:definition) do
         proc do |f|
           f.mold = Molds::KeywordsMold.new
+          f.attribute_list = %i[name description duration id external].freeze
 
           f.attribute(:name) { "Name" }
           f[:description] { name.upcase }
@@ -37,8 +38,9 @@ module ObjectForge
           end
 
           f.trait :useless do
-            f.useless { "Useless" }
+            f.transient(:useless) { "Useless" }
             f.sequence(:useless_id) { "Useless #{id}" }
+            f.transient(:moustached_villain) { "A-ha!" }
           end
         end
       end
@@ -52,11 +54,18 @@ module ObjectForge
         expect(forge_dsl.sequences).to be_frozen
         expect(forge_dsl.traits).to be_frozen
         expect(forge_dsl.traits.values).to all be_frozen
+        expect(forge_dsl.options).to be_frozen
       end
 
       it "contains mold in options" do
-        expect(forge_dsl.options).to match(mold: Molds::KeywordsMold)
-        expect(forge_dsl.options).to be_frozen
+        expect(forge_dsl.options).to include(mold: an_instance_of(Molds::KeywordsMold))
+      end
+
+      it "contains attribute_list in options exactly as specified" do
+        expect(forge_dsl.options).to include(
+          attribute_list: %i[name description duration id external]
+        )
+        expect(forge_dsl.options[:attribute_list]).to be_frozen
       end
 
       it "contains root attributes, including sequenced ones" do
@@ -96,7 +105,9 @@ module ObjectForge
         expect(forge_dsl.traits[:special].keys).to contain_exactly(:name, :id)
         expect(forge_dsl.traits[:special].values).to all be_a Proc
 
-        expect(forge_dsl.traits[:useless].keys).to contain_exactly(:useless, :useless_id)
+        expect(forge_dsl.traits[:useless].keys).to contain_exactly(
+          :useless, :useless_id, :moustached_villain
+        )
         expect(forge_dsl.traits[:useless].values).to all be_a Proc
       end
 
@@ -163,6 +174,42 @@ module ObjectForge
       end
     end
 
+    describe "definition without any transient attributes" do
+      let(:definition) do
+        proc do
+          attr_1 { "Name" }
+          sequence(:attr_2) { "#{attr_1} #{_1}" }
+          trait :unnamed do
+            attr_1 { nil }
+            sequence(:attr_2) { "<unnamed> #{_1}" }
+          end
+        end
+      end
+
+      it "does not set :attribute_list option" do
+        expect(forge_dsl.attributes[:attr_1]).to be_a Proc
+        expect(forge_dsl.attributes[:attr_2]).to be_a Proc
+        expect(forge_dsl.options.key?(:attribute_list)).to be false
+      end
+    end
+
+    describe "definition with conflicting attribute_list and transient attributes" do
+      let(:definition) do
+        proc do
+          self.attribute_list = %i[attr_1 attr_2].freeze
+          attribute(:attr_1) { "Name" }
+          transient(:attr_2) { "Value" }
+        end
+      end
+
+      it "fails with DSLError" do
+        expect { forge_dsl }.to raise_error(
+          DSLError,
+          "attribute_list must not include transient attributes (:attr_2)"
+        )
+      end
+    end
+
     describe "#option" do
       context "with a valid name and value" do
         let(:definition) { proc { |f| f.option(:caramba, value) } }
@@ -222,6 +269,20 @@ module ObjectForge
             expect(forge_dsl.attributes[:`].call).to eq "`Name`"
           end
         end
+
+        context "with `transient: true` metadata" do
+          let(:definition) do
+            proc do |f|
+              f.attribute(:attr_1, transient: true) { "Name" }
+              f.attribute(:attr_2) { "Name" }
+            end
+          end
+
+          it "defines an attribute Proc but excludes it from attribute_list" do
+            expect(forge_dsl.attributes[:attr_1]).to be_a Proc
+            expect(forge_dsl.options[:attribute_list]).to eq %i[attr_2]
+          end
+        end
       end
 
       context "when attribute name is not a Symbol" do
@@ -248,6 +309,23 @@ module ObjectForge
     end
 
     include_examples "has an alias", :[], :attribute
+
+    describe "#transient" do
+      let(:definition) do
+        proc { |f|
+          f.transient(:transient_attr) { "Transient Value" }
+          f.attribute(:attr_1) { "Name" }
+        }
+      end
+
+      it "defines attribute with transient metadata" do
+        expect(forge_dsl.attributes).to match(
+          transient_attr: instance_of(Proc),
+          attr_1: instance_of(Proc)
+        )
+        expect(forge_dsl.options[:attribute_list]).to eq %i[attr_1]
+      end
+    end
 
     describe "#sequence" do
       context "with valid, plain sequence definition" do
