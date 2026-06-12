@@ -12,9 +12,8 @@ module ObjectForge
   #   but it's not a private API.
   #
   # @thread_safety DSL is not thread-safe.
-  #   Take care not to introduce side effects,
-  #   especially in attribute definitions.
-  #   The instance itself is frozen after initialization,
+  #   Take care not to introduce side effects, especially in attribute definitions.
+  #   The instance itself and its attributes are frozen after initialization,
   #   so it should be safe to share.
   # @since 0.1.0
   class ForgeDSL < UnBasicObject # rubocop:disable Metrics/ClassLength

@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+**Added**
+- `:attribute_list` option in `Forge`, which is an allowlist of attributes to be passed to the mold.
+- `transient` keyword arguments in `ForgeDSL#attribute` and `ForgeDSL#sequence` which marks an attribute to be excluded from attribute list.
+- `#transient` method in `ForgeDSL` which is a shortcut for `attribute(name, transient: true)`.
+
+**Changed**
+- If any `transient` attributes are specified in `ForgeDSL`, an `attribute_list` will be automatically generated to exclude them.
+- `Forge` will automatically reorder attributes by `:attribute_list` if specified.
+
 [Compare v0.4.0...main](https://github.com/trinistr/object_forge/compare/v0.4.0...main)
 
 ## [v0.4.0] — 2026-05-28
+
+This update adds more customization options to the forge system. Especially useful are blocks to be executed after an object is forged.
 
 **Added**
 - `:crucible` option (previously known as settings) in `Forge`, allowing to replace `Crucible` with any `call`-able object. May be useful to provide a faster attributes resolver.
