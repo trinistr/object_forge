@@ -322,14 +322,15 @@ Of course, you can abuse this to your heart's content. Look at the documentation
 
 > [!NOTE]
 >
-> If you don't specify a mold, **ObjectForge** will infer one for core data containers, including **Hash**, **Struct**, and **Data** subclasses.
+> If you don't specify a mold, **ObjectForge** will infer one for core data containers including **Hash**, **Array**, **Struct**, and **Data** subclasses.
 
 **ObjectForge** comes pre-equipped with a selection of molds for common cases:
 
-- `ObjectForge::Molds::SingleArgumentMold` (*the default*) calls `new(attributes)`, suitable for **ActiveModel**-style objects and **Dry::Struct**, as an example
-- `ObjectForge::Molds::KeywordsMold` calls `new(**attributes)`, suitable for **Data** and similar classes
-- `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), providing a way to easily use build hashes
-- `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct**s
+- `ObjectForge::Molds::SingleArgumentMold` (*the default*) calls `new(attributes)`, suitable for **ActiveModel**-style objects and **Dry::Struct**, as an example.
+- `ObjectForge::Molds::KeywordsMold` calls `new(**attributes)`, suitable for **Data** and similar classes.
+- `ObjectForge::Molds::StructMold` handles all possible cases of `keyword_init` for **Struct**s.
+- `ObjectForge::Molds::HashMold` allows building **Hash** (including subclasses), including setting `default` and `default_proc` values.
+- `ObjectForge::Molds::ArrayMold` allows building **Array** (including subclasses), based on attribute ordering.
 
 You can also set a Class with a `#call` method as a mold. It will be instantiated on every call, providing a clean mold object.
 

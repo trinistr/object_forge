@@ -58,6 +58,32 @@ module ObjectForge
         end
       end
 
+      context "when called with Array" do
+        let(:klass) { Array }
+
+        it "returns ArrayMold" do
+          expect(mold).to be_a described_class::ArrayMold
+        end
+
+        specify "returned mold is appropriate" do
+          expect(built_object).to be_a Array
+          expect(built_object).to eq([1, 2])
+        end
+
+        context "when called with a subclass of Array" do
+          let(:klass) { Class.new(Array) }
+
+          it "returns ArrayMold" do
+            expect(mold).to be_a described_class::ArrayMold
+          end
+
+          specify "returned mold is appropriate" do
+            expect(built_object).to be_a klass
+            expect(built_object).to eq([1, 2])
+          end
+        end
+      end
+
       context "when called with any other class" do
         let(:klass) { Class.new }
 
