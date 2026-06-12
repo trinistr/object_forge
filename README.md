@@ -11,7 +11,7 @@
 
 **ObjectForge** is a small factory library for Ruby objects with minimal assumptions about framework, persistence, or runtime environment.
 
-It is designed for cases where factory-style object construction is useful, but Rails-oriented or database-oriented tooling is a poor fit. **ObjectForge** works well with plain Ruby objects, hashes, structs, and custom build flows.
+It is designed for cases where factory-style object construction is useful, but Rails-oriented or database-oriented tooling is a poor fit. **ObjectForge** works well with plain Ruby objects, hashes, arrays, structs, and custom build flows.
 
 The library focuses on:
 
@@ -375,7 +375,6 @@ forge.forge { |rect| RectangleRepository.save(rect); puts "persisted!" }
 
 **ObjectForge** is pretty fast for what it is. However, if you are worried, there are certain things that can be done to make it faster.
 
-- The easiest thing is to enable [**YJIT**](https://docs.ruby-lang.org/en/master/yjit/yjit_md.html). It will probably speed up your whole application, but be aware that it is not always suitable and may even degrade performance on some workloads. It *is* considered production-ready though.
 - Calling a **Forge** directly, instead of through **Forgeyard**, is faster due to not needing argument forwarding. This is consistent (but check on your system anyway!).
 - Using `self[:name]` instead of plain `name` inside attribute definitions does not engage dynamic method dispatch, which *should* be faster. However, micro-benchmarking does not show conclusive results.
 
@@ -421,11 +420,13 @@ kanban
     [Thread-safe behavior]
     [Tapping into built objects for post-processing]
     [Custom builders / molds]
-    [Built-in Hash, Struct, Data builders / molds]
+    [Built-in Hash, Array, Struct, Data builders / molds]
     [Ability to replace resolver]
     [After-build hook]
     [Transient attributes / attribute filtering]
   [⚗️ To do]
+    [Reference to forgeyard in forge / crucible resolution]
+    [Equality comparisons]
   [❔ Maybe, maybe not]
     [Calling traits from traits]
     [Default traits]

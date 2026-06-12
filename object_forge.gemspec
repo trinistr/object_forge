@@ -12,14 +12,14 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.1.3"
   spec.summary =
     "A small, flexible factory library for plain Ruby objects, " \
-    "hashes, structs and custom build flows."
+    "hashes, arrays, structs and custom build flows."
   spec.description = <<~TEXT
     ObjectForge is a small factory library for Ruby objects with minimal assumptions
     about framework, persistence, or runtime environment.
 
     It is designed for cases where factory-style object construction is useful,
     but Rails-oriented or database-oriented tooling is a poor fit. ObjectForge
-    works well with plain Ruby objects, hashes, structs, and custom build flows.
+    works well with plain Ruby objects, hashes, arrays, structs, and custom build flows.
 
     The library focuses on explicit configuration, independent registries and factories,
     and replaceable components. It aims to provide a familiar workflow without
