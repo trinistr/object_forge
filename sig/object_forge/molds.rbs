@@ -29,7 +29,7 @@ module ObjectForge
       interface _StructSubclass[T]
         def new
           : (*untyped) -> T
-          | (**untyped) -> T
+          | (**Hash[Symbol, untyped]) -> T
           | (Hash[Symbol, untyped]) -> T
         def members: -> Array[Symbol]
         def keyword_init?: -> bool?
@@ -51,17 +51,32 @@ module ObjectForge
 
     class HashMold
       interface _HashSubclass[T]
-        def []: (Hash[untyped, untyped]) -> T
+        def []: (Hash[Symbol, untyped]) -> T
+      end
+      interface _Hash[K, X]
+        def default=: (X) -> X
+        def default_proc=: (Proc?) -> Proc?
       end
 
       attr_reader default: untyped?
       attr_reader default_proc: Proc?
 
       def initialize
-        : (?untyped? default_value) ?{ (Hash[untyped, untyped] hash, untyped key) -> untyped} -> void
+        : (?untyped? default_value) ?{ (Hash[Symbol, untyped] hash, Symbol key) -> untyped} -> void
       
       def call
-        : [T < Hash] (forge_target: _HashSubclass[T], attributes: Hash[Symbol, untyped], **untyped) -> T
+        : [X] (forge_target: _HashSubclass[_Hash[Symbol, X]], attributes: Hash[Symbol, untyped], **untyped) -> _Hash[Symbol, X]
+    end
+
+    class ArrayMold
+      interface _ArraySubclass[T]
+        def new: (Array[untyped]) -> T
+      end
+      interface _Array[X]
+      end
+
+      def call
+        : [X] (forge_target: _ArraySubclass[_Array[X]], attributes: Hash[Symbol, untyped], **untyped) -> _Array[X]
     end
   end
 end

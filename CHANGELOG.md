@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `:attribute_list` option in `Forge`, which is an allowlist of attributes to be passed to the mold.
 - `transient` keyword arguments in `ForgeDSL#attribute` and `ForgeDSL#sequence` which marks an attribute to be excluded from attribute list.
 - `#transient` method in `ForgeDSL` which is a shortcut for `attribute(name, transient: true)`.
+- `Molds::ArrayMold` that supports `Array` and subclasses.
 
 **Changed**
 - If any `transient` attributes are specified in `ForgeDSL`, an `attribute_list` will be automatically generated to exclude them.
-- `Forge` will automatically reorder attributes by `:attribute_list` if specified.
+- `Forge` will automatically reorder attributes by `:attribute_list` if specified. Especially useful for `Molds::ArrayMold`.
+- `Molds.mold_for` will now return `Molds::ArrayMold` if relevant.
 
 [Compare v0.4.0...main](https://github.com/trinistr/object_forge/compare/v0.4.0...main)
 

@@ -122,7 +122,8 @@ module ObjectForge
     # Currently provides specific recognition for:
     # - subclasses of +Struct+ ({StructMold}),
     # - subclasses of +Data+ ({KeywordsMold}),
-    # - +Hash+ and subclasses ({HashMold}).
+    # - +Hash+ and subclasses ({HashMold}),
+    # - +Array+ and subclasses ({ArrayMold}).
     # Other objects just get {SingleArgumentMold}.
     #
     # @param forge_target [Class, Any]
@@ -131,19 +132,22 @@ module ObjectForge
     # @thread_safety Thread-safe.
     # @since 0.3.0
     def self.mold_for(forge_target)
-      if ::Class === forge_target
+      return SingleArgumentMold.new unless ::Class === forge_target
+
+      mold_class =
         if forge_target < ::Struct
-          StructMold.new
+          StructMold
         elsif defined?(::Data) && forge_target < ::Data
-          KeywordsMold.new
+          KeywordsMold
         elsif forge_target <= ::Hash
-          HashMold.new
+          HashMold
+        elsif forge_target <= ::Array
+          ArrayMold
         else
-          SingleArgumentMold.new
+          SingleArgumentMold
         end
-      else
-        SingleArgumentMold.new
-      end
+
+      mold_class.new
     end
 
     # Wrap mold if needed.
