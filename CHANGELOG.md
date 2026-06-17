@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+[Compare v0.4.1...main](https://github.com/trinistr/object_forge/compare/v0.4.1...main)
+
+## [v0.4.1] — 2026-06-17
+
 This update mostly fixes bad signatures shipped in 0.4.0.
 
 **Changed**
@@ -15,7 +19,7 @@ This update mostly fixes bad signatures shipped in 0.4.0.
 **Fixed**
 - RBS signatures got an overhaul. Many signatures were corrected or added.
 
-[Compare v0.4.0...main](https://github.com/trinistr/object_forge/compare/v0.4.0...main)
+[Compare v0.4.0...v0.4.1](https://github.com/trinistr/object_forge/compare/v0.4.0...v0.4.1)
 
 ## [v0.4.0] — 2026-05-28
 
@@ -101,6 +105,7 @@ Initital implementation.
 [Compare v0.0.0...v0.1.0](https://github.com/trinistr/object_forge/compare/v0.0.0...v0.1.0)
 
 [Next]: https://github.com/trinistr/object_forge/tree/main
+[v0.4.1]: https://github.com/trinistr/object_forge/tree/v0.4.1
 [v0.4.0]: https://github.com/trinistr/object_forge/tree/v0.4.0
 [v0.3.0]: https://github.com/trinistr/object_forge/tree/v0.3.0
 [v0.2.0]: https://github.com/trinistr/object_forge/tree/v0.2.0
