@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+This update mostly fixes bad signatures shipped in 0.4.0.
+
+**Changed**
+- `ForgeDSL` will now raise `DSLError` when trying to set an option with a block.
+
+**Fixed**
+- RBS signatures got an overhaul. Many signatures were corrected or added.
+
 [Compare v0.4.0...main](https://github.com/trinistr/object_forge/compare/v0.4.0...main)
 
 ## [v0.4.0] — 2026-05-28
