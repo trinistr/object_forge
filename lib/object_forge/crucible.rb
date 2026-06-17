@@ -115,7 +115,7 @@ module ObjectForge
       return unless (attribute_proc = @attributes[name]) && (::Proc === attribute_proc)
 
       @resolving_attributes << name
-      @attributes[name] = instance_exec(&attribute_proc)
+      @attributes[name] = instance_exec(&attribute_proc) # steep:ignore BlockTypeMismatch
       @resolved_attributes << name
     ensure
       @resolving_attributes.pop

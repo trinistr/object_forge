@@ -189,7 +189,8 @@ module ObjectForge
               "unknown traits for forge#{" #{name}" if name}: #{unknown_traits.join(", ")}"
       end
 
-      attributes = @parameters.attributes.merge(*@parameters.traits.values_at(*traits), overrides)
+      trait_attributes = @parameters.traits.values_at(*traits) # : Array[Hash[Symbol, ObjectForge::attribute]]
+      attributes = @parameters.attributes.merge(*trait_attributes, overrides)
       @crucible.call(attributes)
     end
   end

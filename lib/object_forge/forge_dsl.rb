@@ -198,7 +198,7 @@ module ObjectForge
       seq = @sequences[name] ||= Sequence.new(initial)
 
       if block_given?
-        attribute(name) { instance_exec(seq.next, &) }
+        attribute(name) { instance_exec(seq.next, &) } # steep:ignore BlockTypeMismatch
       else
         attribute(name) { seq.next }
       end
