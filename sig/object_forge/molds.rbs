@@ -3,15 +3,7 @@ module ObjectForge
     def self.wrap_mold
       : ((ObjectForge::mold | Class | nil) mold) -> ObjectForge::mold?
     def self.mold_for
-      : (ObjectForge::_Forgable forge_target) -> ObjectForge::mold
-
-    class SingleArgumentMold
-      include ObjectForge::_Mold
-    end
-
-    class KeywordsMold
-      include ObjectForge::_Mold
-    end
+      : (ObjectForge::forge_target) -> ObjectForge::mold
 
     class WrappedMold
       interface _MoldClass[T]
@@ -25,58 +17,68 @@ module ObjectForge
       def initialize: (_MoldClass[ObjectForge::mold] wrapped_mold) -> void
     end
 
+    class SingleArgumentMold
+      include ObjectForge::_Mold
+    end
+
+    class KeywordsMold
+      include ObjectForge::_Mold
+    end
+
     class StructMold
       interface _StructSubclass[T]
         def new
-          : (*untyped) -> T
-          | (**Hash[Symbol, untyped]) -> T
-          | (Hash[Symbol, untyped]) -> T
+          : (*ObjectForge::attribute) -> T
+          | (**ObjectForge::attribute) -> T
+          | (Hash[Symbol, ObjectForge::attribute]) -> T
         def members: -> Array[Symbol]
         def keyword_init?: -> bool?
       end
 
       RUBY_FEATURE_AUTO_KEYWORDS: bool
+
       attr_reader lax: bool
+      alias lax? lax
 
       def initialize: (?lax: bool) -> void
 
       def call
-        : [T < Struct] (forge_target: _StructSubclass[T], attributes: Hash[Symbol, untyped], **untyped) -> T
+        : [T < Struct] (forge_target: _StructSubclass[T], attributes: Hash[Symbol, ObjectForge::attribute], **untyped) -> T
       
       private
       
       def build_struct_with_unspecified_keyword_init
-        : [T < Struct] (_StructSubclass[T] forge_target, Hash[Symbol, untyped] attributes) -> T
+        : [T < Struct] (_StructSubclass[T] forge_target, Hash[Symbol, ObjectForge::attribute] attributes) -> T
     end
 
     class HashMold
       interface _HashSubclass[T]
-        def []: (Hash[Symbol, untyped]) -> T
+        def []: (Hash[Symbol, ObjectForge::attribute]) -> T
       end
       interface _Hash[K, X]
         def default=: (X) -> X
         def default_proc=: (Proc?) -> Proc?
       end
 
-      attr_reader default: untyped?
+      attr_reader default: ObjectForge::attribute
       attr_reader default_proc: Proc?
 
       def initialize
-        : (?untyped? default_value) ?{ (Hash[Symbol, untyped] hash, Symbol key) -> untyped} -> void
+        : (?ObjectForge::attribute? default_value) ?{ (Hash[Symbol, ObjectForge::attribute] hash, Symbol key) -> ObjectForge::attribute} -> void
       
       def call
-        : [X] (forge_target: _HashSubclass[_Hash[Symbol, X]], attributes: Hash[Symbol, untyped], **untyped) -> _Hash[Symbol, X]
+        : (forge_target: _HashSubclass[_Hash[Symbol, ObjectForge::attribute]], attributes: Hash[Symbol, ObjectForge::attribute], **untyped) -> _Hash[Symbol, ObjectForge::attribute]
     end
 
     class ArrayMold
       interface _ArraySubclass[T]
-        def new: (Array[untyped]) -> T
+        def new: (Array[ObjectForge::attribute]) -> T
       end
       interface _Array[X]
       end
 
       def call
-        : [X] (forge_target: _ArraySubclass[_Array[X]], attributes: Hash[Symbol, untyped], **untyped) -> _Array[X]
+        : (forge_target: _ArraySubclass[_Array[ObjectForge::attribute]], attributes: Hash[Symbol, ObjectForge::attribute], **untyped) -> _Array[ObjectForge::attribute]
     end
   end
 end

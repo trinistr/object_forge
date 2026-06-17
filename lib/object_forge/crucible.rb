@@ -88,19 +88,10 @@ module ObjectForge
     # @return [Any]
     #
     # @raise [CircularAttributeDependencyError] if a dependency cycle is detected
-    def method_missing(name) # rubocop:disable Metrics/MethodLength
+    def method_missing(name)
       if @attributes.key?(name)
-        if @resolving_attributes.include?(name)
-          raise_circular_dependency_error!(name)
-        elsif !@resolved_attributes.include?(name) && (::Proc === @attributes[name])
-          begin
-            @resolving_attributes << name
-            @attributes[name] = instance_exec(&@attributes[name])
-            @resolved_attributes << name
-          ensure
-            @resolving_attributes.pop
-          end
-        end
+        raise_circular_dependency_error!(name) if @resolving_attributes.include?(name)
+        resolve_attribute!(name) unless @resolved_attributes.include?(name)
         @attributes[name]
       else
         super
@@ -118,6 +109,16 @@ module ObjectForge
       loop = @resolving_attributes[loop_start..] # : Array[Symbol]
       raise CircularAttributeDependencyError,
             "attribute depends on itself: #{loop.join(" -> ")} -> #{name}"
+    end
+
+    def resolve_attribute!(name)
+      return unless (attribute_proc = @attributes[name]) && (::Proc === attribute_proc)
+
+      @resolving_attributes << name
+      @attributes[name] = instance_exec(&attribute_proc) # steep:ignore BlockTypeMismatch
+      @resolved_attributes << name
+    ensure
+      @resolving_attributes.pop
     end
   end
 end

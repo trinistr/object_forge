@@ -234,7 +234,18 @@ module ObjectForge
         it "raises TypeError on definition" do
           expect { forge_dsl }.to raise_error(
             TypeError,
-            "option name must be a Symbol, String given"
+            "option name must be a Symbol, String given (in \"caramba\")"
+          )
+        end
+      end
+
+      context "with a block" do
+        let(:definition) { proc { |f| f.option(:caramba, "uh-oh") { "oof" } } }
+
+        it "raises DSLError" do
+          expect { forge_dsl }.to raise_error(
+            DSLError,
+            "option definition does not take a block (in :caramba)"
           )
         end
       end
@@ -492,7 +503,7 @@ module ObjectForge
 
       context "when called with a reserved name" do
         %i[
-          name? name! ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
+          name? name! ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~ rand
         ].each do |reserved_name|
           describe "##{reserved_name}" do
             let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }
@@ -525,8 +536,12 @@ module ObjectForge
     end
 
     describe "#respond_to?" do
-      let(:definition) { proc { |f| f.__send__(name) { "Name" } if f.respond_to?(name) } }
-      let(:name) { :nnasd_kjbksadk }
+      let(:definition) { proc { |f| responds_to[name] = f.respond_to?(name) } }
+      let(:responds_to) { {} }
+
+      let(:name) { :a_random_name }
+
+      before { forge_dsl }
 
       it "returns true if the method is defined" do
         expect(forge_dsl.respond_to?(:attribute)).to be true
@@ -534,20 +549,28 @@ module ObjectForge
 
       context "if called during DSL definition" do
         it "returns true for non-reserved names" do
-          expect(forge_dsl.attributes[name]).to be_a Proc
+          expect(responds_to[name]).to be true
         end
 
         context "when called with a reserved name" do
           %i[
-            name? name! name= ` []= + - * / % ** +@ -@ & | ^ ~ << >> < > <= >= === !== =~ !~ rand
+            name? name! ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~ rand
           ].each do |reserved_name|
             describe "##{reserved_name}" do
               let(:name) { reserved_name }
 
               it "returns false" do
-                expect(forge_dsl.attributes[reserved_name]).to be nil
+                expect(responds_to[reserved_name]).to be false
               end
             end
+          end
+        end
+
+        context "when called with an option name" do
+          let(:name) { :option_name= }
+
+          it "returns true" do
+            expect(responds_to[name]).to be true
           end
         end
       end
