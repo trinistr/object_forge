@@ -103,8 +103,9 @@ module ObjectForge
     # @raise [TypeError] if +name+ is not a Symbol
     def option(name, value)
       unless ::Symbol === name
-        raise ::TypeError, "option name must be a Symbol, #{name.class} given"
+        raise ::TypeError, "option name must be a Symbol, #{name.class} given (in #{name.inspect})"
       end
+      raise DSLError, "option definition does not take a block (in #{name.inspect})" if block_given?
 
       @options[name] = value
 
@@ -287,10 +288,13 @@ module ObjectForge
     # @raise [DSLError] if a reserved +name+ is used
     def method_missing(name, value = nil, **nil, &)
       return super(name) if frozen?
+
       if valid_option_method?(name)
-        return option(name[...-1].to_sym, value) # steep:ignore NoMethod
+        # Intentionally passing block to `option` to trigger DSLError if it is present.
+        return option(name[...-1].to_sym, value, &) # steep:ignore NoMethod, UnexpectedBlockGiven
       end
-      return attribute(name, &) if respond_to_missing?(name, false)
+      # Block can be missing, but `attribute` will raise if it is.
+      return attribute(name, &) if respond_to_missing?(name, false) # steep:ignore BlockTypeMismatch
 
       raise DSLError, "#{name.inspect} is a reserved name (in #{name.inspect})"
     end
