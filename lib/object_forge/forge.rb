@@ -82,6 +82,7 @@ module ObjectForge
       @crucible = determine_crucible(options)
       @mold = determine_mold(forge_target, options)
       @after_forge_hook = determine_after_forge_hook(options)
+      validate_other_options(options)
     end
 
     # Forge a new instance, applying attributes to forge target.
@@ -177,6 +178,13 @@ module ObjectForge
       end
 
       hook
+    end
+
+    def validate_other_options(options)
+      return if options[:attribute_list].nil?
+      unless Array === options[:attribute_list] && options[:attribute_list].all? { Symbol === _1 }
+        raise TypeError, "attribute_list must be an Array of Symbol"
+      end
     end
 
     # Resolve attributes using default attributes, specified traits and overrides.

@@ -136,6 +136,9 @@ class ObjectForge::Forge
 
   def determine_after_forge_hook
     : (Hash[Symbol, untyped] options) -> ObjectForge::_Hook?
+  
+  def validate_other_options
+    : (Hash[Symbol, untyped] options) -> void
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, ObjectForge::attribute] overrides) -> Hash[Symbol, ObjectForge::attribute]

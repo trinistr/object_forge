@@ -265,6 +265,22 @@ module ObjectForge
             expect(forge.forge).to eq forged_class.new(foo: 1, bar: 2)
           end
         end
+
+        context "with invalid non-Array value" do
+          let(:options) { { attribute_list: "invalid" } }
+
+          it "raises TypeError" do
+            expect { forge.forge }.to raise_error(TypeError)
+          end
+        end
+
+        context "with invalid Array containing non-Symbol elements" do
+          let(:options) { { attribute_list: [:foo, "bar"] } }
+
+          it "raises TypeError" do
+            expect { forge.forge }.to raise_error(TypeError)
+          end
+        end
       end
     end
   end
