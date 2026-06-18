@@ -29,7 +29,7 @@ module ObjectForge
 
       it "defines and registers a forge" do
         expect { definition }.to change(forgeyard.forges, :size).by(1)
-        expect(Forge).to have_received(:define).with(Object, name: :foo)
+        expect(Forge).to have_received(:define).with(Object, name: :foo, yard: forgeyard)
         expect(forgeyard.forges[:foo]).to be forge
       end
     end
@@ -77,6 +77,18 @@ module ObjectForge
         it "raises KeyError" do
           expect { forgeyard[:nonexistent] }.to raise_error KeyError
         end
+      end
+    end
+
+    describe "key?" do
+      before { forgeyard.register(:test, forge) }
+
+      it "returns true if a forge is registered under the given name" do
+        expect(forgeyard.key?(:test)).to be true
+      end
+
+      it "returns false if a forge is not registered under the given name" do
+        expect(forgeyard.key?(:nonexistent)).to be false
       end
     end
 

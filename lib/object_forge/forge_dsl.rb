@@ -299,7 +299,7 @@ module ObjectForge
     # - all names ending in +?+, +!+
     # - all names starting with a non-word ASCII character
     #   (operators, +`+, +[]+, +[]=+)
-    # - +rand+
+    # - +rand+ and +yard+
     #
     # @param name [Symbol] attribute or option name
     # @param value [Any] value for option
@@ -323,7 +323,8 @@ module ObjectForge
     def respond_to_missing?(name, _include_all)
       return super if frozen?
 
-      !name.end_with?("?", "!") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) && name != :rand
+      !name.end_with?("?", "!") && !name.match?(/\A(?=\p{ASCII})\P{Word}/) &&
+        !name.match?(/\A(?:rand|yard)\z/)
     end
 
     def valid_option_method?(name)

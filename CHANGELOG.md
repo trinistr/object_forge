@@ -12,11 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `transient` keyword arguments in `ForgeDSL#attribute` and `ForgeDSL#sequence` which marks an attribute to be excluded from attribute list.
 - `#transient` method in `ForgeDSL` which is a shortcut for `attribute(name, transient: true)`.
 - `Molds::ArrayMold` that supports `Array` and subclasses.
+- `Crucible` can take a `:yard` parameter to refer to other forges in the same forgeyard.
 
 **Changed**
 - If any `transient` attributes are specified in `ForgeDSL`, an `attribute_list` will be automatically generated to exclude them.
 - `Forge` will automatically reorder attributes by `:attribute_list` if specified. Especially useful for `Molds::ArrayMold`.
 - `Molds.mold_for` will now return `Molds::ArrayMold` if relevant.
+- If `:crucible` takes a `:yard` parameter, forge's yard will be passed to it in `Forge#forge`.
 
 [Compare v0.4.1...main](https://github.com/trinistr/object_forge/compare/v0.4.1...main)
 

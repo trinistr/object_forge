@@ -30,6 +30,7 @@ If you need factory-style object generation without coupling it to Rails, Active
     - [Quick start](#quick-start)
     - [Basics](#basics)
     - [Independent forgeyards and forges](#independent-forgeyards-and-forges)
+    - [Association-like nested objects](#association-like-nested-objects)
     - [Defining final attribute list](#defining-final-attribute-list)
     - [Molds: configuring object construction](#molds-configuring-object-construction)
     - [After-build customization](#after-build-customization)
@@ -199,12 +200,15 @@ It is possible and *encouraged* to create multiple forgeyards, each with its own
 
 ```ruby
 forgeyard = ObjectForge::Forgeyard.new
+
 forgeyard.define(:dot, Point) do |f|
   f.sequence(:id, "a")
-  f.x { rand(-radius..radius) }
-  f.y { rand(-radius..radius) }
-  f.radius { 0.5 }
-  f.trait :z do f.radius { 0 } end
+  f.x { rand(-variance..variance) }
+  f.y { rand(-variance..variance) }
+
+  f.variance { 0.5 }
+
+  f.trait :z do f.variance { 0 } end
 end
 ```
 
@@ -244,6 +248,50 @@ forge.forge(:z)
 forge.(radius: 500)
   # => #<struct Point id="c", x=-141, y=109>
 ```
+
+### Association-like nested objects
+
+Nested objects can naturally be constructed in attribute definitions. However, forges belonging to forgeyards provide a more convenient way to refer to their forgeyard in attribute definitions. It is fairly simple to build object graphs by putting related forges in the same `yard`:
+
+```ruby
+geometric_yard = ObjectForge::Forgeyard.new
+geometric_yard.define(:point, Point) do |f|
+  # ... reusing the Point forge from the forgeyard example above.
+end
+
+Ellipse = Data.define(:center, :major_semiaxis, :minor_semiaxis)
+geometric_yard.define(:circle, Ellipse) do |f|
+  # Current forge's forgeyard is available as `yard` pseudo-attribute:
+  f.center { yard.forge(:point) }
+  f.transient(:radius) { 1.0 }
+
+  f.major_semiaxis { radius }
+  f.minor_semiaxis { radius }
+end
+
+geometric_yard.forge(:circle, radius: 4.0)
+  # => #<data Ellipse center=#<struct Point id="a", x=0.3487797161039954, y=-0.11378243307810132>, major_semiaxis=4.0, minor_semiaxis=4.0>
+```
+
+There is an alternative way to refer to `yard`'s forges if no attribute has the same name — just mention it by name directly:
+
+```ruby
+Line = Data.define(:a, :b)
+geometric_yard.define(:segment, Line) do |f|
+  # There is no "point" attribute, so `point` refers to the forge:
+  f.a { point.forge(:z) }
+  f.b { point.forge }
+end
+
+geometric_yard.forge(:segment)
+  # => #<data Line a=#<struct Point id="b", x=0, y=0>, b=#<struct Point id="c", x=0.2701288765117644, y=0.008413574136415414>>
+```
+
+> [!IMPORTANT]
+>
+> Referring to a related forge by name is not special syntax the same way **FactoryBot**'s _associations_ are; it just returns the forge object, which then needs to be called to construct an instance.
+
+As objects are not initialized before attributes are resolved and set, it can be tricky to create circular references. If you find yourself needing to do this, an [after-forge hook](#after-build-customization) can be used to modify objects after building them.
 
 ### Defining final attribute list
 
@@ -294,7 +342,7 @@ ObjectForge.forge(:point, position: [10, 13.4], altitude: 5, unit: :mm)
 
 > [!NOTE]
 >
-> `attribute_list` and `transient` attributes can be used in the same definition. However, transient attributes *can't* appear in attribute list; this will raise an error.
+> `attribute_list` and `transient` attributes can be used in the same definition. However, transient attributes **can't** appear in attribute list; this will raise an error.
 
 ### Molds: configuring object construction
 
@@ -395,7 +443,7 @@ Forge definition:
 
 Attributes:
 
-- *There are no associations*. If nested objects are required, they should be created and set in the block for the attribute.
+- There are no magic associations. Forgeyards provide a similar way to call related forges, but you need to be explicit about it.
 
 Traits:
 
@@ -424,8 +472,8 @@ kanban
     [Ability to replace resolver]
     [After-build hook]
     [Transient attributes / attribute filtering]
-  [⚗️ To do]
     [Reference to forgeyard in forge / crucible resolution]
+  [⚗️ To do]
     [Equality comparisons]
   [❔ Maybe, maybe not]
     [Calling traits from traits]

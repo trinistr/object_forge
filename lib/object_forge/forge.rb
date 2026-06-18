@@ -30,11 +30,11 @@ module ObjectForge
     #   A forge's options.
     #   Known options:
     #   - +:crucible+ — a +call+able object that knows how to resolve attributes,
-    #     taking a hash of initial attributes.
+    #     taking a hash of initial attributes and possibly a yard (see {Crucible}).
     #   - +:attribute_list+ — an array of attribute names to filter and sort by
     #     before passing attributes to the mold.
     #   - +:mold+ — a +call+able object that knows how to build the instance,
-    #     taking a class and a hash of attributes.
+    #     taking a class and a hash of attributes (see {Molds}).
     #   - +:after_forge+/+:after_build+ — a +call+able object that is passed
     #     the forged instance and can do anything with it.
     #   @since 0.3.0
@@ -48,15 +48,19 @@ module ObjectForge
     #
     # @param forge_target [Class, Any] class or object to forge
     # @param name [Symbol, nil] forge name
+    # @param yard [Forgeyard, nil] forgeyard this forge belongs to
     # @yieldparam dsl [ForgeDSL]
     # @yieldreturn [void]
     # @return [Forge] forge
-    def self.define(forge_target, name: nil, &)
-      new(forge_target, ForgeDSL.new(&), name:)
+    def self.define(forge_target, name: nil, yard: nil, &)
+      new(forge_target, ForgeDSL.new(&), name:, yard:)
     end
 
     # @return [Symbol, nil] forge name, only used for identification purposes
     attr_reader :name
+
+    # @return [Forgeyard, nil] forgeyard this forge belongs to
+    attr_reader :yard
 
     # @return [Class, Any] class or object to forge
     # @since 0.4.0
@@ -70,11 +74,13 @@ module ObjectForge
     #   will be passed to mold as +forge_target+ argument
     # @param parameters [Parameters, ForgeDSL] forge parameters
     # @param name [Symbol, nil] forge name
+    # @param yard [Forgeyard, nil] forgeyard this forge belongs to
     #
     # @raise [ObjectInterfaceError] if forge options do not have expected interface;
     #   see {Parameters#options} for details
-    def initialize(forge_target, parameters, name: nil)
+    def initialize(forge_target, parameters, name: nil, yard: nil)
       @name = name
+      @yard = yard
       @forge_target = forge_target
       @parameters = parameters
 
@@ -88,7 +94,6 @@ module ObjectForge
     # Forge a new instance, applying attributes to forge target.
     #
     # Positional arguments are taken as trait names, keyword arguments as attribute overrides.
-    #
     # All traits and overrides are applied in argument order,
     # with overrides always applied after traits.
     #
@@ -105,9 +110,8 @@ module ObjectForge
     #
     # @raise [ArgumentError] if a trait name is unknown
     def forge(*traits, **overrides)
-      resolved_attributes = resolve_attributes(traits, overrides)
-      resolved_attributes = apply_attribute_list(resolved_attributes)
-      instance = @mold.call(forge_target: @forge_target, attributes: resolved_attributes)
+      attributes = build_attribute_hash(traits, overrides)
+      instance = @mold.call(forge_target: @forge_target, attributes: attributes)
       @after_forge_hook&.call(instance)
       yield instance if block_given?
       instance
@@ -119,8 +123,9 @@ module ObjectForge
     private
 
     # Get a crucible object based on parameters.
-    #
     # It's either the object provided in options, or {Crucible}.
+    #
+    # This method also determines whether the crucible accepts a +yard+ parameter.
     #
     # @param options [Hash]
     # @option options [#call, nil] :crucible
@@ -130,13 +135,28 @@ module ObjectForge
     #
     # @since 0.4.0
     def determine_crucible(options)
-      crucible = options[:crucible] || Crucible
+      @crucible_takes_yard = true and return Crucible unless options[:crucible]
 
+      crucible = options[:crucible]
       unless crucible.respond_to?(:call)
         raise ObjectInterfaceError, "crucible must respond to #call"
       end
 
+      @crucible_takes_yard = crucible_takes_yard_parameter?(crucible)
       crucible
+    end
+
+    # Check if a crucible accepts a +yard+ keyword parameter.
+    #
+    # @param crucible [#call]
+    # @return [Boolean]
+    #
+    # @since <<next>>
+    def crucible_takes_yard_parameter?(crucible)
+      parameters = (Proc === crucible) ? crucible.parameters : crucible.method(:call).parameters
+      parameters.any? do |type, name|
+        type == :keyrest || ((type == :keyreq || type == :key) && name == :yard)
+      end
     end
 
     # Get appropriate mold based on parameters.
@@ -180,11 +200,33 @@ module ObjectForge
       hook
     end
 
+    # Validate options that will only be used at runtime.
+    #
+    # @param options [Hash]
+    # @option options [Array<Symbol>, nil] :attribute_list
+    #
+    # @raise [TypeError]
+    #
+    # @since <<next>>
     def validate_other_options(options)
       return if options[:attribute_list].nil?
       unless Array === options[:attribute_list] && options[:attribute_list].all? { Symbol === _1 }
         raise TypeError, "attribute_list must be an Array of Symbol"
       end
+    end
+
+    # Build final attribute hash using default attributes, specified traits and overrides,
+    # sorted and filtered by attribute list.
+    #
+    # @param traits [Array<Symbol>]
+    # @param overrides [Hash{Symbol => Proc, Any}]
+    # @return [Hash{Symbol => Any}]
+    #
+    # @raise [ArgumentError]
+    #
+    # @since <<next>>
+    def build_attribute_hash(traits, overrides)
+      apply_attribute_list(resolve_attributes(traits, overrides))
     end
 
     # Resolve attributes using default attributes, specified traits and overrides.
@@ -202,13 +244,20 @@ module ObjectForge
 
       trait_attributes = @parameters.traits.values_at(*traits) # : Array[Hash[Symbol, ObjectForge::attribute]]
       attributes = @parameters.attributes.merge(*trait_attributes, overrides)
-      @crucible.call(attributes)
+
+      if @crucible_takes_yard
+        @crucible.call(attributes, yard: @yard) # steep:ignore UnexpectedKeywordArgument
+      else
+        @crucible.call(attributes)
+      end
     end
 
     # Filter and sort attributes based on the attribute list.
     #
     # @param attributes [Hash{Symbol => Any}]
     # @return [Hash{Symbol => Any}]
+    #
+    # @since <<next>>
     def apply_attribute_list(attributes)
       return attributes unless (attribute_list = @parameters.options[:attribute_list])
 

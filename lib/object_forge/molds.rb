@@ -164,7 +164,7 @@ module ObjectForge
     # @thread_safety Thread-safe.
     # @since 0.3.0
     def self.wrap_mold(mold)
-      if mold.nil? || mold.respond_to?(:call)
+      if nil == mold || mold.respond_to?(:call) # rubocop:disable Style/YodaCondition
         mold # : ObjectForge::mold?
       elsif ::Class === mold && mold.public_method_defined?(:call)
         WrappedMold.new(mold)

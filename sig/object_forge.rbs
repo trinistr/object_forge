@@ -3,11 +3,13 @@ module ObjectForge
   type forge_result = untyped
   type attribute = untyped
 
-  type mold = ::Object & _Mold
+  type mold = _RespondTo & _Mold
+  type crucible = _RespondTo & (_Crucible | _CrucibleWithYard)
   type sequenceable = _RespondTo & _Sequenceable
 
   interface _RespondTo
     def respond_to?: (Symbol name, ?bool include_private) -> bool
+    def method: (Symbol name) -> ::Method
     def class: -> Class
   end
   interface _Sequenceable
@@ -26,9 +28,20 @@ module ObjectForge
     def call
       : (Hash[Symbol, ObjectForge::attribute]) -> Hash[Symbol, ObjectForge::attribute]
   end
+  interface _CrucibleWithYard
+    def call
+      : (Hash[Symbol, ObjectForge::attribute], ?yard: ObjectForge::_Yard?) -> Hash[Symbol, ObjectForge::attribute]
+  end
   interface _Hook
     def call
       : (ObjectForge::forge_result) -> void
+  end
+  interface _Yard
+    def []
+      : (Symbol name) -> untyped
+    
+    def key?
+      : (Symbol name) -> bool
   end
 
   class Error < StandardError
@@ -87,6 +100,9 @@ class ObjectForge::Forgeyard
   
   def []
     : (Symbol name) -> ObjectForge::Forge
+  
+  def key?
+    : (Symbol name) -> bool
 
   def forge
     : (Symbol name, *Symbol traits, **ObjectForge::attribute overrides) ?{ (ObjectForge::forge_result) -> void } -> ObjectForge::forge_result
@@ -103,23 +119,25 @@ class ObjectForge::Forge
       : (attributes: Hash[Symbol, ObjectForge::attribute], traits: Hash[Symbol, Hash[Symbol, ObjectForge::attribute]], options: Hash[Symbol, untyped]) -> void
   end
 
+  attr_reader name: Symbol?
+
+  attr_reader yard: ObjectForge::_Yard?
+
   attr_reader forge_target: ObjectForge::forge_target
   alias target forge_target
 
-  attr_reader name: Symbol?
-
   attr_reader parameters: ObjectForge::_ForgeParameters
 
-  @crucible: ObjectForge::_Crucible
+  @crucible: ObjectForge::crucible
   @mold: ObjectForge::_Mold
   @after_forge_hook: ObjectForge::_Hook?
 
   def self.define
-    : (ObjectForge::forge_target, ?name: Symbol?) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
-    | (ObjectForge::forge_target, ?name: Symbol?) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
+    : (ObjectForge::forge_target, ?name: Symbol?, ?yard: ObjectForge::_Yard?) { (ObjectForge::ForgeDSL) -> void } -> ObjectForge::Forge
+    | (ObjectForge::forge_target, ?name: Symbol?, ?yard: ObjectForge::_Yard?) { [self: ObjectForge::ForgeDSL] -> void } -> ObjectForge::Forge
   
   def initialize
-    : (ObjectForge::forge_target, ObjectForge::_ForgeParameters parameters, ?name: Symbol?) -> void
+    : (ObjectForge::forge_target, ObjectForge::_ForgeParameters parameters, ?name: Symbol?, ?yard: ObjectForge::_Yard?) -> void
   
   def forge
     : (*Symbol traits, **ObjectForge::attribute overrides) ?{ (ObjectForge::forge_result) -> void } -> ObjectForge::forge_result
@@ -129,7 +147,10 @@ class ObjectForge::Forge
   private
   
   def determine_crucible
-    : (Hash[Symbol, untyped]) -> ObjectForge::_Crucible
+    : (Hash[Symbol, untyped]) -> ObjectForge::crucible
+
+  def crucible_takes_yard_parameter?
+    : (ObjectForge::crucible) -> bool
 
   def determine_mold
     : (ObjectForge::forge_target, Hash[Symbol, untyped]) -> ObjectForge::mold
@@ -139,6 +160,9 @@ class ObjectForge::Forge
   
   def validate_other_options
     : (Hash[Symbol, untyped] options) -> void
+
+  def build_attribute_hash
+    : (Array[Symbol] traits, Hash[Symbol, ObjectForge::attribute] overrides) -> Hash[Symbol, ObjectForge::attribute]
 
   def resolve_attributes
     : (Array[Symbol] traits, Hash[Symbol, ObjectForge::attribute] overrides) -> Hash[Symbol, ObjectForge::attribute]
@@ -204,17 +228,21 @@ class ObjectForge::ForgeDSL < ObjectForge::UnBasicObject
 end
 
 class ObjectForge::Crucible < ObjectForge::UnBasicObject
+  EMPTY_YARD: Hash[Symbol, untyped]
+
   def self.call
-    : (Hash[Symbol, ObjectForge::attribute]) -> Hash[Symbol, ObjectForge::attribute]
+    : (Hash[Symbol, ObjectForge::attribute], ?yard: ObjectForge::_Yard?) -> Hash[Symbol, ObjectForge::attribute]
   def self.resolve
-    : (Hash[Symbol, ObjectForge::attribute]) -> Hash[Symbol, ObjectForge::attribute]
+    : (Hash[Symbol, ObjectForge::attribute], ?yard: ObjectForge::_Yard?) -> Hash[Symbol, ObjectForge::attribute]
 
   @attributes: Hash[Symbol, ObjectForge::attribute]
   @resolved_attributes: Set[Symbol]
   @resolving_attributes: Array[Symbol]
 
+  attr_reader yard: ObjectForge::_Yard
+
   def initialize
-    : (Hash[Symbol, ObjectForge::attribute] attributes) -> void
+    : (Hash[Symbol, ObjectForge::attribute] attributes, ?yard: ObjectForge::_Yard?) -> void
 
   def resolve!
     : -> Hash[Symbol, ObjectForge::attribute]

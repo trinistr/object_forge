@@ -2,10 +2,11 @@
 
 module ObjectForge
   RSpec.describe Forge do
-    subject(:forge) { described_class.new(forged_class, parameters, name: name) }
+    subject(:forge) { described_class.new(forged_class, parameters, name: name, yard: yard) }
 
     let(:forged_class) { Struct.new(:foo, :bar, keyword_init: true) }
     let(:name) { "ASDFg" }
+    let(:yard) { { bar: 3 } }
     let(:parameters) do
       described_class::Parameters.new(
         options: options,
@@ -17,6 +18,36 @@ module ObjectForge
     end
     let(:options) { {} }
 
+    describe "#name" do
+      it "returns the specified name of the forge" do
+        expect(forge.name).to eq name
+      end
+
+      context "when name is nil" do
+        let(:name) { nil }
+
+        it "returns nil" do
+          expect(forge.name).to be nil
+        end
+      end
+    end
+
+    describe "#yard" do
+      let(:yard) { instance_double(Forgeyard) }
+
+      it "returns the specified yard of the forge" do
+        expect(forge.yard).to be yard
+      end
+
+      context "when yard is nil" do
+        let(:yard) { nil }
+
+        it "returns nil" do
+          expect(forge.yard).to be nil
+        end
+      end
+    end
+
     describe "#forge_target" do
       it "returns the class to forge" do
         expect(forge.forge_target).to be forged_class
@@ -27,12 +58,6 @@ module ObjectForge
     describe "#target" do
       it "returns the class to forge" do
         expect(forge.target).to be forged_class
-      end
-    end
-
-    describe "#name" do
-      it "returns the name of the forge" do
-        expect(forge.name).to eq name
       end
     end
 
@@ -152,11 +177,40 @@ module ObjectForge
       end
 
       describe ":crucible" do
-        context "with a non-nil object" do
-          let(:options) { { crucible: ->(attributes) { attributes.transform_values(&:inspect) } } }
+        context "with a non-nil object taking only attributes" do
+          let(:options) do
+            { crucible: ->(attributes) { attributes.transform_values(&:inspect) } }
+          end
 
           it "uses the object to resolve attributes" do
             expect(forge.forge).to have_attributes(foo: /Proc/, bar: /Proc/)
+          end
+        end
+
+        context "with a non-nil object taking attributes and :yard keyword parameter" do
+          let(:crucible) do
+            Class.new do
+              def call(attributes, yard: {})
+                attributes.to_h { |k, v| [k, yard[k] || v.inspect] }
+              end
+            end
+          end
+          let(:options) { { crucible: crucible.new } }
+
+          it "uses the object to resolve attributes" do
+            expect(forge.forge).to have_attributes(foo: /Proc/, bar: 3)
+          end
+
+          context "if crucible takes :yard in keyrest parameters" do
+            let(:options) do
+              { crucible: ->(attributes, **kwargs) {
+                attributes.to_h { |k, v| [k, kwargs[:yard][k] || v.inspect] }
+              } }
+            end
+
+            it "detects that and supplies the yard" do
+              expect(forge.forge).to have_attributes(foo: /Proc/, bar: 3)
+            end
           end
         end
 
