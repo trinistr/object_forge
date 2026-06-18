@@ -503,7 +503,9 @@ module ObjectForge
 
       context "when called with a reserved name" do
         %i[
-          name? name! ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~ rand
+          name? name!
+          ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~
+          rand yard
         ].each do |reserved_name|
           describe "##{reserved_name}" do
             let(:definition) { proc { |f| f.__send__(reserved_name) { "Name?" } } }
@@ -554,7 +556,9 @@ module ObjectForge
 
         context "when called with a reserved name" do
           %i[
-            name? name! ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~ rand
+            name? name!
+            ` []= + - * / % ** +@ -@ & | ^ ~ @~ << >> < > <= >= === !== =~ !~
+            rand yard
           ].each do |reserved_name|
             describe "##{reserved_name}" do
               let(:name) { reserved_name }

@@ -14,6 +14,8 @@ module ObjectForge
   #   and using {.call} is thread-safe.
   # @since 0.1.0
   class Crucible < UnBasicObject
+    EMPTY_YARD = {}.freeze # steep:ignore UnannotatedEmptyCollection
+
     class << self
       # Resolve all attributes by calling their +Proc+s,
       # using a new instance as evaluation context.
@@ -23,9 +25,10 @@ module ObjectForge
       # @thread_safety This method is thread-safe.
       #
       # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
+      # @param yard [Hash{Symbol => Any}, nil] additional context for the crucible
       # @return [Hash{Symbol => Any}] resolved attributes
-      def call(attributes)
-        new(attributes).resolve!
+      def call(attributes, yard: EMPTY_YARD)
+        new(attributes, yard:).resolve!
       end
 
       alias resolve call
@@ -33,10 +36,15 @@ module ObjectForge
 
     %i[rand].each { |m| private define_method(m, ::Kernel.instance_method(m)) }
 
+    # @return [Hash{Symbol => Any}, Forgeyard] additional context for the crucible
+    attr_reader :yard
+
     # @param attributes [Hash{Symbol => Proc, Any}] initial attributes
-    def initialize(attributes)
+    # @param yard [Hash{Symbol => Any}, nil] additional context for the crucible
+    def initialize(attributes, yard: EMPTY_YARD)
       super()
       @attributes = attributes
+      @yard = yard || EMPTY_YARD
       @resolved_attributes = ::Set.new
       @resolving_attributes = []
     end
@@ -93,6 +101,8 @@ module ObjectForge
         raise_circular_dependency_error!(name) if @resolving_attributes.include?(name)
         resolve_attribute!(name) unless @resolved_attributes.include?(name)
         @attributes[name]
+      elsif @yard.key?(name)
+        @yard[name]
       else
         super
       end
@@ -101,7 +111,7 @@ module ObjectForge
     alias [] method_missing
 
     def respond_to_missing?(name, _include_all)
-      @attributes.key?(name) || super
+      @attributes.key?(name) || @yard.key?(name) || super
     end
 
     def raise_circular_dependency_error!(name)

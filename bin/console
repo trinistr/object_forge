@@ -19,11 +19,15 @@ FORGE =
     f.trait :zero do
       f.foo { 0 }
     end
+
+    f.trait :marine do
+      f.foo { sea.build }
+    end
   end
 
 FAST_FORGE =
   FORGEYARD.define(:sea, Hash) do |f|
-    f.crucible = ->(attributes) { attributes.transform_values(&:call) }
+    f.crucible = ->(attributes, **) { attributes.transform_values(&:call) }
 
     f.wide { true }
     f.deep { false }

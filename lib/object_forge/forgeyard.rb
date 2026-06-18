@@ -27,7 +27,7 @@ module ObjectForge
     # @yieldreturn [void]
     # @return [Forge] forge
     def define(name, forge_target, &)
-      register(name, Forge.define(forge_target, name: name, &))
+      register(name, Forge.define(forge_target, name: name, yard: self, &))
     end
 
     # Add a forge under a specified name.
@@ -53,6 +53,14 @@ module ObjectForge
     # @raise [KeyError] if forge with the specified name is not registered
     def [](name)
       @forges.fetch(name)
+    end
+
+    # Check if a forge is registered under a given name.
+    #
+    # @param name [Symbol] name of the forge
+    # @return [Boolean] whether a forge is registered under the given name
+    def key?(name)
+      !!@forges.get(name)
     end
 
     # Build an instance using a forge.

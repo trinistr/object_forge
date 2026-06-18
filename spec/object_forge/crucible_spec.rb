@@ -2,9 +2,10 @@
 
 module ObjectForge
   RSpec.describe Crucible do
-    subject(:crucible) { described_class.new(attributes) }
+    subject(:crucible) { described_class.new(attributes, yard:) }
 
     let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bar } } }
+    let(:yard) { { special: 33 } }
 
     describe ".call" do
       subject(:resolved_attributes) { described_class.call(attributes) }
@@ -23,10 +24,22 @@ module ObjectForge
 
         expect(resolved_attributes).to eq({ success: true })
       end
+
+      it "passes yard along" do
+        expect(described_class.call({ a: -> { b } }, yard: { b: :bee })).to eq({ a: :bee })
+      end
     end
 
     describe described_class.singleton_class do
       include_examples "has an alias", :resolve, :call
+    end
+
+    describe "#yard" do
+      let(:yard) { { foo: 1, bar: 2 } }
+
+      it "returns the yard" do
+        expect(crucible.yard).to be yard
+      end
     end
 
     describe "#resolve!" do
@@ -64,12 +77,30 @@ module ObjectForge
       context "if an attribute is not found" do
         let(:attributes) { { foo: -> { 1 }, bar: 2, baz: -> { foo + bard } } }
 
-        it "raises NameError" do
-          expect { crucible.resolve! }.to raise_error(
-            NameError,
-            # Ruby 3.4 changed initial quote from "`" to "'" in error messages.
-            /\Aundefined local variable or method ['`]bard'/
-          )
+        context "and yard does not contain the missing name" do
+          it "raises NameError" do
+            expect { crucible.resolve! }.to raise_error(
+              NameError,
+              # Ruby 3.4 changed initial quote from "`" to "'" in error messages.
+              /\Aundefined local variable or method ['`]bard'/
+            )
+          end
+        end
+
+        context "and yard contains the missing name" do
+          let(:yard) { { bard: 6 } }
+
+          it "uses value rom the yard instead of raising" do
+            expect(crucible.resolve!).to eq({ foo: 1, bar: 2, baz: 7 })
+          end
+        end
+      end
+
+      context "if attributes and yard have the same key" do
+        let(:yard) { { foo: 99 } }
+
+        it "uses value from attributes" do
+          expect(crucible.resolve!).to eq({ foo: 1, bar: 2, baz: 3 })
         end
       end
 
@@ -159,10 +190,16 @@ module ObjectForge
     end
 
     describe "#respond_to?" do
-      it "returns true if a corresponding key exists" do
+      it "returns true if a corresponding key exists in attributes" do
         key = attributes.keys.sample
         expect(crucible).to respond_to key
         expect(crucible.__send__(key)).to be attributes[key]
+      end
+
+      it "returns true if a corresponding key exists in yard" do
+        key = yard.keys.sample
+        expect(crucible).to respond_to key
+        expect(crucible.__send__(key)).to be yard[key]
       end
 
       it "returns false if a corresponding key does not exist" do
