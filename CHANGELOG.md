@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Next]
 
+[Compare v0.5.0...main](https://github.com/trinistr/object_forge/compare/v0.5.0...main)
+
+## [v0.5.0] — 2026-06-19
+
 **Added**
 - `:attribute_list` option in `Forge`, which is an allowlist of attributes to be passed to the mold.
 - `transient` keyword arguments in `ForgeDSL#attribute` and `ForgeDSL#sequence` which marks an attribute to be excluded from attribute list.
@@ -20,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Molds.mold_for` will now return `Molds::ArrayMold` if relevant.
 - If `:crucible` takes a `:yard` parameter, forge's yard will be passed to it in `Forge#forge`.
 
-[Compare v0.4.1...main](https://github.com/trinistr/object_forge/compare/v0.4.1...main)
+[Compare v0.4.1...v0.5.0](https://github.com/trinistr/object_forge/compare/v0.4.1...v0.5.0)
 
 ## [v0.4.1] — 2026-06-17
 
@@ -120,6 +124,7 @@ Initital implementation.
 [Compare v0.0.0...v0.1.0](https://github.com/trinistr/object_forge/compare/v0.0.0...v0.1.0)
 
 [Next]: https://github.com/trinistr/object_forge/tree/main
+[v0.5.0]: https://github.com/trinistr/object_forge/tree/v0.5.0
 [v0.4.1]: https://github.com/trinistr/object_forge/tree/v0.4.1
 [v0.4.0]: https://github.com/trinistr/object_forge/tree/v0.4.0
 [v0.3.0]: https://github.com/trinistr/object_forge/tree/v0.3.0

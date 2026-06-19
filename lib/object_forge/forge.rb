@@ -151,7 +151,7 @@ module ObjectForge
     # @param crucible [#call]
     # @return [Boolean]
     #
-    # @since <<next>>
+    # @since 0.5.0
     def crucible_takes_yard_parameter?(crucible)
       parameters = (Proc === crucible) ? crucible.parameters : crucible.method(:call).parameters
       parameters.any? do |type, name|
@@ -207,7 +207,7 @@ module ObjectForge
     #
     # @raise [TypeError]
     #
-    # @since <<next>>
+    # @since 0.5.0
     def validate_other_options(options)
       return if options[:attribute_list].nil?
       unless Array === options[:attribute_list] && options[:attribute_list].all? { Symbol === _1 }
@@ -224,7 +224,7 @@ module ObjectForge
     #
     # @raise [ArgumentError]
     #
-    # @since <<next>>
+    # @since 0.5.0
     def build_attribute_hash(traits, overrides)
       apply_attribute_list(resolve_attributes(traits, overrides))
     end
@@ -257,7 +257,7 @@ module ObjectForge
     # @param attributes [Hash{Symbol => Any}]
     # @return [Hash{Symbol => Any}]
     #
-    # @since <<next>>
+    # @since 0.5.0
     def apply_attribute_list(attributes)
       return attributes unless (attribute_list = @parameters.options[:attribute_list])
 

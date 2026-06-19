@@ -5,7 +5,7 @@ module ObjectForge
     # Mold for constructing Arrays.
     #
     # @thread_safety Thread-safe.
-    # @since <<next>>
+    # @since 0.5.0
     class ArrayMold
       # Build a new array from attributes' values.
       #
