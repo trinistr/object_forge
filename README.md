@@ -34,7 +34,6 @@ If you need factory-style object generation without coupling it to Rails, Active
     - [Defining final attribute list](#defining-final-attribute-list)
     - [Molds: configuring object construction](#molds-configuring-object-construction)
     - [After-build customization](#after-build-customization)
-    - [Performance tips](#performance-tips)
 - [Differences and limitations (compared to FactoryBot)](#differences-and-limitations-compared-to-factorybot)
 - [Current and planned features (roadmap)](#current-and-planned-features-roadmap)
 - [Development](#development)
@@ -219,6 +218,14 @@ forgeyard.forge(:dot, :z, id: "0")
   # => #<struct Point id="0", x=0, y=0>
 ```
 
+And the forge can be referenced on its own:
+
+```ruby
+dot_forge = forgeyard[:dot]
+dot_forge.forge
+  # => #<struct Point id="a", x=0.3958959145276243, y=-0.04519596671967796>
+```
+
 Note how the forge isn't registered in the default forgeyard:
 
 ```ruby
@@ -249,9 +256,13 @@ forge.(radius: 500)
   # => #<struct Point id="c", x=-141, y=109>
 ```
 
+> [!TIP]
+>
+> Calling a **Forge** directly, instead of through **Forgeyard**, is faster due to not needing argument forwarding.
+
 ### Association-like nested objects
 
-Nested objects can naturally be constructed in attribute definitions. However, forges belonging to forgeyards provide a more convenient way to refer to their forgeyard in attribute definitions. It is fairly simple to build object graphs by putting related forges in the same `yard`:
+Nested objects can naturally be constructed in attribute definitions. However, forges defined through forgeyards provide a more convenient way to refer to their forgeyard in attribute definitions. It is fairly simple to build object graphs by putting related forges in the same `yard`:
 
 ```ruby
 geometric_yard = ObjectForge::Forgeyard.new
@@ -419,13 +430,6 @@ forge.forge { |rect| RectangleRepository.save(rect); puts "persisted!" }
 >
 > If both hook and block are used, the hook runs before the block. 
 
-### Performance tips
-
-**ObjectForge** is pretty fast for what it is. However, if you are worried, there are certain things that can be done to make it faster.
-
-- Calling a **Forge** directly, instead of through **Forgeyard**, is faster due to not needing argument forwarding. This is consistent (but check on your system anyway!).
-- Using `self[:name]` instead of plain `name` inside attribute definitions does not engage dynamic method dispatch, which *should* be faster. However, micro-benchmarking does not show conclusive results.
-
 ## Differences and limitations (compared to FactoryBot)
 
 If you are used to FactoryBot, be aware that there are quite a few differences in specifics.
@@ -434,16 +438,13 @@ General:
 
 - The user (you) is responsible for loading forge definitions, there are no search paths. If **ObjectForge** is used in tests, it should be enough to add something like `Dir["spec/forges/**/*.rb].each { require _1 }` to your `spec_helper.rb` (or `rails_helper.rb`).
 - `Forgeyard.define` *is* the forge definition block, there is no separate `factory` block.
+- There is no concept of associations, or magic association methods. Forgeyards provide similar functionality, but it is more explicit.
 
 Forge definition:
 
 - Class specification for a forge is non-optional, there is no assumption about the class name.
 - If the DSL block declares a block argument, `self` context is not changed, and DSL methods can't be called with an implicit receiver.
 - There is no forge inheritance or nesting.
-
-Attributes:
-
-- There are no magic associations. Forgeyards provide a similar way to call related forges, but you need to be explicit about it.
 
 Traits:
 
